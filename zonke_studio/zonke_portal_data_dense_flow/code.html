@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ZONKE_SYSTEMS // CLIENT_TERMINAL</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#ffb59f",
+                        "on-secondary-fixed": "#3a0a00",
+                        "surface-bright": "#37393a",
+                        "on-background": "#e2e2e2",
+                        "secondary-container": "#ff571c",
+                        "surface": "#121414",
+                        "tertiary-fixed": "#d2e5f5",
+                        "on-primary": "#283500",
+                        "on-tertiary-container": "#556774",
+                        "on-tertiary-fixed-variant": "#374956",
+                        "on-primary-fixed-variant": "#3c4d00",
+                        "surface-container-highest": "#333535",
+                        "primary-fixed": "#c3f400",
+                        "on-primary-container": "#556d00",
+                        "background": "#121414",
+                        "surface-tint": "#abd600",
+                        "on-primary-fixed": "#161e00",
+                        "inverse-on-surface": "#2f3131",
+                        "surface-container-low": "#1a1c1c",
+                        "on-surface-variant": "#c4c9ac",
+                        "surface-container-lowest": "#0c0f0f",
+                        "on-surface": "#e2e2e2",
+                        "error-container": "#93000a",
+                        "tertiary-container": "#d2e5f5",
+                        "on-tertiary-fixed": "#0b1d29",
+                        "on-error": "#690005",
+                        "on-secondary-container": "#531300",
+                        "tertiary-fixed-dim": "#b6c9d8",
+                        "secondary": "#ffb59f",
+                        "on-tertiary": "#21323e",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed": "#ffdbd0",
+                        "on-secondary-fixed-variant": "#852400",
+                        "inverse-surface": "#e2e2e2",
+                        "surface-container": "#1e2020",
+                        "tertiary": "#ffffff",
+                        "outline": "#8e9379",
+                        "primary-container": "#c3f400",
+                        "on-secondary": "#5e1700",
+                        "primary-fixed-dim": "#abd600",
+                        "surface-container-high": "#282a2b",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#121414",
+                        "inverse-primary": "#506600",
+                        "primary": "#ffffff",
+                        "outline-variant": "#444933",
+                        "surface-variant": "#333535"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "unit": "4px",
+                        "sm": "8px",
+                        "xl": "64px",
+                        "lg": "32px",
+                        "gutter": "24px",
+                        "margin": "40px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["JetBrains Mono"],
+                        "code-snippet": ["JetBrains Mono"],
+                        "body-lg": ["JetBrains Mono"],
+                        "headline-xl": ["JetBrains Mono"],
+                        "headline-md": ["JetBrains Mono"],
+                        "body-sm": ["JetBrains Mono"],
+                        "label-mono": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["72px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "code-snippet": ["14px", { "lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400" }],
+                        "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.primary');
+            background-image: linear-gradient(0deg, transparent 24%, rgba(51, 51, 51, 0.3) 25%, rgba(51, 51, 51, 0.3) 26%, transparent 27%, transparent 74%, rgba(51, 51, 51, 0.3) 75%, rgba(51, 51, 51, 0.3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(51, 51, 51, 0.3) 25%, rgba(51, 51, 51, 0.3) 26%, transparent 27%, transparent 74%, rgba(51, 51, 51, 0.3) 75%, rgba(51, 51, 51, 0.3) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+        .brutalist-border {
+            border: 1px solid theme('colors.surface-variant');
+        }
+        .brutalist-border-primary {
+            border: 2px solid theme('colors.primary');
+        }
+        .brutalist-border-accent {
+            border: 2px solid theme('colors.primary-fixed');
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row font-body-sm text-body-sm selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Sidebar Navigation -->
+<aside class="w-full md:w-64 bg-surface-container-lowest border-b md:border-b-0 md:border-r border-surface-variant flex flex-col h-auto md:h-screen sticky top-0 z-40 shrink-0">
+<div class="p-gutter border-b border-surface-variant flex items-center justify-between md:justify-start">
+<span class="font-headline-md text-headline-md font-black tracking-tighter text-primary">ZONKE_AI</span>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<nav class="flex-1 p-md hidden md:flex flex-col gap-unit">
+<a class="font-label-mono text-label-mono text-primary-fixed border border-primary-fixed bg-surface-container-low px-md py-sm flex items-center gap-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                [ COMMAND_CENTER ]
+            </a>
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+                PROTOCOL
+            </a>
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="#">
+<span class="material-symbols-outlined">folder_special</span>
+                RESOURCES
+            </a>
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+                LOGS
+            </a>
+</nav>
+<div class="p-md border-t border-surface-variant hidden md:block">
+<div class="font-label-mono text-label-mono text-on-surface-variant mb-sm">SYS_STATUS: <span class="text-primary-fixed animate-pulse">ONLINE</span></div>
+<div class="text-xs text-surface-variant font-code-snippet">USER: ROOT // UID: 9021</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col h-screen overflow-y-auto">
+<!-- Top App Bar (Mobile) / Header Area (Desktop) -->
+<header class="p-gutter border-b border-surface-variant flex justify-between items-center bg-surface bg-opacity-90 backdrop-blur-sm sticky top-0 z-30">
+<div>
+<h1 class="font-headline-xl text-headline-xl text-primary">NODE_COMMAND</h1>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant mt-xs">&gt; INITIALIZING SESSION SECURE CONNECTION...</p>
+</div>
+<button class="bg-primary-fixed text-on-primary-fixed font-label-mono text-label-mono px-gutter py-md uppercase hover:bg-primary transition-colors brutalist-border-accent flex items-center gap-sm">
+<span class="material-symbols-outlined">calendar_month</span>
+                BOOK_CONSULT_
+            </button>
+</header>
+<div class="p-margin flex flex-col xl:flex-row gap-lg max-w-[1920px] mx-auto w-full flex-1">
+<!-- Left Side: Complex Gantt (60%) -->
+<div class="w-full xl:w-[60%] flex flex-col gap-md">
+<section class="bg-surface-container brutalist-border p-md relative flex-1 flex flex-col">
+<div class="absolute -top-3 left-md bg-surface px-sm font-label-mono text-label-mono text-primary-fixed border border-surface-variant">
+                        [ NEURAL_TIMELINE ]
+                    </div>
+<div class="mt-md flex-1 overflow-y-auto">
+<div class="grid grid-cols-12 gap-x-sm border-b border-surface-variant pb-sm mb-sm text-on-surface-variant font-label-mono text-[10px]">
+<div class="col-span-3">NODE_ID</div>
+<div class="col-span-9 flex justify-between">
+<span>T-0</span>
+<span>T-1</span>
+<span>T-2</span>
+<span>T-3</span>
+<span>T-4</span>
+<span>T-5</span>
+</div>
+</div>
+<div class="space-y-sm">
+<!-- Gantt Item 1 -->
+<div class="grid grid-cols-12 gap-sm items-center hover:bg-surface-container-low transition-colors p-1">
+<div class="col-span-3 font-code-snippet text-code-snippet text-primary truncate text-xs">ALPHA_NODE_01</div>
+<div class="col-span-9 bg-surface-container-lowest h-4 brutalist-border relative overflow-hidden">
+<div class="h-full bg-primary-fixed w-[85%] absolute left-0 flex items-center px-sm"></div>
+<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none opacity-20" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, #000 5px, #000 10px);"></div>
+</div>
+</div>
+<!-- Gantt Item 2 -->
+<div class="grid grid-cols-12 gap-sm items-center hover:bg-surface-container-low transition-colors p-1">
+<div class="col-span-3 font-code-snippet text-code-snippet text-primary truncate text-xs">BETA_EXTRACT_02</div>
+<div class="col-span-9 bg-surface-container-lowest h-4 brutalist-border relative overflow-hidden">
+<div class="h-full bg-surface-variant w-[45%] absolute left-[10%] flex items-center px-sm"></div>
+</div>
+</div>
+<!-- Gantt Item 3 -->
+<div class="grid grid-cols-12 gap-sm items-center hover:bg-surface-container-low transition-colors p-1">
+<div class="col-span-3 font-code-snippet text-code-snippet text-primary truncate text-xs">GAMMA_SYNC_03</div>
+<div class="col-span-9 bg-surface-container-lowest h-4 brutalist-border relative overflow-hidden">
+<div class="h-full bg-primary-fixed w-[60%] absolute left-[30%] flex items-center px-sm"></div>
+<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none opacity-20" style="background-image: repeating-linear-gradient(-45deg, transparent, transparent 5px, #000 5px, #000 10px);"></div>
+</div>
+</div>
+<!-- Gantt Item 4 -->
+<div class="grid grid-cols-12 gap-sm items-center hover:bg-surface-container-low transition-colors p-1">
+<div class="col-span-3 font-code-snippet text-code-snippet text-primary truncate text-xs">DELTA_NODE_04</div>
+<div class="col-span-9 bg-surface-container-lowest h-4 brutalist-border relative overflow-hidden">
+<div class="h-full border border-primary-fixed w-[25%] absolute left-[55%] flex items-center px-sm"></div>
+</div>
+</div>
+<!-- Gantt Item 5 -->
+<div class="grid grid-cols-12 gap-sm items-center hover:bg-surface-container-low transition-colors p-1">
+<div class="col-span-3 font-code-snippet text-code-snippet text-error truncate text-xs">EPSILON_CRIT_05</div>
+<div class="col-span-9 bg-surface-container-lowest h-4 brutalist-border relative overflow-hidden">
+<div class="h-full bg-error w-[15%] absolute left-[75%] flex items-center px-sm animate-pulse"></div>
+</div>
+</div>
+<!-- Gantt Item 6 -->
+<div class="grid grid-cols-12 gap-sm items-center hover:bg-surface-container-low transition-colors p-1">
+<div class="col-span-3 font-code-snippet text-code-snippet text-primary truncate text-xs">ZETA_NODE_06</div>
+<div class="col-span-9 bg-surface-container-lowest h-4 brutalist-border relative overflow-hidden">
+<div class="h-full bg-surface-variant w-[80%] absolute left-[20%] flex items-center px-sm"></div>
+</div>
+</div>
+<!-- Gantt Item 7 -->
+<div class="grid grid-cols-12 gap-sm items-center hover:bg-surface-container-low transition-colors p-1">
+<div class="col-span-3 font-code-snippet text-code-snippet text-primary truncate text-xs">ETA_SYNC_07</div>
+<div class="col-span-9 bg-surface-container-lowest h-4 brutalist-border relative overflow-hidden">
+<div class="h-full border border-surface-variant w-[40%] absolute left-[5%] flex items-center px-sm"></div>
+</div>
+</div>
+<!-- Gantt Item 8 -->
+<div class="grid grid-cols-12 gap-sm items-center hover:bg-surface-container-low transition-colors p-1">
+<div class="col-span-3 font-code-snippet text-code-snippet text-primary truncate text-xs">THETA_EXTRACT_08</div>
+<div class="col-span-9 bg-surface-container-lowest h-4 brutalist-border relative overflow-hidden">
+<div class="h-full bg-primary-fixed w-[50%] absolute left-[45%] flex items-center px-sm"></div>
+<div class="absolute top-0 bottom-0 left-0 right-0 pointer-events-none opacity-20" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, #000 5px, #000 10px);"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="bg-surface-container brutalist-border p-sm flex items-center gap-md">
+<div class="h-32 w-32 shrink-0 bg-surface border border-surface-variant p-1">
+<img alt="Low poly wireframe render of a neural node" class="w-full h-full object-cover opacity-80 mix-blend-screen grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzYpEYW9bc9hA4OCY7JL_wbZQ29qVrkBBsAyNXD9Cpr-IWYD5Zp2OJIyF3tJJSm2QG-NPmH-o8IMbxAdlnqqmy5wuwCiF1cCxg4tHDQBm90ZHGOYfpI0bBO9733_O3TEfYgIaSWeMW4JqHh60VYeuM75RAGUSsDv9XWllanBPeUeK_oagiX5qj2G4XjgBOj6yqLIkGEt2--gsAmmqvrfjc3_PY9tJNCe8q-WscUa2AU2FoX0TNq4Gd7T_nc1SxjnFDkfeUEnXrCjrz"/>
+</div>
+<div class="flex-1">
+<h3 class="font-label-mono text-primary-fixed mb-xs">NODE_SCHEMATIC_VIEW</h3>
+<p class="font-code-snippet text-xs text-on-surface-variant">Blueprint rendering of the current active neural node cluster. Extraction protocols are nominal.</p>
+</div>
+</div>
+</div>
+<!-- Right Side: Stacked Budgets & Logs (40%) -->
+<div class="w-full xl:w-[40%] flex flex-col gap-md">
+<!-- Budget Command -->
+<div class="flex flex-col gap-md">
+<!-- Card 1 -->
+<div class="bg-surface-container brutalist-border p-md flex flex-col gap-md relative group hover:border-primary transition-colors">
+<div class="font-label-mono text-label-mono text-on-surface-variant">[ NODE_ALLOCATION ]</div>
+<div class="font-headline-md text-headline-md text-primary">$12,400<span class="text-body-sm text-surface-variant">/mo</span></div>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant text-sm">Baseline operational metrics aligned.</p>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container brutalist-border-accent p-md flex flex-col gap-md relative shadow-[4px_4px_0px_0px_#c3f400]">
+<div class="absolute -top-3 right-md bg-primary-fixed px-sm font-label-mono text-label-mono text-on-primary-fixed">
+                            OPTIMAL_EXTRACTION
+                        </div>
+<div class="font-label-mono text-label-mono text-primary-fixed">[ HIGH_YIELD_NODE ]</div>
+<div class="font-headline-md text-headline-md text-primary">$24,800<span class="text-body-sm text-surface-variant">/mo</span></div>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant text-sm">Enhanced computational bandwidth.</p>
+<button class="mt-2 bg-primary-fixed text-on-primary-fixed font-label-mono text-label-mono py-xs uppercase hover:bg-primary transition-colors text-xs">
+                            UPGRADE_PROTOCOL
+                        </button>
+</div>
+</div>
+<!-- Extraction Logs -->
+<section class="bg-surface-container brutalist-border p-md flex-1 overflow-y-auto">
+<div class="font-label-mono text-label-mono text-primary mb-md pb-xs border-b border-surface-variant flex justify-between">
+<span>&gt; EXTRACTION_LOGS</span>
+<span class="text-on-surface-variant">NODE v2.1</span>
+</div>
+<ul class="font-code-snippet text-code-snippet space-y-sm text-sm">
+<li class="flex items-start gap-sm text-on-surface-variant hover:text-primary-fixed transition-colors cursor-crosshair">
+<span class="w-16 shrink-0 text-surface-variant">10:42</span>
+<span class="material-symbols-outlined text-xs mt-1">memory</span>
+<span class="flex-1">NEURAL_NODE_ALPHA: Sync complete. Yield +12%</span>
+</li>
+<li class="flex items-start gap-sm text-on-surface-variant hover:text-primary-fixed transition-colors cursor-crosshair">
+<span class="w-16 shrink-0 text-surface-variant">10:38</span>
+<span class="material-symbols-outlined text-xs mt-1">download</span>
+<span class="flex-1">DATA_EXTRACTION: Block 0x8F9A retrieved successfully.</span>
+</li>
+<li class="flex items-start gap-sm text-error hover:text-primary-fixed transition-colors cursor-crosshair">
+<span class="w-16 shrink-0 text-surface-variant">10:15</span>
+<span class="material-symbols-outlined text-xs mt-1">warning</span>
+<span class="flex-1">NODE_BETA_FAIL: Thermal limits exceeded. Throttling...</span>
+</li>
+<li class="flex items-start gap-sm text-on-surface-variant hover:text-primary-fixed transition-colors cursor-crosshair">
+<span class="w-16 shrink-0 text-surface-variant">09:55</span>
+<span class="material-symbols-outlined text-xs mt-1">settings_backup_restore</span>
+<span class="flex-1">SYS_RESTORE: Reverting to stable node configuration.</span>
+</li>
+<li class="flex items-start gap-sm text-on-surface-variant hover:text-primary-fixed transition-colors cursor-crosshair">
+<span class="w-16 shrink-0 text-surface-variant">09:30</span>
+<span class="material-symbols-outlined text-xs mt-1">memory</span>
+<span class="flex-1">NEURAL_NODE_GAMMA: Initializing connection protocol.</span>
+</li>
+</ul>
+</section>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto border-t-2 border-primary bg-surface-container-lowest w-full py-xl flex flex-col md:flex-row justify-between items-center px-margin gap-md">
+<div class="font-terminal-log text-terminal-log text-primary">
+                ©2024 ZONKE_SYSTEMS [HUMAN_OBSOLETE_ARCH]
+            </div>
+<div class="flex gap-md font-label-mono text-label-mono">
+<a class="text-outline hover:text-primary transition-all duration-75" href="#">TERMINAL_ACCESS</a>
+<a class="text-outline hover:text-primary transition-all duration-75" href="#">DATA_PRIVACY</a>
+<a class="text-outline hover:text-primary transition-all duration-75" href="#">SYSTEM_STATUS</a>
+</div>
+</footer>
+</main>
+</body></html>

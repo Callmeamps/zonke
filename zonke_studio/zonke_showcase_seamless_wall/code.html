@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ZONKE_AI // SHOWCASE_CANVAS</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for brutalist feel */
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #121414; border-left: 1px solid #333535; }
+        ::-webkit-scrollbar-thumb { background: #333535; border: 1px solid #121414; }
+        ::-webkit-scrollbar-thumb:hover { background: #c3f400; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#c3f400",
+                        "tertiary": "#ffffff",
+                        "outline": "#8e9379",
+                        "surface-container": "#1e2020",
+                        "on-secondary-fixed-variant": "#852400",
+                        "inverse-surface": "#e2e2e2",
+                        "secondary-fixed": "#ffdbd0",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#333535",
+                        "outline-variant": "#444933",
+                        "primary": "#ffffff",
+                        "inverse-primary": "#506600",
+                        "surface-container-high": "#282a2b",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#121414",
+                        "primary-fixed-dim": "#abd600",
+                        "on-secondary": "#5e1700",
+                        "surface-container-highest": "#333535",
+                        "primary-fixed": "#c3f400",
+                        "on-primary-container": "#556d00",
+                        "on-tertiary-container": "#556774",
+                        "on-tertiary-fixed-variant": "#374956",
+                        "on-primary-fixed-variant": "#3c4d00",
+                        "tertiary-fixed": "#d2e5f5",
+                        "on-primary": "#283500",
+                        "secondary-container": "#ff571c",
+                        "surface": "#121414",
+                        "surface-bright": "#37393a",
+                        "on-background": "#e2e2e2",
+                        "on-secondary-fixed": "#3a0a00",
+                        "secondary-fixed-dim": "#ffb59f",
+                        "tertiary-fixed-dim": "#b6c9d8",
+                        "secondary": "#ffb59f",
+                        "on-tertiary": "#21323e",
+                        "on-secondary-container": "#531300",
+                        "tertiary-container": "#d2e5f5",
+                        "on-tertiary-fixed": "#0b1d29",
+                        "on-error": "#690005",
+                        "on-surface-variant": "#c4c9ac",
+                        "surface-container-lowest": "#0c0f0f",
+                        "on-surface": "#e2e2e2",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1a1c1c",
+                        "on-primary-fixed": "#161e00",
+                        "inverse-on-surface": "#2f3131",
+                        "background": "#121414",
+                        "surface-tint": "#abd600"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "lg": "32px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "sm": "8px",
+                        "margin": "40px",
+                        "md": "16px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["JetBrains Mono"],
+                        "headline-md": ["JetBrains Mono"],
+                        "body-sm": ["JetBrains Mono"],
+                        "code-snippet": ["JetBrains Mono"],
+                        "body-lg": ["JetBrains Mono"],
+                        "display-lg": ["JetBrains Mono"],
+                        "headline-xl": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400" }],
+                        "code-snippet": ["14px", { "lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "display-lg": ["72px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen selection:bg-primary-container selection:text-surface-dim">
+<!-- Global Scanline Texture Overlay (CSS Gradient instead of base64) -->
+<div class="fixed inset-0 pointer-events-none z-[100] bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100%_4px] mix-blend-overlay"></div>
+<!-- Stripped TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-surface-variant bg-surface flex justify-between items-center px-margin h-16 max-w-[1920px] mx-auto">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<span class="font-headline-md text-headline-md font-black tracking-tighter text-primary">ZONKE_AI</span>
+</div>
+<div class="font-label-mono text-label-mono text-on-surface-variant border border-surface-variant px-sm py-xs bg-surface-container">
+            [ SHOWCASE_MODE : ACTIVE ]
+        </div>
+</header>
+<!-- Fixed Canvas Masonry Grid -->
+<main class="pt-16 max-w-[1920px] mx-auto border-x border-surface-variant bg-surface">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-[400px] gap-0 border-b border-surface-variant relative">
+<!-- Grid Lines Overlay (Vertical) -->
+<div class="absolute inset-y-0 left-1/4 border-l border-surface-variant hidden xl:block pointer-events-none z-10"></div>
+<div class="absolute inset-y-0 left-1/2 border-l border-surface-variant hidden md:block pointer-events-none z-10"></div>
+<div class="absolute inset-y-0 left-3/4 border-l border-surface-variant hidden lg:block pointer-events-none z-10"></div>
+<!-- Card 01 : 2x2 Span -->
+<article class="group relative col-span-1 md:col-span-2 row-span-2 overflow-hidden border-b border-surface-variant bg-surface-container border-r xl:border-r-0 cursor-crosshair">
+<div class="absolute inset-0 bg-cover bg-center grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-75" data-alt="A massive, complex microchip architecture viewed under high magnification. The intricate metallic traces form a dense cityscape of technology. Lit by harsh, cold directional light with stark black shadows. The color palette is heavily desaturated with intense, aggressive lime green highlights reflecting off the silicon. Industrial, brutalist, and highly technical." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBcXQA_FQEpVTfRzY4A4aO-vvIPSkn-fZL0z7O3dKT6UkMy5xuaIcUbLQeTyCEp8YHYGoGszvCkQdWalb7YY6uVSZeIwZpl6LCScn_I0mphLimitkYnSstJyOyHCNpSPOygkfSLsJKHdBEXk_-_GsYLuxUu7cqBdU5lqhjnxDTQ1CAhkhHhFQhf5e7SB1Nhkzu8kkZtULgp0q-ghFLXyFm-ZgOHOKT2sjnZugzvgO1FjAWfOa_OCDAXK733JGCXpKZ8gzPvjLthSozc');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent group-hover:bg-surface/20 transition-colors duration-75"></div>
+<!-- Technical Overlays -->
+<div class="absolute top-md left-md border border-surface-variant px-sm py-xs font-label-mono text-label-mono text-primary-container bg-surface flex items-center gap-xs">
+<span class="w-2 h-2 bg-primary-container animate-pulse"></span>
+                    CORE_NODE_ALPHA
+                </div>
+<!-- Content & CTA -->
+<div class="absolute inset-x-margin bottom-margin z-20 translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-150 ease-out flex flex-col gap-md items-start">
+<div class="bg-surface border-l-4 border-primary-container p-sm inline-block">
+<h2 class="font-headline-xl text-headline-xl text-primary m-0 leading-none">NEURAL_ENGINE</h2>
+</div>
+<p class="font-body-lg text-body-lg text-inverse-surface bg-surface-container/90 border border-surface-variant p-md max-w-lg">
+                        High-capacity localized processing unit. Designed for hostile data environments. Bypasses standard latency constraints.
+                    </p>
+<button class="mt-sm bg-primary-container text-surface-dim border-2 border-primary-container font-label-mono text-label-mono px-lg py-md uppercase font-bold tracking-[0.2em] hover:bg-transparent hover:text-primary-container transition-colors flex items-center gap-sm">
+                        I WANT THIS <span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+</article>
+<!-- Card 02 : 1x1 Span -->
+<article class="group relative col-span-1 row-span-1 overflow-hidden border-b border-surface-variant bg-surface border-r xl:border-r-0 cursor-crosshair">
+<div class="absolute inset-0 bg-cover bg-center grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-75" data-alt="A glowing neon server rack isolated in a pitch-black brutalist concrete bunker. Thick, heavy black power cables snake across the rough floor. The lighting is extremely high contrast, dominated by deep shadows and piercing electric lime green status lights. The aesthetic is raw, underground, and aggressively technical." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB06yU8W1n4HV_R7Lnq2FJ9rYDqNjc4BdGm8MZaV-ZxUPi0VSu_ZU3YVWA_zHaASr9U5hSi8UiHpzLCg0-IdZtosXpgUy7TOd92lu7D1SZ81nqER97ZNQAOEXrHMtZW5J8VTmnRBPbw8jzF7shEYayjEGx-MtfnoaIXC55RDyhSn86nJBJxf6HkPSwC_MD3BFmqGKUtslh4MGSOxdzr4etxqaj8J0yFlvlAvNrTVNuQx126TQZ1XbFaRcdwrJG01MHhEtTKPk8kKa98');"></div>
+<div class="absolute inset-0 bg-surface/60 group-hover:bg-transparent transition-colors duration-75"></div>
+<div class="absolute top-sm right-sm font-label-mono text-label-mono text-on-surface-variant">
+                    [ ID: 884 ]
+                </div>
+<div class="absolute inset-0 p-margin flex flex-col justify-end z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-gradient-to-t from-surface via-surface/90 to-transparent">
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">DATA_TETHER</h3>
+<button class="bg-primary-container text-surface-dim font-label-mono text-label-mono px-md py-sm w-full text-center uppercase font-bold hover:bg-primary transition-colors">
+                        I WANT THIS
+                    </button>
+</div>
+</article>
+<!-- Card 03 : 1x2 Span -->
+<article class="group relative col-span-1 row-span-2 overflow-hidden border-b border-surface-variant bg-surface-container border-r xl:border-r-0 cursor-crosshair">
+<div class="absolute inset-0 bg-cover bg-center grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-75" data-alt="An abstract, heavy industrial metal structure resembling a futuristic communications tower. The metal is dark, scratched, and heavily textured. Shot from a low angle looking up into a dark, starless sky. Accented with severe, straight geometric lines and singular bright lime green laser beam cutting through the darkness. Guerrilla tech vibe." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAZwwhnHFRFMmNqs4kuCCCbTkj8iTJawCMETK0wldxI8wyki2AUpViOFWQhUL45h7QvbzptOyaVmPwFd2zrmjrgQv55JJ0flE1HCwL2VbHpZMWIiVuYSYYUD_XYCPHM5qVZPptRJTY0AozRSuEUfeg7NNPVuMdQNqnXXWONMVTPwwQywfJEkXYeBxW8R8toJUL1d7P7To4g5QSOG56kz3WfHSP5mGZRshMqMXlsNuCC5M72MybqNWXIMdzpy0nKeOPKPGEpTZJqICHo');"></div>
+<div class="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-surface to-transparent pointer-events-none"></div>
+<div class="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-surface to-transparent pointer-events-none"></div>
+<div class="absolute inset-x-md top-md flex justify-between items-start">
+<span class="font-label-mono text-label-mono text-surface bg-primary-container px-xs py-1">CRITICAL</span>
+<span class="material-symbols-outlined text-outline">satellite_alt</span>
+</div>
+<div class="absolute inset-x-md bottom-md z-20 flex flex-col gap-sm opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-150">
+<h3 class="font-headline-md text-headline-md text-primary bg-surface inline-block border border-surface-variant px-sm">UPLINK_ARRAY</h3>
+<button class="bg-primary-container text-surface-dim font-label-mono text-label-mono px-md py-md uppercase font-bold hover:bg-primary transition-colors flex justify-center items-center gap-xs">
+                        I WANT THIS <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+</button>
+</div>
+</article>
+<!-- Card 04 : 1x1 Span -->
+<article class="group relative col-span-1 row-span-1 overflow-hidden border-b border-surface-variant bg-surface border-r xl:border-r-0 cursor-crosshair flex items-center justify-center p-lg">
+<!-- Text only card for pacing -->
+<div class="w-full h-full border border-surface-variant bg-surface-container flex flex-col justify-between p-md relative overflow-hidden">
+<div class="absolute -right-10 -bottom-10 opacity-10">
+<span class="material-symbols-outlined" style="font-size: 160px; font-variation-settings: 'FILL' 1;">deployed_code</span>
+</div>
+<div class="font-label-mono text-label-mono text-primary-container">SYS_LOG</div>
+<div class="z-10 transition-transform duration-100 group-hover:-translate-y-2">
+<h3 class="font-headline-md text-headline-md text-primary mb-xs">FRAMEWORK_V2</h3>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant max-w-[200px]">Initializes baseline parameters for unstructured data sets.</p>
+</div>
+<div class="absolute inset-x-0 bottom-0 p-md translate-y-full group-hover:translate-y-0 transition-transform duration-100 bg-surface border-t border-surface-variant">
+<button class="w-full bg-primary-container text-surface-dim font-label-mono text-label-mono px-sm py-sm uppercase font-bold hover:bg-primary transition-colors">
+                            I WANT THIS
+                        </button>
+</div>
+</div>
+</article>
+<!-- Card 05 : 2x1 Span -->
+<article class="group relative col-span-1 md:col-span-2 row-span-1 overflow-hidden border-b border-surface-variant bg-surface cursor-crosshair border-r lg:border-r-0">
+<div class="absolute inset-0 bg-cover bg-center grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-70 transition-all duration-75" data-alt="A close-up of pure digital noise and encrypted code scrolling down a black terminal screen. The text is sharp and mechanical. A thick overlay of a brutalist, dirty window pane creates harsh reflections. The only color present is a stark, radioactive lime green bleeding from the edges of the digital text. High technical density." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCbDczkP4IGPce9OOTADzryrgJwvRrNuUFfKuEP7kEuurWNfXLlsqM9NCxqjO03fiQJ-MTbZ4d6eBs9j93Kafs_Jsg-4xxZ78zou4NMkFTrKEBwNswWfOWB80XpgN8J9ENeP-x344lz8uh7FCJMb_FM-72fdQ9Z9ucionwIuwku_xZXv0mAEEfxxV13d_mzBTOy2KgMrESUHnE1LriS_ZmFY_6puV4km8T8v6SOSPV5t7sjqPZxHzxK3zDvVCku8JsUcTj4cNjCqXK3');"></div>
+<div class="absolute inset-0 bg-surface/70 group-hover:bg-surface/30 transition-colors duration-75"></div>
+<div class="absolute inset-0 flex flex-col md:flex-row items-end md:items-center justify-between p-margin z-20">
+<div class="w-full md:w-auto">
+<div class="font-label-mono text-label-mono text-outline mb-xs">[ PROTOCOL_ENGAGED ]</div>
+<h2 class="font-headline-xl text-headline-xl text-primary drop-shadow-[2px_2px_0px_rgba(51,53,53,1)]">ZERO_TRUST_NET</h2>
+</div>
+<div class="w-full md:w-auto mt-md md:mt-0 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-150">
+<button class="bg-primary-container text-surface-dim font-label-mono text-label-mono px-xl py-lg uppercase font-bold tracking-widest hover:bg-primary transition-colors border-2 border-transparent hover:border-surface shadow-[4px_4px_0px_#333535]">
+                            I WANT THIS
+                        </button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Minimal Footer -->
+<footer class="bg-surface-container-lowest border-t-2 border-primary-container w-full py-xl px-margin flex flex-col md:flex-row justify-between items-center gap-md max-w-[1920px] mx-auto relative z-50">
+<div class="font-terminal-log text-terminal-log text-primary-container font-bold tracking-widest">
+            ©2024 ZONKE_SYSTEMS [HUMAN_OBSOLETE_ARCH]
+        </div>
+<div class="flex gap-lg">
+<a class="font-label-mono text-label-mono text-outline hover:text-primary-container transition-colors duration-75" href="#">TERMINAL_ACCESS</a>
+<a class="font-label-mono text-label-mono text-outline hover:text-primary-container transition-colors duration-75" href="#">DATA_PRIVACY</a>
+<a class="font-label-mono text-label-mono text-outline hover:text-primary-container transition-colors duration-75" href="#">SYSTEM_STATUS</a>
+</div>
+</footer>
+</body></html>

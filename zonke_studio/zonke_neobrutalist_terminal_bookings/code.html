@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ZONKE_AI | AGENCY MIGRATION</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#556774",
+                        "on-tertiary-fixed-variant": "#374956",
+                        "on-primary-fixed-variant": "#3c4d00",
+                        "surface-container-highest": "#333535",
+                        "primary-fixed": "#c3f400",
+                        "on-primary-container": "#556d00",
+                        "secondary-container": "#ff571c",
+                        "surface": "#121414",
+                        "tertiary-fixed": "#d2e5f5",
+                        "on-primary": "#283500",
+                        "surface-bright": "#37393a",
+                        "on-background": "#e2e2e2",
+                        "secondary-fixed-dim": "#ffb59f",
+                        "on-secondary-fixed": "#3a0a00",
+                        "on-secondary-container": "#531300",
+                        "tertiary-fixed-dim": "#b6c9d8",
+                        "secondary": "#ffb59f",
+                        "on-tertiary": "#21323e",
+                        "tertiary-container": "#d2e5f5",
+                        "on-tertiary-fixed": "#0b1d29",
+                        "on-error": "#690005",
+                        "surface-container-low": "#1a1c1c",
+                        "on-surface-variant": "#c4c9ac",
+                        "surface-container-lowest": "#0c0f0f",
+                        "on-surface": "#e2e2e2",
+                        "error-container": "#93000a",
+                        "background": "#121414",
+                        "surface-tint": "#c3f400",
+                        "on-primary-fixed": "#161e00",
+                        "inverse-on-surface": "#2f3131",
+                        "primary-container": "#c3f400",
+                        "surface-container": "#1e2020",
+                        "tertiary": "#ffffff",
+                        "outline": "#8e9379",
+                        "secondary-fixed": "#ffdbd0",
+                        "on-secondary-fixed-variant": "#852400",
+                        "inverse-surface": "#e2e2e2",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#333535",
+                        "primary": "#c3f400",
+                        "outline-variant": "#444933",
+                        "surface-container-high": "#282a2b",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#121414",
+                        "inverse-primary": "#506600",
+                        "on-secondary": "#5e1700",
+                        "primary-fixed-dim": "#abd600"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "lg": "32px",
+                        "unit": "4px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "margin": "40px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["JetBrains Mono"],
+                        "body-sm": ["JetBrains Mono"],
+                        "label-mono": ["JetBrains Mono"],
+                        "display-lg": ["JetBrains Mono"],
+                        "code-snippet": ["JetBrains Mono"],
+                        "body-lg": ["JetBrains Mono"],
+                        "headline-xl": ["JetBrains Mono"],
+                        "terminal-log": ["JetBrains Mono"],
+                        "label-mono-sm": ["JetBrains Mono"],
+                        "body-md": ["JetBrains Mono"],
+                        "headline-lg": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "terminal-log": ["13px", {"lineHeight": "140%", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "headline-xl": ["64px", {"lineHeight": "100%", "letterSpacing": "-0.04em", "fontWeight": "900"}],
+                        "body-md": ["14px", {"lineHeight": "150%", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "150%", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "headline-lg": ["48px", {"lineHeight": "110%", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-mono-sm": ["12px", {"lineHeight": "120%", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "120%", "letterSpacing": "0em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #121414;
+            color: #e2e2e2;
+            background-image: 
+                linear-gradient(rgba(20, 20, 20, 0.9), rgba(20, 20, 20, 0.9)),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(195, 244, 0, 0.03) 2px, rgba(195, 244, 0, 0.03) 4px);
+        }
+        .neo-brutalist-card {
+            background-color: #1a1c1c;
+            border: 2px solid #8e9379;
+            box-shadow: 6px 6px 0px 0px #8e9379;
+            position: relative;
+        }
+        .neo-brutalist-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(195, 244, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(195, 244, 0, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .neo-brutalist-card > * {
+            position: relative;
+            z-index: 1;
+        }
+        .neo-brutalist-primary {
+            border: 2px solid #c3f400;
+            box-shadow: 6px 6px 0px 0px #c3f400;
+        }
+        .neo-brutalist-button {
+            border: 2px solid #c3f400;
+            box-shadow: 4px 4px 0px 0px #c3f400;
+            transition: all 0.1s ease;
+        }
+        .neo-brutalist-button:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px #c3f400;
+        }
+        .neo-brutalist-button-alt {
+            border: 2px solid #8e9379;
+            box-shadow: 4px 4px 0px 0px #8e9379;
+            transition: all 0.1s ease;
+        }
+        .neo-brutalist-button-alt:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px #8e9379;
+        }
+        .neo-brutalist-warning {
+            border: 2px solid #ff571c;
+            box-shadow: 4px 4px 0px 0px #ff571c;
+        }
+        .glitch-hover:hover { 
+            background-color: #c3f400; 
+            color: #121414; 
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1a1c1c; border-left: 2px solid #444933; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c3f400; border: 2px solid #1a1c1c; }
+        
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col md:flex-row font-body-lg">
+<div class="scanline"></div>
+<!-- Sidebar Navigation -->
+<aside class="w-full md:w-64 md:h-screen md:fixed left-0 top-0 bg-surface-container-low border-b md:border-b-0 md:border-r-2 border-outline z-50 flex flex-col p-lg neo-brutalist-card">
+<div class="font-headline-md text-headline-md font-black tracking-tighter text-primary mb-xl bg-surface-container-highest inline-block px-sm py-xs border-2 border-primary w-fit">
+            ZONKE_AI
+        </div>
+<nav class="flex flex-col gap-md flex-grow font-terminal-log">
+<a class="text-on-surface font-medium hover:bg-primary hover:text-surface transition-colors duration-100 px-md py-sm border-2 border-outline hover:border-primary uppercase" href="#">[PROTOCOL]</a>
+<a class="text-on-surface font-medium hover:bg-primary hover:text-surface transition-colors duration-100 px-md py-sm border-2 border-outline hover:border-primary uppercase" href="#">[RESOURCES]</a>
+<a class="text-surface font-bold border-2 border-primary bg-primary px-md py-sm uppercase shadow-[4px_4px_0px_0px_#444933]" href="#">&gt; LOGS_</a>
+</nav>
+<div class="mt-xl">
+<button class="w-full font-terminal-log text-terminal-log text-primary bg-surface neo-brutalist-button px-md py-sm glitch-hover transition-all text-left uppercase font-bold">
+                BOOK_CONSULT_
+            </button>
+<div class="mt-md font-terminal-log text-[10px] text-primary bg-surface-container-high p-sm border border-outline-variant">
+                &gt; SYS.ID: ARCH_PRIME<br/>
+                &gt; AUTH: GRANTED<br/>
+                &gt; STATUS: ONLINE
+            </div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col md:ml-64 w-full">
+<div class="max-w-[1200px] w-full mx-auto px-margin py-xl flex flex-col gap-xl">
+<!-- Hero Section -->
+<section class="neo-brutalist-card p-lg flex flex-col lg:flex-row gap-lg items-start relative mt-md">
+<div class="absolute -top-4 -right-4 p-xs px-sm border-2 border-primary font-terminal-log text-terminal-log text-surface bg-primary shadow-[4px_4px_0px_0px_#444933] font-bold z-20">
+                    SYS.VER_9.4.2 [SECURE]
+                </div>
+<div class="flex-1 flex flex-col gap-md z-10">
+<div class="inline-flex items-center gap-sm font-label-mono-sm text-label-mono-sm text-primary bg-surface-container-highest px-sm py-xs border border-primary w-fit">
+<span class="material-symbols-outlined" style="font-size: 16px;">terminal</span>
+<span>// DIRECTIVE: UPGRADE_</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface uppercase max-w-4xl leading-none mt-sm">
+                        EVOLVE YOUR AGENCY.<br/>CLAIM YOUR SECTOR.
+                    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-md border-l-4 border-primary pl-md bg-surface p-md">
+                        Initiate seamless CRM extraction protocols. Deploy neural networks to map high-value leads. Obsolete manual workflows and establish total operational dominance in your real estate sector.
+                    </p>
+<div class="mt-lg flex flex-wrap gap-lg">
+<button class="bg-primary text-surface font-terminal-log text-terminal-log px-lg py-md neo-brutalist-button font-bold tracking-widest uppercase hover:bg-white transition-colors">
+                            COMMENCE_EXTRACTION_
+                        </button>
+<button class="bg-surface text-on-surface font-terminal-log text-terminal-log px-lg py-md neo-brutalist-button-alt uppercase hover:bg-surface-container-high transition-colors">
+                            VIEW_DATA_STREAM_
+                        </button>
+</div>
+</div>
+<div class="flex-1 w-full relative min-h-[400px] border-2 border-outline bg-surface-container p-sm neo-brutalist-card">
+<div class="absolute -top-3 -left-3 bg-secondary-container text-surface font-terminal-log text-[10px] px-2 py-1 font-bold z-20 border-2 border-outline shadow-[2px_2px_0px_0px_#8e9379]">
+                        DATA_VIZ_MODULE
+                    </div>
+<div class="w-full h-full bg-surface relative overflow-hidden border-2 border-outline" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAQwWeN5hT7yQdT0jHuO5Omv8LjGWea1GalMEYhsULoXuwe-kXVC9gRAsdIpSR6q0fzsjfOn6UyeLhvGg4Pq41V4REG7hW_nGG0nI9Ee5Cb3PsfJ5HOXPm86ZKXDHG4fme3uvsBt2escwTjG84DTsP9Ka3GSgKhFsTF8VzwY1RViS_6DlYDxOjT_MrpFIS-TpeDV6sGTLMG_1oH24Vpm_vovqxIFbBqWdjETET9MtzLpO6wKd-u5ft0_ZWocHeEpxdIEbgqvgyU7pf_'); background-size: cover; background-position: center; filter: grayscale(100%) contrast(120%);">
+<div class="absolute inset-0 bg-primary/20 mix-blend-multiply"></div>
+<div class="absolute inset-0 border-4 border-primary/40 pointer-events-none"></div>
+<!-- Overlay Grid -->
+<div class="absolute inset-0 grid grid-cols-4 grid-rows-4 opacity-50">
+<div class="border-r border-b border-primary/50"></div><div class="border-r border-b border-primary/50"></div><div class="border-r border-b border-primary/50"></div><div class="border-b border-primary/50"></div>
+<div class="border-r border-b border-primary/50"></div><div class="border-r border-b border-primary/50"></div><div class="border-r border-b border-primary/50"></div><div class="border-b border-primary/50"></div>
+<div class="border-r border-b border-primary/50"></div><div class="border-r border-b border-primary/50"></div><div class="border-r border-b border-primary/50"></div><div class="border-b border-primary/50"></div>
+<div class="border-r border-primary/50"></div><div class="border-r border-primary/50"></div><div class="border-r border-primary/50"></div><div></div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-2/3 h-[2px] bg-primary animate-pulse"></div>
+<div class="absolute text-primary font-terminal-log text-xs bg-surface px-1 mt-6 border border-primary animate-pulse">SCANNING...</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Unified Booking Section -->
+<section class="neo-brutalist-card neo-brutalist-primary p-md md:p-lg flex flex-col gap-md">
+<div class="flex items-center justify-between border-b-2 border-primary pb-sm mb-sm bg-surface p-sm">
+<h2 class="font-headline-md text-headline-md text-primary uppercase font-bold">&gt; EXTRACTION TERMINAL</h2>
+<div class="font-terminal-log text-terminal-log text-surface bg-primary px-sm py-xs animate-pulse border border-primary font-bold shadow-[2px_2px_0px_0px_#444933]">
+                        [UPLINK_ESTABLISHED]
+                    </div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- Calendar Panel -->
+<div class="lg:col-span-2 bg-surface p-md border-2 border-outline neo-brutalist-card flex flex-col gap-md">
+<div class="flex justify-between items-center font-terminal-log text-terminal-log bg-surface-container-high px-sm py-xs border-2 border-outline">
+<span class="text-primary font-bold">&gt; SECTOR_WINDOW: OCT_2024</span>
+<div class="flex gap-sm">
+<button class="hover:bg-primary hover:text-surface px-2 border border-transparent hover:border-primary transition-colors">&lt;</button>
+<button class="hover:bg-primary hover:text-surface px-2 border border-transparent hover:border-primary transition-colors">&gt;</button>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-xs text-center font-label-mono-sm text-label-mono-sm text-outline font-bold border-b border-outline pb-sm">
+<div>MO</div><div>TU</div><div>WE</div><div>TH</div><div>FR</div><div>SA</div><div>SU</div>
+</div>
+<div class="grid grid-cols-7 gap-xs font-terminal-log text-terminal-log">
+<div class="p-sm border-2 border-transparent"></div>
+<div class="p-sm border-2 border-transparent"></div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low">1</div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low">2</div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low">3</div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low">4</div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low">5</div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low">6</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">7</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">8</div>
+<div class="p-sm border-2 border-primary bg-primary text-surface font-bold text-center shadow-[2px_2px_0px_0px_#444933] relative">
+                                9
+                                <div class="absolute -top-1 -right-1 w-2 h-2 bg-secondary-container rounded-full"></div>
+</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">10</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">11</div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low text-center">12</div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low text-center">13</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">14</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">15</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">16</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">17</div>
+<div class="p-sm border-2 border-outline text-on-surface hover:border-primary hover:text-primary hover:bg-surface-container-high cursor-pointer transition-colors text-center">18</div>
+<div class="p-sm border-2 border-outline-variant text-outline bg-surface-container-low text-center">19</div>
+</div>
+</div>
+<!-- Time Slot Panel -->
+<div class="bg-surface p-md border-2 border-outline flex flex-col gap-md relative neo-brutalist-card">
+<div class="absolute -top-3 -right-3 bg-secondary-container text-surface font-label-mono-sm text-[10px] px-2 py-1 border-2 border-outline font-bold z-20 shadow-[2px_2px_0px_0px_#8e9379]">
+                            TARGET_LOCKED
+                        </div>
+<div class="font-terminal-log text-terminal-log bg-surface-container-highest px-sm py-xs border-2 border-primary text-primary font-bold">
+                            &gt; UPLINK: OCT_09_2024
+                        </div>
+<div class="flex flex-col gap-sm overflow-y-auto max-h-[300px] pr-2 custom-scrollbar bg-surface-container-low p-sm border-2 border-outline-variant">
+<button class="w-full text-left font-terminal-log text-terminal-log p-sm border-2 border-outline text-on-surface hover:border-primary hover:bg-surface-container-high transition-colors flex justify-between items-center group bg-surface">
+<span>09:00 AM [EST]</span>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 text-primary" style="font-size: 16px;">add</span>
+</button>
+<button class="w-full text-left font-terminal-log text-terminal-log p-sm border-2 border-outline text-on-surface hover:border-primary hover:bg-surface-container-high transition-colors flex justify-between items-center group bg-surface">
+<span>10:30 AM [EST]</span>
+<span class="material-symbols-outlined opacity-0 group-hover:opacity-100 text-primary" style="font-size: 16px;">add</span>
+</button>
+<button class="w-full text-left font-terminal-log text-terminal-log p-sm border-2 border-primary bg-primary text-surface font-bold flex justify-between items-center shadow-[2px_2px_0px_0px_#444933]">
+<span>&gt; 13:00 PM [EST]</span>
+<span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+</button>
+<button class="w-full text-left font-terminal-log text-terminal-log p-sm border-2 border-outline opacity-50 cursor-not-allowed flex justify-between items-center text-outline bg-surface-container-lowest">
+<span>15:00 PM [EST]</span>
+<span class="text-xs text-secondary-container">[OFFLINE]</span>
+</button>
+</div>
+<button class="mt-auto w-full bg-primary text-surface font-terminal-log text-terminal-log p-sm neo-brutalist-button font-bold uppercase transition-all hover:bg-white">
+                            INITIATE_UPLINK_
+                        </button>
+</div>
+</div>
+</section>
+<!-- Pricing / Packages -->
+<section class="flex flex-col gap-lg pt-md">
+<div class="font-headline-lg text-headline-lg text-on-surface uppercase border-b-4 border-primary pb-sm inline-block w-max bg-surface px-md neo-brutalist-card">
+                    &gt; DEPLOYMENT MODULES
+                </div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Tier 1 -->
+<div class="bg-surface border-2 border-outline p-lg flex flex-col gap-md relative group hover:border-primary transition-colors neo-brutalist-card">
+<div class="absolute -top-4 -left-4 bg-outline text-surface border-2 border-surface px-md py-xs font-label-mono-sm font-bold shadow-[4px_4px_0px_0px_#121414] z-20 group-hover:bg-primary transition-colors">
+                            T-1
+                        </div>
+<div class="bg-surface-container-high p-sm border-2 border-outline-variant mt-sm">
+<div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">SOLO PREDATOR</div>
+<div class="font-terminal-log text-terminal-log text-primary mt-xs">&gt; Total Market Dominance</div>
+</div>
+<hr class="border-outline-variant border-2"/>
+<ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-outline-variant">
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Aggressive Data Scraping</li>
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Unrestricted Node Access</li>
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Priority Extraction Stream</li>
+</ul>
+<button class="w-full bg-surface-container-high text-on-surface border-2 border-outline font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md font-bold neo-brutalist-button-alt">
+                            ACTIVATE_
+                        </button>
+</div>
+<!-- Tier 2 -->
+<div class="bg-surface border-4 border-primary p-lg flex flex-col gap-md relative transform lg:-translate-y-4 neo-brutalist-card neo-brutalist-primary z-10">
+<div class="absolute -top-4 -right-4 bg-primary text-surface font-label-mono-sm px-sm py-xs uppercase font-bold border-2 border-surface shadow-[4px_4px_0px_0px_#121414] z-20">
+                            ESTABLISHED_DOMINANCE
+                        </div>
+<div class="absolute -top-4 -left-4 bg-primary text-surface px-md py-xs font-label-mono-sm font-bold border-2 border-surface shadow-[4px_4px_0px_0px_#121414] z-20">
+                            T-2
+                        </div>
+<div class="bg-primary/10 p-sm border-2 border-primary mt-sm">
+<div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">AGENCY CORE</div>
+<div class="font-terminal-log text-terminal-log font-bold text-primary mt-xs">&gt; Multi-Node Syndicate</div>
+</div>
+<hr class="border-primary border-2"/>
+<ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-primary/50">
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Neural Lead Mapping</li>
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> 24/7 Global Surveillance</li>
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Sovereign Cloud Gateway</li>
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Direct API Execution</li>
+</ul>
+<button class="w-full bg-primary text-surface font-terminal-log p-sm font-bold uppercase hover:bg-white transition-all mt-md neo-brutalist-button text-lg">
+                            ACTIVATE_
+                        </button>
+</div>
+<!-- Tier 3 -->
+<div class="bg-surface border-2 border-outline p-lg flex flex-col gap-md relative group hover:border-primary transition-colors neo-brutalist-card">
+<div class="absolute -top-4 -left-4 bg-outline text-surface border-2 border-surface px-md py-xs font-label-mono-sm font-bold shadow-[4px_4px_0px_0px_#121414] z-20 group-hover:bg-primary transition-colors">
+                            T-3
+                        </div>
+<div class="bg-surface-container-high p-sm border-2 border-outline-variant mt-sm">
+<div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">ENTERPRISE NODE</div>
+<div class="font-terminal-log text-terminal-log text-primary mt-xs">&gt; Global Sector Eradication</div>
+</div>
+<hr class="border-outline-variant border-2"/>
+<ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-outline-variant">
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Infinite Node Proliferation</li>
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Quantum Speed Extraction</li>
+<li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Dedicated War-Room AI</li>
+</ul>
+<button class="w-full bg-surface-container-high text-on-surface border-2 border-outline font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md font-bold neo-brutalist-button-alt">
+                            ACTIVATE_
+                        </button>
+</div>
+</div>
+</section>
+<!-- Technical Specs / Logs -->
+<section class="bg-surface border-2 border-outline p-md mt-lg neo-brutalist-card">
+<div class="flex items-center gap-sm font-terminal-log text-terminal-log mb-md bg-surface-container-highest p-sm border-b-2 border-outline w-fit">
+<div class="w-3 h-3 bg-secondary-container animate-pulse border border-surface"></div>
+<span class="text-on-surface font-bold">SYSTEM_RELEVANCE_LOG</span>
+</div>
+<div class="font-terminal-log text-label-mono-sm text-outline flex flex-col gap-sm font-mono bg-surface-container-low p-md border border-outline-variant">
+<div class="hover:bg-surface-container-high p-1">&gt; CONNECTING TO BROKERAGE DATABASES... <span class="text-primary">[OK]</span></div>
+<div class="hover:bg-surface-container-high p-1">&gt; BYPASSING LEGACY CRM PROTOCOLS... <span class="text-primary">[OK]</span></div>
+<div class="hover:bg-surface-container-high p-1">&gt; NEURAL NETWORK INITIALIZATION... <span class="text-secondary-container bg-secondary-container/10 px-1 border border-secondary-container animate-pulse">PENDING</span></div>
+<div class="hover:bg-surface-container-high p-1">&gt; WAITING FOR USER INPUT... <span class="inline-block w-2 h-4 bg-primary animate-ping align-middle ml-1"></span></div>
+</div>
+</section>
+<!-- Footer within main area -->
+<footer class="bg-surface-container-low w-full py-lg border-t-4 border-primary mt-xl neo-brutalist-card mb-lg px-lg">
+<div class="flex flex-col md:flex-row justify-between items-center gap-md w-full">
+<div class="font-terminal-log text-terminal-log text-primary bg-surface px-sm py-xs border border-primary">
+                        ©2024 ZONKE_SYSTEMS [HUMAN_OBSOLETE_ARCH]
+                    </div>
+<nav class="flex gap-md font-terminal-log text-label-mono-sm bg-surface px-md py-sm border-2 border-outline">
+<a class="text-outline hover:text-primary hover:bg-surface-container-high transition-all duration-75 px-2" href="#">[TERMINAL_ACCESS]</a>
+<a class="text-outline hover:text-primary hover:bg-surface-container-high transition-all duration-75 px-2" href="#">[DATA_PRIVACY]</a>
+<a class="text-outline hover:text-primary hover:bg-surface-container-high transition-all duration-75 px-2" href="#">[SYSTEM_STATUS]</a>
+</nav>
+</div>
+</footer>
+</div>
+</main>
+</body></html>

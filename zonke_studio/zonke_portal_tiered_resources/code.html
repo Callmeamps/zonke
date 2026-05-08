@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ZONKE_SYSTEMS // RESOURCE_ALLOCATION</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#ffb59f",
+                        "on-secondary-fixed": "#3a0a00",
+                        "surface-bright": "#37393a",
+                        "on-background": "#e2e2e2",
+                        "secondary-container": "#ff571c",
+                        "surface": "#121414",
+                        "tertiary-fixed": "#d2e5f5",
+                        "on-primary": "#283500",
+                        "on-tertiary-container": "#556774",
+                        "on-tertiary-fixed-variant": "#374956",
+                        "on-primary-fixed-variant": "#3c4d00",
+                        "surface-container-highest": "#333535",
+                        "primary-fixed": "#c3f400",
+                        "on-primary-container": "#556d00",
+                        "background": "#121414",
+                        "surface-tint": "#abd600",
+                        "on-primary-fixed": "#161e00",
+                        "inverse-on-surface": "#2f3131",
+                        "surface-container-low": "#1a1c1c",
+                        "on-surface-variant": "#c4c9ac",
+                        "surface-container-lowest": "#0c0f0f",
+                        "on-surface": "#e2e2e2",
+                        "error-container": "#93000a",
+                        "tertiary-container": "#d2e5f5",
+                        "on-tertiary-fixed": "#0b1d29",
+                        "on-error": "#690005",
+                        "on-secondary-container": "#531300",
+                        "tertiary-fixed-dim": "#b6c9d8",
+                        "secondary": "#ffb59f",
+                        "on-tertiary": "#21323e",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed": "#ffdbd0",
+                        "on-secondary-fixed-variant": "#852400",
+                        "inverse-surface": "#e2e2e2",
+                        "surface-container": "#1e2020",
+                        "tertiary": "#ffffff",
+                        "outline": "#8e9379",
+                        "primary-container": "#c3f400",
+                        "on-secondary": "#5e1700",
+                        "primary-fixed-dim": "#abd600",
+                        "surface-container-high": "#282a2b",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#121414",
+                        "inverse-primary": "#506600",
+                        "primary": "#ffffff",
+                        "outline-variant": "#444933",
+                        "surface-variant": "#333535"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "unit": "4px",
+                        "sm": "8px",
+                        "xl": "64px",
+                        "lg": "32px",
+                        "gutter": "24px",
+                        "margin": "40px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["JetBrains Mono"],
+                        "code-snippet": ["JetBrains Mono"],
+                        "body-lg": ["JetBrains Mono"],
+                        "headline-xl": ["JetBrains Mono"],
+                        "headline-md": ["JetBrains Mono"],
+                        "body-sm": ["JetBrains Mono"],
+                        "label-mono": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["72px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "code-snippet": ["14px", { "lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400" }],
+                        "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.primary');
+            background-image: linear-gradient(0deg, transparent 24%, rgba(51, 51, 51, 0.3) 25%, rgba(51, 51, 51, 0.3) 26%, transparent 27%, transparent 74%, rgba(51, 51, 51, 0.3) 75%, rgba(51, 51, 51, 0.3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(51, 51, 51, 0.3) 25%, rgba(51, 51, 51, 0.3) 26%, transparent 27%, transparent 74%, rgba(51, 51, 51, 0.3) 75%, rgba(51, 51, 51, 0.3) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+        .brutalist-border {
+            border: 1px solid theme('colors.surface-variant');
+        }
+        .brutalist-border-heavy {
+            border: 4px solid theme('colors.primary');
+        }
+        .brutalist-border-primary {
+            border: 2px solid theme('colors.primary');
+        }
+        .brutalist-border-accent {
+            border: 2px solid theme('colors.primary-fixed');
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row font-body-sm text-body-sm selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-full md:w-64 bg-surface-container-lowest border-b-4 md:border-b-0 md:border-r-4 border-primary flex flex-col h-auto md:h-screen shrink-0 z-40">
+<div class="p-gutter border-b border-surface-variant flex items-center justify-between md:justify-start">
+<span class="font-headline-md text-headline-md font-black tracking-tighter text-primary">ZONKE_AI</span>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<nav class="flex-1 p-md hidden md:flex flex-col gap-unit">
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                COMMAND_CENTER
+            </a>
+<a class="font-label-mono text-label-mono text-primary-fixed border border-primary-fixed bg-surface-container-low px-md py-sm flex items-center gap-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+                [ ALLOCATION ]
+            </a>
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="#">
+<span class="material-symbols-outlined">memory</span>
+                CONSTRAINTS
+            </a>
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+                AUDIT_LOGS
+            </a>
+</nav>
+<div class="p-md border-t border-surface-variant hidden md:block bg-surface-container">
+<div class="font-label-mono text-label-mono text-on-surface-variant mb-sm">SYS_STATUS: <span class="text-primary-fixed animate-pulse">BUDGET_LOCKED</span></div>
+<div class="text-xs text-surface-variant font-code-snippet">USER: FINANCIAL_OP // UID: 4099</div>
+</div>
+</aside>
+<!-- Middle Column: Status Feed -->
+<section class="w-full md:w-[400px] bg-surface border-b-4 md:border-b-0 md:border-r-4 border-primary flex flex-col h-auto md:h-screen shrink-0 z-30">
+<header class="p-md border-b border-surface-variant bg-surface-container-low">
+<h2 class="font-headline-md text-headline-md text-primary">ALLOCATION_FEED</h2>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant mt-xs">&gt; REAL-TIME EXPENDITURE</p>
+</header>
+<div class="flex-1 overflow-y-auto p-md space-y-md">
+<!-- Feed Item 1 -->
+<div class="bg-surface-container brutalist-border p-sm flex flex-col gap-xs">
+<div class="flex justify-between items-center font-label-mono text-label-mono">
+<span class="text-primary-fixed">[ CORE_PROCESSING ]</span>
+<span class="text-surface-variant">10:42:01</span>
+</div>
+<img alt="Circuit Board" class="w-full h-24 object-cover filter grayscale contrast-125 brutalist-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtCe5erRTnWQjMtBMRGcPYBfrdwRdn_zH4zL8JAqFe-zoF0mDGd_B7sg9M8TsGVzpGoDk7DpPMXbk6pPc8GcFjzi4NqJzStG3WnU2Ia1C5qPSyZ6Tv7duRxKYOXdO2lRmddwt4KwZJua0TigPgDjP9gPt1dngNkChIW6pNmjJKwyXlzm9NFDpQHIdiH-KOfSoDCCaM4Tkhoxxv0Unl06T3H7J7slU5cIlBTpXzemlTOLed3E6RrKn4geFBmwheVT_RiKHrD7i98ZLz"/>
+<p class="font-code-snippet text-code-snippet text-primary mt-sm">$4,200 allocated to logic gates.</p>
+</div>
+<!-- Feed Item 2 -->
+<div class="bg-surface-container brutalist-border p-sm flex flex-col gap-xs">
+<div class="flex justify-between items-center font-label-mono text-label-mono">
+<span class="text-error">[ COOLING_SYSTEMS ]</span>
+<span class="text-surface-variant">10:38:15</span>
+</div>
+<p class="font-code-snippet text-code-snippet text-primary">Budget overrun detected in thermal management. Adjustment required.</p>
+<div class="w-full bg-surface-variant h-2 mt-xs"><div class="bg-error h-full w-[85%]"></div></div>
+</div>
+<!-- Feed Item 3 -->
+<div class="bg-surface-container brutalist-border p-sm flex flex-col gap-xs">
+<div class="flex justify-between items-center font-label-mono text-label-mono">
+<span class="text-on-surface-variant">[ MEMORY_BANKS ]</span>
+<span class="text-surface-variant">10:15:00</span>
+</div>
+<img alt="Silicon Wafer" class="w-full h-24 object-cover filter grayscale contrast-125 brutalist-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOpDSdoNwzgN02EKA2J7R0Y6t_58q1dPpwXxQe9S6g1S8U_0kwl1NAGjE7Z9cPPuvyETdhWOWuqUxQTLg8j0ZkEOdOkPNRc6Xc6O_wh2kAcRytn8_Tc82Q8farvJ06BQlFMdfhFDUnAWDfQ2Ej1UfrzZIWDEaHHaILynNzknPp-YKptxmOy4CDEubtV0cWhY7ox_gxrodzi2KJUxUxCn4ov_w18fpISJSWqpfd82dAqK00-htNk9YnlQfbiZImDsDS-gE1qi9JFJB3"/>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant mt-sm">Stable configuration. Under budget.</p>
+</div>
+</div>
+</section>
+<!-- Right Column: Resource Management Canvas -->
+<main class="flex-1 flex flex-col h-screen overflow-y-auto relative bg-surface-container-lowest">
+<!-- Top Header -->
+<header class="p-gutter border-b border-surface-variant flex justify-between items-center bg-surface bg-opacity-90 backdrop-blur-sm sticky top-0 z-20">
+<div>
+<h1 class="font-headline-xl text-headline-xl text-primary">RESOURCE_MANAGEMENT</h1>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant mt-xs">&gt; BUDGETARY CONSTRAINTS ACTIVE</p>
+</div>
+<button class="bg-surface text-primary border-2 border-primary font-label-mono text-label-mono px-gutter py-md uppercase hover:bg-primary hover:text-on-primary transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+                RECALCULATE_
+            </button>
+</header>
+<div class="p-margin flex flex-col gap-lg max-w-[1200px] w-full">
+<!-- Constraint Visualization -->
+<section class="bg-surface brutalist-border-primary p-md relative shadow-[8px_8px_0px_0px_theme('colors.primary')]">
+<div class="absolute -top-3 left-md bg-primary px-sm font-label-mono text-label-mono text-on-primary border border-primary">
+                    [ OVERALL_BUDGET_CONSTRAINT ]
+                </div>
+<div class="mt-md flex flex-col md:flex-row gap-lg items-center">
+<div class="w-full md:w-1/2">
+<div class="font-display-lg text-display-lg text-primary">$128K</div>
+<div class="font-code-snippet text-code-snippet text-primary-fixed mt-sm">MAXIMUM ALLOWABLE QUARTERLY SPEND</div>
+<div class="w-full bg-surface-variant h-4 mt-md brutalist-border">
+<div class="bg-primary-fixed h-full w-[72%] flex items-center px-sm">
+<span class="text-on-primary-fixed font-label-mono text-[10px]">72% UTILIZED</span>
+</div>
+</div>
+</div>
+<div class="w-full md:w-1/2">
+<img alt="Circuit Details" class="w-full h-48 object-cover filter grayscale contrast-150 brutalist-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTvKQ4lfe4lm0egwgaJU-qnPLQwNR0TeF2iwRG2Xx7VAhaB_fNiCL4faagYmfLiic70QV6W9-aOm9XHmlGINBgjAL9nkXC4RrGyutCs7Q6dGBvyf3tSSVVGzL7ONnPHV7i4RjEg544QMOk3RgY-sBYwNaWO-Lr-rqItJLPz3SqMnGoerJ4xnOcqn93CxTu6SgvMhftx700A5irAQjXMarx1xDDgRvNBnvb_4X_yf7pIY5DjkBZHzCncFJHsjkmmt1D62UpScxGXF9G"/>
+</div>
+</div>
+</section>
+<!-- Departmental Allocations -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Allocation 1 -->
+<div class="bg-surface-container brutalist-border p-md flex flex-col gap-md relative">
+<div class="font-label-mono text-label-mono text-on-surface-variant">[ SILICON_PROCUREMENT ]</div>
+<div class="font-headline-md text-headline-md text-primary">$45,000<span class="text-body-sm text-surface-variant">/QTR</span></div>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant">Raw material acquisition for custom chipsets.</p>
+<div class="mt-auto flex gap-sm">
+<button class="flex-1 border border-primary-fixed text-primary-fixed font-label-mono text-label-mono py-sm uppercase hover:bg-primary-fixed hover:text-on-primary-fixed transition-all">
+        APPROVE_
+    </button>
+<button class="flex-1 border border-error text-error font-label-mono text-label-mono py-sm uppercase hover:bg-error hover:text-on-error transition-all">
+        REJECT_
+    </button>
+</div>
+</div>
+<!-- Allocation 2 -->
+<div class="bg-surface-container brutalist-border p-md flex flex-col gap-md relative">
+<div class="font-label-mono text-label-mono text-on-surface-variant">[ ALGORITHMIC_RESEARCH ]</div>
+<div class="font-headline-md text-headline-md text-primary">$62,500<span class="text-body-sm text-surface-variant">/QTR</span></div>
+<p class="font-code-snippet text-code-snippet text-on-surface-variant">Neural pathway mapping and optimization.</p>
+<div class="mt-auto flex gap-sm">
+<button class="flex-1 bg-surface-variant text-on-surface-variant font-label-mono text-label-mono py-sm uppercase cursor-not-allowed border border-surface-variant">
+        LOCKED_
+    </button>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="mt-auto border-t-2 border-primary bg-surface-container-lowest w-full py-xl flex flex-col md:flex-row justify-between items-center px-margin gap-md">
+<div class="font-terminal-log text-terminal-log text-primary">
+                ©2024 ZONKE_SYSTEMS [RESOURCE_ARCH_V2]
+            </div>
+<div class="flex gap-md font-label-mono text-label-mono">
+<a class="text-outline hover:text-primary transition-all duration-75" href="#">BUDGET_POLICY</a>
+<a class="text-outline hover:text-primary transition-all duration-75" href="#">PROCUREMENT_API</a>
+</div>
+</footer>
+</main>
+</body></html>
