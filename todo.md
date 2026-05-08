@@ -31,10 +31,10 @@
 - [ ] GA4 integration snippet (add manually later)
 
 ### Final Checks
-- [ ] Verify responsive design (mobile breakpoints)
+- [~] Verify responsive design (mobile breakpoints)
 - [ ] Test form submissions (deploy to Netlify/Render)
-- [ ] Ensure no private keys in client
-- [ ] All pages linked correctly
+- [x] Ensure no private keys in client
+- [x] All pages linked correctly
 
 
 ### Components & Assets
