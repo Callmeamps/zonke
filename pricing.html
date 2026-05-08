@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pricing | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface": "#121414",
+          "surface-dim": "#121414",
+          "surface-bright": "#37393a",
+          "surface-container-lowest": "#0c0f0f",
+          "surface-container-low": "#1a1c1c",
+          "surface-container": "#1e2020",
+          "surface-container-high": "#282a2b",
+          "surface-container-highest": "#333535",
+          "on-surface": "#e2e2e2",
+          "on-surface-variant": "#c4c9ac",
+          "inverse-surface": "#e2e2e2",
+          "inverse-on-surface": "#2f3131",
+          "outline": "#8e9379",
+          "outline-variant": "#444933",
+          "surface-tint": "#abd600",
+          "primary": "#c3f400",
+          "on-primary": "#283500",
+          "primary-container": "#c3f400",
+          "on-primary-container": "#556d00",
+          "inverse-primary": "#506600",
+          "secondary": "#ffb59f",
+          "on-secondary": "#5e1700",
+          "secondary-container": "#ff571c",
+          "on-secondary-container": "#531300",
+          "tertiary": "#ffffff",
+          "on-tertiary": "#21323e",
+          "tertiary-container": "#d2e5f5",
+          "on-tertiary-container": "#556774",
+          "error": "#ffb4ab",
+          "on-error": "#690005",
+          "error-container": "#93000a",
+          "on-error-container": "#ffdad6",
+          "primary-fixed": "#c3f400",
+          "primary-fixed-dim": "#abd600",
+          "on-primary-fixed": "#161e00",
+          "on-primary-fixed-variant": "#3c4d00",
+          "secondary-fixed": "#ffdbd0",
+          "secondary-fixed-dim": "#ffb59f",
+          "on-secondary-fixed": "#3a0a00",
+          "on-secondary-fixed-variant": "#852400",
+          "tertiary-fixed": "#d2e5f5",
+          "tertiary-fixed-dim": "#b6c9d8",
+          "on-tertiary-fixed": "#0b1d29",
+          "on-tertiary-fixed-variant": "#374956"
+        },
+        borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+        spacing: { "xs": "4px", "unit": "4px", "sm": "8px", "xl": "64px", "lg": "32px", "gutter": "24px", "margin": "40px", "md": "16px" },
+        fontFamily: {
+          "display-lg": ["JetBrains Mono"],
+          "code-snippet": ["JetBrains Mono"],
+          "body-lg": ["JetBrains Mono"],
+          "headline-xl": ["JetBrains Mono"],
+          "headline-md": ["JetBrains Mono"],
+          "body-sm": ["JetBrains Mono"],
+          "label-mono": ["JetBrains Mono"],
+          "terminal-log": ["JetBrains Mono"]
+        },
+        fontSize: {
+          "display-lg": ["72px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+          "code-snippet": ["14px", { "lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400" }],
+          "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+          "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "700" }],
+          "body-sm": ["14px", { "lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400" }],
+          "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }],
+          "terminal-log": ["13px", { "lineHeight": "140%", "letterSpacing": "0.02em", "fontWeight": "400" }]
+        }
+      }
+    }
+  };
+</script>
+<style>
+  body {
+    background-color: #121414;
+    color: #e2e2e2;
+    background-image:
+      linear-gradient(rgba(20, 20, 20, 0.9), rgba(20, 20, 20, 0.9)),
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(195, 244, 0, 0.03) 2px, rgba(195, 244, 0, 0.03) 4px);
+  }
+  .scanline {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+    background-size: 100% 4px;
+    pointer-events: none; z-index: 9999; opacity: 0.3;
+  }
+  .neo-brutalist-card {
+    background-color: #1a1c1c;
+    border: 2px solid #8e9379;
+    box-shadow: 6px 6px 0px 0px #8e9379;
+    position: relative;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .neo-brutalist-primary {
+    border: 2px solid #c3f400;
+    box-shadow: 6px 6px 0px 0px #c3f400;
+  }
+  .neo-brutalist-button {
+    border: 2px solid #c3f400;
+    box-shadow: 4px 4px 0px 0px #c3f400;
+    transition: all 0.1s ease;
+  }
+  .neo-brutalist-button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px #c3f400;
+  }
+  .neo-brutalist-button:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px 0px #c3f400;
+  }
+  .neo-brutalist-button-alt {
+    border: 2px solid #8e9379;
+    box-shadow: 4px 4px 0px 0px #8e9379;
+  }
+  .neo-brutalist-button-alt:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px #8e9379;
+  }
+  .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #1a1c1c; border-left: 2px solid #444933; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #c3f400; border: 2px solid #1a1c1c; }
+  #particle-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: -1;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body class="antialiased min-h-screen flex flex-col md:flex-row font-body-sm text-body-sm selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<div class="scanline"></div>
+<canvas id="particle-canvas"></canvas>
+
+<!-- Sidebar Navigation -->
+<aside class="w-full md:w-64 md:h-screen md:fixed left-0 top-0 bg-surface-container-lowest border-b-4 md:border-b-0 md:border-r-4 border-primary flex flex-col h-auto md:h-screen shrink-0 z-40">
+  <div class="p-gutter border-b border-surface-variant flex items-center justify-between md:justify-start">
+    <span class="font-headline-xl text-headline-xl font-black tracking-tighter text-primary">ZONKE</span>
+    <button class="md:hidden text-primary" aria-label="Menu">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </div>
+  <nav class="flex-1 p-md hidden md:flex flex flex-col gap-unit">
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="index.html">
+      <span class="material-symbols-outlined">home</span> HOME
+    </a>
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="real-estate.html">
+      <span class="material-symbols-outlined">apartment</span> REAL_ESTATE
+    </a>
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="tenders.html">
+      <span class="material-symbols-outlined">description</span> TENDERS
+    </a>
+    <a class="font-label-mono text-label-mono text-primary border border-primary bg-surface-container-low px-md py-sm flex items-center gap-sm" href="pricing.html">
+      <span class="material-symbols-outlined">payments</span> PRICING
+    </a>
+  </nav>
+  <div class="p-md border-t border-surface-variant md:block bg-surface-container">
+    <div class="font-label-mono text-label-mono text-on-surface-variant mb-sm">SYS_STATUS: <span class="text-primary-fixed animate-pulse">ONLINE</span></div>
+    <div class="text-xs text-surface-variant font-code-snippet">USER: GUEST // UNAUTH</div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="flex-grow flex flex-col md:ml-64 w-full">
+  <div class="max-w-[1200px] w-full mx-auto px-margin py-xl flex flex-col gap-xl" id="main-content">
+
+    <section class="flex flex-col items-start gap-lg animate-on-scroll fade-in">
+      <div class="inline-flex items-center gap-sm font-label-mono text-label-mono text-primary bg-surface-container-highest px-sm py-xs border border-primary">
+        <span class="material-symbols-outlined" style="font-size: 16px;">attach_money</span>
+        <span>// PRICING_</span>
+      </div>
+      <h1 class="font-headline-xl text-headline-xl text-primary uppercase">DEPLOYMENT MODULES</h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+        All prices in South African Rand (ZAR). Setup fees are one-time. Monthly includes support, updates, and cloud infrastructure.
+      </p>
+    </section>
+
+    <!-- Consultation Tier -->
+    <section class="pt-md">
+      <div class="font-headline-lg text-headline-lg text-on-surface uppercase border-b-4 border-primary pb-sm inline-block w-max bg-surface px-md neo-brutalist-card">
+        CONSULTATION
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-lg mt-lg">
+        <!-- Starter -->
+        <div class="neo-brutalist-card p-lg flex flex-col gap-md relative group hover:border-primary transition-colors">
+          <div class="absolute -top-4 -left-4 bg-outline text-surface border-2 border-surface px-md py-xs font-label-mono-sm font-bold shadow-[4px_4px_0px_0px_#121414] z-20 group-hover:bg-primary transition-colors">STARTER</div>
+          <div class="bg-surface-container-high p-sm border-2 border-outline-variant mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">Consultation</div>
+            <div class="font-terminal-log text-terminal-log text-primary mt-xs">&gt; Quick-start assessment</div>
+          </div>
+          <hr class="border-outline-variant border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-outline-variant">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> 5-minute lead/tender audit</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Roadmap document</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> 1 strategy call (30m)</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Action list</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-outline mt-md group-hover:border-primary transition-colors">
+            R4,500
+          </div>
+          <a href="real-estate.html#audit" class="w-full bg-outline text-surface font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md neo-brutalist-button-alt font-bold text-center">
+            APPLY_
+          </a>
+        </div>
+        <!-- Pro -->
+        <div class="neo-brutalist-card p-lg flex flex-col gap-md relative group hover:border-primary transition-colors">
+          <div class="absolute -top-4 -left-4 bg-secondary-container text-surface border-2 border-surface px-md py-xs font-label-mono-sm font-bold shadow-[4px_4px_0px_0px_#121414] z-20 group-hover:bg-primary transition-colors">PRO</div>
+          <div class="bg-surface-container-high p-sm border-2 border-outline-variant mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">Consultation Plus</div>
+            <div class="font-terminal-log text-terminal-log text-primary mt-xs">&gt; Deep-dive planning</div>
+          </div>
+          <hr class="border-outline-variant border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-outline-variant">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Comprehensive audit</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Process map</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Implementation plan</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> 1 strategy call (60m)</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-outline mt-md group-hover:border-primary transition-colors">
+            R9,500
+          </div>
+          <a href="real-estate.html#audit" class="w-full bg-outline text-surface font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md neo-brutalist-button-alt font-bold text-center">
+            APPLY_
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Integration Tier -->
+    <section class="pt-md">
+      <div class="font-headline-lg text-headline-lg text-on-surface uppercase border-b-4 border-primary pb-sm inline-block w-max bg-surface px-md neo-brutalist-card">
+        INTEGRATION
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-lg mt-lg">
+        <!-- Starter -->
+        <div class="neo-brutalist-card p-lg flex flex-col gap-md relative group hover:border-primary transition-colors">
+          <div class="absolute -top-4 -left-4 bg-outline text-surface border-2 border-surface px-md py-xs font-label-mono-sm font-bold shadow-[4px_4px_0px_0px_#121414] z-20 group-hover:bg-primary transition-colors">STARTER</div>
+          <div class="bg-surface-container-high p-sm border-2 border-outline-variant mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">Basic Funnel</div>
+            <div class="font-terminal-log text-terminal-log text-primary mt-xs">&gt; One office or team</div>
+          </div>
+          <hr class="border-outline-variant border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-outline-variant">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Lead capture form</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Auto-responder sequence</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Basic dashboard</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Onboarding & handoff docs</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-outline mt-md group-hover:border-primary transition-colors">
+            R12,500 setup<br><span class="text-body-sm">R3,500/mo</span>
+          </div>
+          <a href="real-estate.html#booking" class="w-full bg-outline text-surface font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md neo-brutalist-button-alt font-bold text-center">
+            START_
+          </a>
+        </div>
+        <!-- Growth -->
+        <div class="neo-brutalist-card neo-brutalist-primary p-lg flex flex-col gap-md relative transform md:-translate-y-4 z-10">
+          <div class="absolute -top-4 -right-4 bg-primary text-surface font-label-mono-sm px-sm py-xs uppercase font-bold border-2 border-surface shadow-[4px_4px_0px_0px_#121414] z-20">MOST COMMON</div>
+          <div class="absolute -top-4 -left-4 bg-primary text-surface px-md py-xs font-label-mono-sm font-bold border-2 border-surface shadow-[4px_4px_0px_0px_#121414] z-20">GROWTH</div>
+          <div class="bg-primary/10 p-sm border-2 border-primary mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">Full Workflow</div>
+            <div class="font-terminal-log text-terminal-log font-bold text-primary mt-xs">&gt; Expanded + Dashboard + Training</div>
+          </div>
+          <hr class="border-primary border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-primary/50">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Everything in Basic</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Advanced automations</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Custom dashboard</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Team training session</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Monthly support & updates</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-primary mt-md">
+            R25,000 setup<br><span class="text-body-sm">R6,500/mo</span>
+          </div>
+          <a href="real-estate.html#booking" class="w-full bg-primary text-surface font-terminal-log p-sm font-bold uppercase hover:bg-white transition-all mt-md neo-brutalist-button text-lg text-center">
+            START_
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Migration Tier -->
+    <section class="pt-md">
+      <div class="font-headline-lg text-headline-lg text-on-surface uppercase border-b-4 border-primary pb-sm inline-block w-max bg-surface px-md neo-brutalist-card">
+        MANAGED MIGRATION
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-lg mt-lg">
+        <!-- Full Adoption -->
+        <div class="neo-brutalist-card neo-brutalist-primary p-lg flex flex-col gap-md relative z-10">
+          <div class="absolute -top-4 -left-4 bg-primary text-surface px-md py-xs font-label-mono-sm font-bold border-2 border-surface shadow-[4px_4px_0px_0px_#121414] z-20">ENTERPRISE</div>
+          <div class="bg-primary/10 p-sm border-2 border-primary mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">Full Rollout</div>
+            <div class="font-terminal-log text-terminal-log font-bold text-primary mt-xs">&gt; Complete adoption + optimisation</div>
+          </div>
+          <hr class="border-primary border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-primary/50">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Everything in Growth</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Dedicated supervisor</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Ongoing optimisation</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Priority SLA</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Custom integrations</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-primary mt-md">
+            R45,000 setup<br><span class="text-body-sm">R12,500/mo</span>
+          </div>
+          <a href="real-estate.html#booking" class="w-full bg-primary text-surface font-terminal-log p-sm font-bold uppercase hover:bg-white transition-all mt-md neo-brutalist-button text-lg text-center">
+            TALK TO US_
+          </a>
+        </div>
+        <!-- Software-as-a-Service -->
+        <div class="neo-brutalist-card p-lg flex flex-col gap-md relative group hover:border-primary transition-colors">
+          <div class="absolute -top-4 -left-4 bg-outline text-surface border-2 border-surface px-md py-xs font-label-mono-sm font-bold shadow-[4px_4px_0px_0px_#121414] z-20 group-hover:bg-primary transition-colors">SwS</div>
+          <div class="bg-surface-container-high p-sm border-2 border-outline-variant mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">Platform Subscription</div>
+            <div class="font-terminal-log text-terminal-log text-primary mt-xs">&gt; Access + managed support</div>
+          </div>
+          <hr class="border-outline-variant border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-outline-variant">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Software access per vertical</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Managed support included</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Updates & maintenance</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Scale as you grow</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-outline mt-md group-hover:border-primary transition-colors">
+            R7,500&ndash;15,000 setup<br><span class="text-body-sm">R4,500&ndash;9,500/mo</span>
+          </div>
+          <a href="real-estate.html#booking" class="w-full bg-outline text-surface font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md neo-brutalist-button-alt font-bold text-center">
+            INQUIRE_
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="neo-brutalist-card neo-brutalist-primary p-lg flex flex-col items-center text-center gap-md mt-xl animate-on-scroll fade-in">
+      <h2 class="font-headline-md text-headline-md text-primary uppercase max-w-3xl">READY TO UPGRADE?</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+        Not sure which module fits? Book a call. We'll map your current state and recommend the shortest path.
+      </p>
+      <a href="real-estate.html#booking" class="neo-brutalist-button bg-surface text-on-primary font-label-mono text-label-mono px-xl py-md text-lg uppercase font-bold shadow-[6px_6px_0px_0px_#c3f400] hover:bg-primary hover:text-surface transition-colors">
+        BOOK CALL_
+      </a>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t-2 border-primary bg-surface-container-lowest w-full py-xl flex flex-col md:flex-row justify-between items-center px-margin gap-md">
+    <div class="font-terminal-log text-terminal-log text-primary">
+      ©2024 ZONKE_AI [HUMAN_OBSOLETE_ARCH]
+    </div>
+    <nav class="flex gap-md font-label-mono text-label-mono">
+      <a class="text-outline hover:text-primary transition-all duration-75" href="#">[TERMINAL_ACCESS]</a>
+      <a class="text-outline hover:text-primary transition-all duration-75" href="#">[DATA_PRIVACY]</a>
+      <a class="text-outline hover:text-primary transition-all duration-75" href="#">[SYSTEM_STATUS]</a>
+    </nav>
+  </footer>
+</main>
+
+<script src="https://unpkg.com/motion@10.16.2/dist/motion.min.js"></script>
+<script type="module">
+  import { inView } from "https://unpkg.com/@motionone/on-scroll@10.16.2/dist/on-scroll.js";
+  inView('.animate-on-scroll', ({ target }) => {
+    motion.animate(target, { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] }, { duration: 0.6, easing: "ease-out" });
+  }, { amount: 0.1 });
+</script>
+<script src="assets/js/particles.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.querySelector('aside button[aria-label="Menu"]');
+    if (menuBtn) {
+      menuBtn.addEventListener('click', () => {
+        const nav = menuBtn.closest('aside').querySelector('nav');
+        nav.classList.toggle('hidden');
+      });
+    }
+  });
+</script>
+</body>
+</html>

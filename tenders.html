@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tender Vault | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface": "#121414",
+          "surface-dim": "#121414",
+          "surface-bright": "#37393a",
+          "surface-container-lowest": "#0c0f0f",
+          "surface-container-low": "#1a1c1c",
+          "surface-container": "#1e2020",
+          "surface-container-high": "#282a2b",
+          "surface-container-highest": "#333535",
+          "on-surface": "#e2e2e2",
+          "on-surface-variant": "#c4c9ac",
+          "inverse-surface": "#e2e2e2",
+          "inverse-on-surface": "#2f3131",
+          "outline": "#8e9379",
+          "outline-variant": "#444933",
+          "surface-tint": "#abd600",
+          "primary": "#c3f400",
+          "on-primary": "#283500",
+          "primary-container": "#c3f400",
+          "on-primary-container": "#556d00",
+          "inverse-primary": "#506600",
+          "secondary": "#ffb59f",
+          "on-secondary": "#5e1700",
+          "secondary-container": "#ff571c",
+          "on-secondary-container": "#531300",
+          "tertiary": "#ffffff",
+          "on-tertiary": "#21323e",
+          "tertiary-container": "#d2e5f5",
+          "on-tertiary-container": "#556774",
+          "error": "#ffb4ab",
+          "on-error": "#690005",
+          "error-container": "#93000a",
+          "on-error-container": "#ffdad6",
+          "primary-fixed": "#c3f400",
+          "primary-fixed-dim": "#abd600",
+          "on-primary-fixed": "#161e00",
+          "on-primary-fixed-variant": "#3c4d00",
+          "secondary-fixed": "#ffdbd0",
+          "secondary-fixed-dim": "#ffb59f",
+          "on-secondary-fixed": "#3a0a00",
+          "on-secondary-fixed-variant": "#852400",
+          "tertiary-fixed": "#d2e5f5",
+          "tertiary-fixed-dim": "#b6c9d8",
+          "on-tertiary-fixed": "#0b1d29",
+          "on-tertiary-fixed-variant": "#374956"
+        },
+        borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+        spacing: { "xs": "4px", "unit": "4px", "sm": "8px", "xl": "64px", "lg": "32px", "gutter": "24px", "margin": "40px", "md": "16px" },
+        fontFamily: {
+          "display-lg": ["JetBrains Mono"],
+          "code-snippet": ["JetBrains Mono"],
+          "body-lg": ["JetBrains Mono"],
+          "headline-xl": ["JetBrains Mono"],
+          "headline-md": ["JetBrains Mono"],
+          "body-sm": ["JetBrains Mono"],
+          "label-mono": ["JetBrains Mono"],
+          "terminal-log": ["JetBrains Mono"]
+        },
+        fontSize: {
+          "display-lg": ["72px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+          "code-snippet": ["14px", { "lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400" }],
+          "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+          "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "0em", "fontWeight": "700" }],
+          "body-sm": ["14px", { "lineHeight": "1.5", "letterSpacing": "0.02em", "fontWeight": "400" }],
+          "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }],
+          "terminal-log": ["13px", { "lineHeight": "140%", "letterSpacing": "0.02em", "fontWeight": "400" }]
+        }
+      }
+    }
+  };
+</script>
+<style>
+  body {
+    background-color: #121414;
+    color: #e2e2e2;
+    background-image:
+      linear-gradient(rgba(20, 20, 20, 0.9), rgba(20, 20, 20, 0.9)),
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(195, 244, 0, 0.03) 2px, rgba(195, 244, 0, 0.03) 4px);
+  }
+  .scanline {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+    background-size: 100% 4px;
+    pointer-events: none; z-index: 9999; opacity: 0.3;
+  }
+  .neo-brutalist-card {
+    background-color: #1a1c1c;
+    border: 2px solid #8e9379;
+    box-shadow: 6px 6px 0px 0px #8e9379;
+    position: relative;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .neo-brutalist-primary {
+    border: 2px solid #c3f400;
+    box-shadow: 6px 6px 0px 0px #c3f400;
+  }
+  .neo-brutalist-button {
+    border: 2px solid #c3f400;
+    box-shadow: 4px 4px 0px 0px #c3f400;
+    transition: all 0.1s ease;
+  }
+  .neo-brutalist-button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px #c3f400;
+  }
+  .neo-brutalist-button:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px 0px #c3f400;
+  }
+  .neo-brutalist-button-alt {
+    border: 2px solid #8e9379;
+    box-shadow: 4px 4px 0px 0px #8e9379;
+  }
+  .neo-brutalist-button-alt:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px #8e9379;
+  }
+  .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: #1a1c1c; border-left: 2px solid #444933; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #c3f400; border: 2px solid #1a1c1c; }
+  #particle-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: -1;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body class="antialiased min-h-screen flex flex-col md:flex-row font-body-sm text-body-sm selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<div class="scanline"></div>
+<canvas id="particle-canvas"></canvas>
+
+<!-- Sidebar Navigation -->
+<aside class="w-full md:w-64 md:h-screen md:fixed left-0 top-0 bg-surface-container-lowest border-b-4 md:border-b-0 md:border-r-4 border-primary flex flex-col h-auto md:h-screen shrink-0 z-40">
+  <div class="p-gutter border-b border-surface-variant flex items-center justify-between md:justify-start">
+    <span class="font-headline-xl text-headline-xl font-black tracking-tighter text-primary">ZONKE</span>
+    <button class="md:hidden text-primary" aria-label="Menu">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </div>
+  <nav class="flex-1 p-md hidden md:flex flex flex-col gap-unit">
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="index.html">
+      <span class="material-symbols-outlined">home</span> HOME
+    </a>
+    <a class="font-label-mono text-label-mono text-primary border border-primary bg-surface-container-low px-md py-sm flex items-center gap-sm" href="tenders.html">
+      <span class="material-symbols-outlined">description</span> TENDERS
+    </a>
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="real-estate.html">
+      <span class="material-symbols-outlined">apartment</span> REAL_ESTATE
+    </a>
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="pricing.html">
+      <span class="material-symbols-outlined">payments</span> PRICING
+    </a>
+  </nav>
+  <div class="p-md border-t border-surface-variant md:block bg-surface-container">
+    <div class="font-label-mono text-label-mono text-on-surface-variant mb-sm">SYS_STATUS: <span class="text-primary-fixed animate-pulse">ONLINE</span></div>
+    <div class="text-xs text-surface-variant font-code-snippet">USER: GUEST // UNAUTH</div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="flex-grow flex flex-col md:ml-64 w-full">
+  <div class="max-w-[1200px] w-full mx-auto px-margin py-xl flex flex-col gap-xl" id="main-content">
+
+    <!-- Hero Section -->
+    <section class="flex flex-col items-start gap-lg animate-on-scroll fade-in">
+      <div class="inline-flex items-center gap-sm font-label-mono text-label-mono text-primary bg-surface-container-highest px-sm py-xs border border-primary">
+        <span class="material-symbols-outlined" style="font-size: 16px;">terminal</span>
+        <span>// DIRECTIVE: UPGRADE_</span>
+      </div>
+      <h1 class="font-headline-xl text-headline-xl text-primary uppercase leading-none">TENDER VAULT</h1>
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+        Opportunity signals. Deadline tracking. AI-assisted draft support.
+      </p>
+      <p class="font-body-md text-body-md text-outline max-w-xl">
+        For bid teams that can't afford to miss a submission.
+      </p>
+      <div class="flex flex-wrap gap-lg mt-md">
+        <a href="#booking" class="neo-brutalist-button bg-primary text-on-primary font-label-mono text-label-mono px-lg py-sm uppercase font-bold inline-block text-left">BOOK DEMO CALL_</a>
+        <a href="#audit" class="neo-brutalist-button-alt bg-surface text-on-surface font-label-mono text-label-mono px-lg py-sm uppercase hover:bg-surface-container-high transition-colors inline-block text-left">RUN MY AUDIT_</a>
+      </div>
+    </section>
+
+    <!-- Audit Section -->
+    <section id="audit" class="neo-brutalist-card neo-brutalist-primary p-md md:p-lg flex flex-col gap-md animate-on-scroll fade-in">
+      <div class="flex items-center justify-between border-b-2 border-primary pb-sm mb-sm bg-surface p-sm">
+        <h2 class="font-headline-md text-headline-md text-primary uppercase font-bold">&gt; FIND YOUR LEAK</h2>
+        <div class="font-terminal-log text-terminal-log text-surface bg-primary px-sm py-xs animate-pulse border border-primary font-bold shadow-[2px_2px_0px_0px_#444933]">
+          [UPLINK_ESTABLISHED]
+        </div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+        <div class="lg:col-span-2">
+          <p class="font-body-lg text-body-lg text-on-surface mb-lg">
+            Free 5-minute audit. What have you missed this quarter? Get the report. See the gap. Then decide.
+          </p>
+          <form id="audit-form" class="flex flex-col gap-md" action="/api/submit-audit" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div class="flex flex-col gap-xs">
+                <label class="font-label-mono text-label-mono text-primary" for="audit-email">EMAIL</label>
+                <input type="email" id="audit-email" name="email" required
+                  class="bg-surface border-2 border-outline text-on-surface font-body-sm p-sm focus:border-primary focus:outline-none"
+                  placeholder="you@company.com">
+              </div>
+              <div class="flex flex-col gap-xs">
+                <label class="font-label-mono text-label-mono text-primary" for="audit-company">COMPANY</label>
+                <input type="text" id="audit-company" name="company"
+                  class="bg-surface border-2 border-outline text-on-surface font-body-sm p-sm focus:border-primary focus:outline-none"
+                  placeholder="Your Firm">
+              </div>
+            </div>
+            <input type="hidden" name="vertical" value="tenders">
+            <button type="submit" class="self-start neo-brutalist-button bg-primary text-on-primary font-label-mono text-label-mono px-lg py-sm uppercase font-bold">
+              RUN AUDIT_
+            </button>
+          </form>
+          <div id="audit-response" class="mt-md hidden"></div>
+        </div>
+        <div class="bg-surface p-md border-2 border-outline neo-brutalist-card flex flex-col gap-sm relative">
+          <div class="absolute -top-3 -right-3 bg-secondary-container text-surface font-label-mono text-[10px] px-2 py-1 border-2 border-outline font-bold z-20 shadow-[2px_2px_0px_0px_#8e9379]">
+            SIGNAL_FEED
+          </div>
+          <div class="font-terminal-log text-terminal-log text-outline text-xs flex flex-col gap-xs">
+            <div>> SCANNING TENDER SOURCES...</div>
+            <div class="text-primary-fixed">[OK]</div>
+            <div>> DEADLINE TRACKER ACTIVE</div>
+            <div class="text-primary-fixed">[OK]</div>
+            <div>> DRAFT ASSISTANT: STANDBY</div>
+            <div class="animate-pulse text-secondary-container">[READY]</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="animate-on-scroll fade-in">
+      <div class="neo-brutalist-card neo-brutalist-primary p-md md:p-lg flex flex-col gap-md">
+        <h2 class="font-headline-md text-headline-md text-primary uppercase font-bold">BOOK DEMO CALL</h2>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Select a time that works for you. We'll show one system working.</p>
+        <form id="booking-form" class="flex flex-col gap-md" action="/api/submit-booking" method="POST">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+            <div class="flex flex-col gap-xs">
+              <label class="font-label-mono text-label-mono text-primary" for="booking-name">NAME</label>
+              <input type="text" id="booking-name" name="name" required
+                class="bg-surface border-2 border-outline text-on-surface font-body-sm p-sm focus:border-primary focus:outline-none"
+                placeholder="John Doe">
+            </div>
+            <div class="flex flex-col gap-xs">
+              <label class="font-label-mono text-label-mono text-primary" for="booking-email">EMAIL</label>
+              <input type="email" id="booking-email" name="email" required
+                class="bg-surface border-2 border-outline text-on-surface font-body-sm p-sm focus:border-primary focus:outline-none"
+                placeholder="john@contractor.com">
+            </div>
+          </div>
+          <div class="flex flex-col gap-xs">
+            <label class="font-label-mono text-label-mono text-primary" for="booking-date">PREFERRED DATE & TIME</label>
+            <input type="datetime-local" id="booking-date" name="preferred_date"
+              class="bg-surface border-2 border-outline text-on-surface font-body-sm p-sm focus:border-primary focus:outline-none">
+          </div>
+          <div class="flex flex-col gap-xs">
+            <label class="font-label-mono text-label-mono text-primary" for="booking-message">MESSAGE (OPTIONAL)</label>
+            <textarea id="booking-message" name="message" rows="3"
+              class="bg-surface border-2 border-outline text-on-surface font-body-sm p-sm focus:border-primary focus:outline-none"
+              placeholder="What tender challenges are you facing?"></textarea>
+          </div>
+          <button type="submit" class="self-start neo-brutalist-button bg-primary text-on-primary font-label-mono text-label-mono px-lg py-sm uppercase font-bold">
+            CONFIRM BOOKING_
+          </button>
+        </form>
+        <div id="booking-response" class="mt-md hidden"></div>
+      </div>
+    </section>
+
+    <!-- Pricing Tiers Preview -->
+    <section class="pt-md animate-on-scroll fade-in">
+      <div class="font-headline-lg text-headline-lg text-on-surface uppercase border-b-4 border-primary pb-sm inline-block w-max bg-surface px-md neo-brutalist-card">
+        &gt; DEPLOYMENT MODULES
+      </div>
+      <p class="font-body-sm text-outline mt-sm">Most common entry: <strong class="text-primary-fixed">Integration - Growth</strong>. Prices in ZAR.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-lg mt-lg">
+        <!-- Tier 1 -->
+        <div class="neo-brutalist-card p-lg flex flex-col gap-md relative group hover:border-primary transition-colors">
+          <div class="absolute -top-4 -left-4 bg-outline text-surface border-2 border-surface px-md py-xs font-label-mono-sm font-bold shadow-[4px_4px_0px_0px_#121414] z-20 group-hover:bg-primary transition-colors">
+            CONSULT
+          </div>
+          <div class="bg-surface-container-high p-sm border-2 border-outline-variant mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">STARTER</div>
+            <div class="font-terminal-log text-terminal-log text-primary mt-xs">&gt; Single Strategy Session</div>
+          </div>
+          <hr class="border-outline-variant border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-outline-variant">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Audit + Roadmap</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> 1 strategy call</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Action list</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-outline mt-md group-hover:border-primary transition-colors">
+            R4,500
+          </div>
+          <a href="pricing.html" class="w-full bg-outline text-surface font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md neo-brutalist-button-alt font-bold text-center">
+            APPLY_
+          </a>
+        </div>
+        <!-- Tier 2 -->
+        <div class="neo-brutalist-card neo-brutalist-primary p-lg flex flex-col gap-md relative transform md:-translate-y-4 z-10">
+          <div class="absolute -top-4 -right-4 bg-primary text-surface font-label-mono-sm px-sm py-xs uppercase font-bold border-2 border-surface shadow-[4px_4px_0px_0px_#121414] z-20">
+            MOST COMMON
+          </div>
+          <div class="absolute -top-4 -left-4 bg-primary text-surface px-md py-xs font-label-mono-sm font-bold border-2 border-surface shadow-[4px_4px_0px_0px_#121414] z-20">
+            GROWTH
+          </div>
+          <div class="bg-primary/10 p-sm border-2 border-primary mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">INTEGRATION</div>
+            <div class="font-terminal-log text-terminal-log font-bold text-primary mt-xs">&gt; Full workflow + Dashboard</div>
+          </div>
+          <hr class="border-primary border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-primary/50">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Setup & automations</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Dashboard access</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Team training</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Monthly support</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-primary mt-md">
+            R25,000 setup • R6,500/mo
+          </div>
+          <a href="pricing.html" class="w-full bg-primary text-surface font-terminal-log p-sm font-bold uppercase hover:bg-white transition-all mt-md neo-brutalist-button text-lg text-center">
+            START_
+          </a>
+        </div>
+        <!-- Tier 3 -->
+        <div class="neo-brutalist-card p-lg flex flex-col gap-md relative group hover:border-primary transition-colors">
+          <div class="absolute -top-4 -left-4 bg-outline text-surface border-2 border-surface px-md py-xs font-label-mono-sm font-bold shadow-[4px_4px_0px_0px_#121414] z-20 group-hover:bg-primary transition-colors">
+            MANAGED
+          </div>
+          <div class="bg-surface-container-high p-sm border-2 border-outline-variant mt-sm">
+            <div class="font-headline-md text-headline-md uppercase text-on-surface font-bold">MIGRATION</div>
+            <div class="font-terminal-log text-terminal-log text-primary mt-xs">&gt; Full rollout + optimisation</div>
+          </div>
+          <hr class="border-outline-variant border-2"/>
+          <ul class="flex flex-col gap-md font-body-md text-body-md flex-grow bg-surface-container-low p-sm border border-outline-variant">
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Complete adoption</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Dedicated supervisor</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Ongoing optimisation</li>
+            <li class="flex items-start gap-sm"><span class="text-primary font-bold mt-1">]</span> Priority SLA</li>
+          </ul>
+          <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-outline mt-md group-hover:border-primary transition-colors">
+            R45,000 setup • R12,500/mo
+          </div>
+          <a href="pricing.html" class="w-full bg-outline text-surface font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md neo-brutalist-button-alt font-bold text-center">
+            TALK TO US_
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final Close -->
+    <section class="neo-brutalist-card neo-brutalist-primary p-lg flex flex-col items-center text-center gap-md animate-on-scroll fade-in">
+      <h2 class="font-headline-md text-headline-md text-primary uppercase max-w-3xl">YOUR COMPETITOR IS ALREADY USING AI</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+        This isn't about technology. It's about relevance.<br/>Book 15 minutes. See one system work. Decide after.
+      </p>
+      <a href="#booking" class="neo-brutalist-button bg-surface text-on-primary font-label-mono text-label-mono px-xl py-md text-lg uppercase font-bold shadow-[6px_6px_0px_0px_#c3f400] hover:bg-primary hover:text-surface transition-colors">
+        BOOK DEMO CALL_
+      </a>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t-2 border-primary bg-surface-container-lowest w-full py-xl flex flex-col md:flex-row justify-between items-center px-margin gap-md">
+    <div class="font-terminal-log text-terminal-log text-primary">
+      ©2024 ZONKE_AI [HUMAN_OBSOLETE_ARCH]
+    </div>
+    <nav class="flex gap-md font-label-mono text-label-mono">
+      <a class="text-outline hover:text-primary transition-all duration-75" href="#">[TERMINAL_ACCESS]</a>
+      <a class="text-outline hover:text-primary transition-all duration-75" href="#">[DATA_PRIVACY]</a>
+      <a class="text-outline hover:text-primary transition-all duration-75" href="#">[SYSTEM_STATUS]</a>
+    </nav>
+  </footer>
+</main>
+
+<script src="https://unpkg.com/motion@10.16.2/dist/motion.min.js"></script>
+<script type="module">
+  import { inView } from "https://unpkg.com/@motionone/on-scroll@10.16.2/dist/on-scroll.js";
+  inView('.animate-on-scroll', ({ target }) => {
+    motion.animate(target, { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] }, { duration: 0.6, easing: "ease-out" });
+  }, { amount: 0.1 });
+
+  // Form submissions
+  const auditForm = document.getElementById('audit-form');
+  if (auditForm) {
+    auditForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(auditForm);
+      const body = JSON.stringify(Object.fromEntries(formData));
+      try {
+        const res = await fetch('/api/submit-audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body
+        });
+        const data = await res.json();
+        const respDiv = document.getElementById('audit-response');
+        respDiv.innerHTML = data.success ? `<p class="text-primary">Audit requested. Check your email.</p>` : `<p class="text-error">Error: ${data.error || 'unknown'}</p>`;
+        respDiv.classList.remove('hidden');
+        if (data.success) auditForm.reset();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('audit-response').innerHTML = `<p class="text-error">Network error</p>`;
+        document.getElementById('audit-response').classList.remove('hidden');
+      }
+    });
+  }
+
+  const bookingForm = document.getElementById('booking-form');
+  if (bookingForm) {
+    bookingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(bookingForm);
+      const body = JSON.stringify(Object.fromEntries(formData));
+      try {
+        const res = await fetch('/api/submit-booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body
+        });
+        const data = await res.json();
+        const respDiv = document.getElementById('booking-response');
+        respDiv.innerHTML = data.success ? `<p class="text-primary">Booking confirmed. Check your email for details.</p>` : `<p class="text-error">Error: ${data.error || 'unknown'}</p>`;
+        respDiv.classList.remove('hidden');
+        if (data.success) bookingForm.reset();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('booking-response').innerHTML = `<p class="text-error">Network error</p>`;
+        document.getElementById('booking-response').classList.remove('hidden');
+      }
+    });
+  }
+</script>
+<script src="assets/js/particles.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.querySelector('aside button[aria-label="Menu"]');
+    if (menuBtn) {
+      menuBtn.addEventListener('click', () => {
+        const nav = menuBtn.closest('aside').querySelector('nav');
+        nav.classList.toggle('hidden');
+      });
+    }
+  });
+</script>
+</body>
+</html>

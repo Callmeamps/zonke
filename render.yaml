@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: zonke-website
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    region: frankfurt  # Adjust as needed
+    # Environment variables should be set in Render dashboard:
+    # SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
