@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "zonke",
+  "project_id": "4457b2ea-424e-44d5-ab9e-642252f2f3e4"
+}
