@@ -178,16 +178,16 @@
     </button>
   </div>
   <nav class="flex-1 p-md hidden md:flex flex flex-col gap-unit">
-    <a class="font-label-mono text-label-mono text-primary border border-primary bg-surface-container-low px-md py-sm flex items-center gap-sm" href="index.html">
+    <a class="font-label-mono text-label-mono text-primary border border-primary bg-surface-container-low px-md py-sm flex items-center gap-sm" href="/">
       <span class="material-symbols-outlined">home</span> HOME
     </a>
-    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="real-estate.html">
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="/real-estate">
       <span class="material-symbols-outlined">apartment</span> REAL_ESTATE
     </a>
-    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="tenders.html">
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="/tenders">
       <span class="material-symbols-outlined">description</span> TENDERS
     </a>
-    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="pricing.html">
+    <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="/pricing">
       <span class="material-symbols-outlined">payments</span> PRICING
     </a>
   </nav>
@@ -237,9 +237,17 @@
 <script src="https://unpkg.com/motion@10.16.2/dist/motion.min.js"></script>
 <script type="module">
   import { inView } from "https://unpkg.com/@motionone/on-scroll@10.16.2/dist/on-scroll.js";
-  inView('.animate-on-scroll', ({ target }) => {
-    Motion.animate(target, { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] }, { duration: 0.6, easing: "ease-out" });
-  }, { amount: 0.1 });
+  if (window.motion && typeof inView === 'function') {
+    inView('.animate-on-scroll', ({ target }) => {
+      motion.animate(target, { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] }, { duration: 0.6, easing: "ease-out" });
+    }, { amount: 0.1 });
+  }
+  setTimeout(() => {
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    });
+  }, 700);
 </script>
 <script src="assets/js/particles.js" defer></script>
 <script>

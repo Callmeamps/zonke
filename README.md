@@ -84,6 +84,7 @@ npx serve .
 
 - All form submissions are handled server-side to keep Supabase credentials safe.
 - Frontend uses fetch with JSON; CORS is enabled in functions for same-origin.
+- Pages include animation fail-safes so content still renders if Motion/on-scroll CDN imports fail.
 - Responsive design works on mobile and desktop.
 - Expand with GA4 tracking as needed.
 

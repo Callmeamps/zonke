@@ -36,27 +36,10 @@
 - [x] Ensure no private keys in client
 - [x] All pages linked correctly
 
-
-### Components & Assets
-- [ ] Sidebar navigation (reusable HTML snippet)
-- [ ] Footer (reusable)
-- [ ] Buttons / cards / form styles (Tailwind classes)
-- [ ] Canvas particle network for hero sections (`assets/js/particles.js`)
-- [ ] Scroll animations with motion.dev (`assets/js/scroll-anim.js`)
-- [ ] GA4 integration snippet
-
-### Backend Functions
-- [ ] Core handler logic: `lib/handleAudit.js`, `lib/handleBooking.js`
-- [ ] Netlify functions: `functions/netlify/submit-audit.js`, `functions/netlify/submit-booking.js`
-- [ ] Render functions: `api/submit-audit.js`, `api/submit-booking.js`
-
-### Deployment Configs
-- [ ] `netlify.toml` (build settings, redirects)
-- [ ] `render.yaml` (static + function services)
-- [ ] `.env.example`
-
-### Final Checks
-- [ ] Verify responsive design (mobile breakpoints)
-- [ ] Test form submissions (local mock)
-- [ ] Ensure no private keys in client
-- [ ] All pages linked correctly
+### Recent Fixes
+- [x] Fixed `real-estate.html` class typo (`neo-brutalist-button-alt`)
+- [x] Hardened animation fallback on `index.html`, `real-estate.html`, `tenders.html`, `pricing.html` (content visible even if Motion/CDN fails)
+- [x] Rendered mobile HyperFrames MP4s:
+  - `zonke-videos-mobile/brand-reel-mobile.mp4`
+  - `zonke-videos-mobile-lead/lead-reactor-mobile.mp4`
+  - `zonke-videos-mobile-tender/tender-vault-mobile.mp4`
