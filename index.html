@@ -165,7 +165,7 @@
   }
 </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col md:flex-row font-body-sm text-body-sm selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<body class="antialiased min-h-screen flex flex-col md:flex-row font-body-sm text-body-sm selection:bg-primary-fixed selection:text-on-primary-fixed overflow-y-auto">
 <div class="scanline"></div>
 <canvas id="particle-canvas"></canvas>
 
@@ -238,7 +238,7 @@
 <script type="module">
   import { inView } from "https://unpkg.com/@motionone/on-scroll@10.16.2/dist/on-scroll.js";
   inView('.animate-on-scroll', ({ target }) => {
-    motion.animate(target, { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] }, { duration: 0.6, easing: "ease-out" });
+    Motion.animate(target, { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] }, { duration: 0.6, easing: "ease-out" });
   }, { amount: 0.1 });
 </script>
 <script src="assets/js/particles.js" defer></script>

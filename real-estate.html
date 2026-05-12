@@ -154,7 +154,7 @@
   }
 </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col md:flex-row font-body-sm text-body-sm selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<body class="antialiased min-h-screen flex flex-col md:flex-row font-body-sm text-body-sm selection:bg-primary-fixed selection:text-on-primary-fixed overflow-y-auto">
 <div class="scanline"></div>
 <canvas id="particle-canvas"></canvas>
 
@@ -324,7 +324,7 @@
           <div class="font-label-mono text-label-mono text-primary text-lg text-center py-sm border-2 border-outline mt-md group-hover:border-primary transition-colors">
             R4,500
           </div>
-          <a href="pricing.html" class="w-full bg-outline text-surface font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md neo-brutalistan-button-alt font-bold text-center">
+          <a href="pricing.html" class="w-full bg-outline text-surface font-terminal-log p-sm uppercase hover:bg-primary hover:text-surface transition-colors mt-md neo-brutalist-button-alt font-bold text-center">
             APPLY_
           </a>
         </div>
@@ -410,7 +410,7 @@
 <script type="module">
   import { inView } from "https://unpkg.com/@motionone/on-scroll@10.16.2/dist/on-scroll.js";
   inView('.animate-on-scroll', ({ target }) => {
-    motion.animate(target, { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] }, { duration: 0.6, easing: "ease-out" });
+    Motion.animate(target, { opacity: [0, 1], transform: ['translateY(20px)', 'translateY(0)'] }, { duration: 0.6, easing: "ease-out" });
   }, { amount: 0.1 });
 
   // Form submissions
