@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Lead Reactor - Product Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root {
+      --bg: #121414;
+      --lime: #c3f400;
+      --olive: #8e9379;
+      --white: #ffffff;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg);
+      color: var(--white);
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Scanlines overlay */
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+    }
+    
+    .container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    /* Scene 1: Progress Bar */
+    .scene-1 {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+    
+    .init-text {
+      font-size: 28px;
+      color: var(--lime);
+      letter-spacing: 4px;
+    }
+    
+    .progress-container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .progress-bar {
+      display: flex;
+      gap: 4px;
+      font-size: 48px;
+      color: var(--lime);
+    }
+    
+    .progress-char {
+      opacity: 0.2;
+      transition: opacity 0.1s;
+    }
+    
+    .progress-char.filled {
+      opacity: 1;
+    }
+    
+    .progress-percent {
+      font-size: 24px;
+      color: var(--olive);
+      font-variant-numeric: tabular-nums;
+      min-width: 60px;
+    }
+    
+    /* Scene 2: Grid */
+    .scene-2 {
+      position: absolute;
+      display: none;
+      width: 90%;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+    
+    .card {
+      background: var(--bg);
+      border: 2px solid var(--olive);
+      padding: 24px;
+      min-height: 120px;
+      box-shadow: 6px 6px 0 var(--lime);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    .card-label {
+      font-size: 12px;
+      color: var(--olive);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    
+    .card-value {
+      font-size: 32px;
+      color: var(--white);
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .card-value.highlight {
+      color: var(--lime);
+    }
+    
+    /* Scene 3: CTA */
+    .scene-3 {
+      position: absolute;
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 40px;
+    }
+    
+    .headline {
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--white);
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+    
+    .headline span {
+      color: var(--lime);
+    }
+    
+    .cta-button {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 20px 48px;
+      background: var(--lime);
+      color: var(--bg);
+      border: 2px solid var(--lime);
+      box-shadow: 6px 6px 0 var(--olive);
+      cursor: pointer;
+      transform: translateX(-50px);
+      opacity: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: glitch-shine 0.3s infinite;
+    }
+    
+    @keyframes glitch-shine {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    .glitch {
+      animation: glitch 0.1s infinite;
+    }
+    
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+      100% { transform: translate(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  
+  <div class="container">
+    <!-- Scene 1: Progress Bar -->
+    <div class="scene-1" id="scene1">
+      <div class="init-text">&gt; INITIALIZING LEAD REACTOR...</div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar">
+          <span class="progress-char">█</span>
+          <span class="progress-char">█</span>
+          <span class="progress-char">█</span>
+          <span class="progress-char">█</span>
+          <span class="progress-char">█</span>
+          <span class="progress-char">█</span>
+          <span class="progress-char">█</span>
+          <span class="progress-char">█</span>
+          <span class="progress-char">░</span>
+          <span class="progress-char">░</span>
+        </div>
+        <div class="progress-percent" id="progressPercent">0%</div>
+      </div>
+    </div>
+    
+    <!-- Scene 2: Grid -->
+    <div class="scene-2" id="scene2">
+      <div class="grid">
+        <div class="card">
+          <div class="card-label">Leads</div>
+          <div class="card-value highlight" data-count="0" data-target="1247">0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Qualified</div>
+          <div class="card-value" data-count="0" data-target="892">0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Converted</div>
+          <div class="card-value highlight" data-count="0" data-target="341">0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Revenue</div>
+          <div class="card-value" data-count="0" data-target="2.4" data-prefix="$" data-suffix="M">$0M</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Response</div>
+          <div class="card-value highlight" data-count="0" data-target="0.3" data-suffix="s">0s</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Active</div>
+          <div class="card-value" data-count="0" data-target="24">0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Campaigns</div>
+          <div class="card-value highlight" data-count="0" data-target="18">0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Emails</div>
+          <div class="card-value" data-count="0" data-target="45892">0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Opens</div>
+          <div class="card-value highlight" data-count="0" data-target="67">0%</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Clicks</div>
+          <div class="card-value" data-count="0" data-target="23">0%</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Bookings</div>
+          <div class="card-value highlight" data-count="0" data-target="156">0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">ROI</div>
+          <div class="card-value" data-count="0" data-target="847" data-suffix="%">0%</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Scene 3: CTA -->
+    <div class="scene-3" id="scene3">
+      <div class="headline">
+        <span>Instant response.</span><br>
+        Automated qualification.
+      </div>
+      <button class="cta-button" id="ctaBtn">GET STARTED →</button>
+    </div>
+  </div>
+
+  <script>
+    // Initialize timeline
+    const tl = gsap.timeline({ repeat: -1 });
+    
+    // Scene 1: Progress bar (0-10s)
+    const progressChars = document.querySelectorAll('.progress-char');
+    const progressPercent = document.getElementById('progressPercent');
+    const filledCount = 8;
+    
+    // Animate progress bar fill
+    tl.fromTo('#scene1', 
+      { opacity: 0 }, 
+      { opacity: 1, duration: 0.5 }
+    );
+    
+    // Fill progress characters
+    for (let i = 0; i < progressChars.length; i++) {
+      const isFilled = i < filledCount;
+      tl.fromTo(progressChars[i],
+        { opacity: 0.2 },
+        { 
+          opacity: isFilled ? 1 : 0.2, 
+          duration: 0.8,
+          ease: "power2.out"
+        },
+        `+0.1`
+      );
+    }
+    
+    // Animate percentage counter
+    tl.fromTo(progressPercent,
+      { textContent: "0%" },
+      { 
+        textContent: "87%", 
+        duration: 6,
+        snap: { textContent: 1 },
+        ease: "power2.inOut"
+      },
+      "<"
+    );
+    
+    // Hold scene 1
+    tl.to({}, { duration: 2 });
+    
+    // Fade out scene 1
+    tl.to('#scene1', { opacity: 0, duration: 0.5 });
+    
+    // Scene 2: Grid reveal (10-20s)
+    tl.call(() => {
+      document.getElementById('scene2').style.display = 'block';
+    });
+    
+    tl.fromTo('#scene2',
+      { opacity: 0 },
+      { opacity: 1, duration: 0.5 }
+    );
+    
+    // Animate cards in with stagger
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+      tl.fromTo(card,
+        { opacity: 0, y: 20 },
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.4,
+          ease: "back.out(1.7)"
+        },
+        `-=0.3`
+      );
+    });
+    
+    // Animate count-up for each card
+    const cardValues = document.querySelectorAll('.card-value');
+    cardValues.forEach((value, index) => {
+      const target = parseFloat(value.dataset.target);
+      const prefix = value.dataset.prefix || '';
+      const suffix = value.dataset.suffix || '';
+      const isDecimal = target.toString().includes('.');
+      
+      tl.fromTo(value,
+        { textContent: "0" },
+        { 
+          textContent: target,
+          duration: 2,
+          snap: { textContent: isDecimal ? 0.1 : 1 },
+          ease: "power2.out",
+          onUpdate: function() {
+            const current = this.targets()[0].textContent;
+            value.textContent = prefix + (isDecimal ? current.toFixed(1) : Math.round(current)) + suffix;
+          }
+        },
+        `-=1.5`
+      );
+    });
+    
+    // Hold scene 2
+    tl.to({}, { duration: 1 });
+    
+    // Fade out scene 2
+    tl.to('#scene2', { opacity: 0, duration: 0.5 });
+    
+    // Scene 3: CTA (20-30s)
+    tl.call(() => {
+      document.getElementById('scene3').style.display = 'flex';
+    });
+    
+    tl.fromTo('#scene3',
+      { opacity: 0 },
+      { opacity: 1, duration: 0.5 }
+    );
+    
+    // Slide headline from left
+    tl.fromTo('.headline',
+      { x: -100, opacity: 0 },
+      { x: 0, opacity: 1, duration: 1, ease: "power3.out" }
+    );
+    
+    // Slide CTA button
+    tl.fromTo('#ctaBtn',
+      { x: -50, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+      "-=0.5"
+    );
+    
+    // Add glitch effect to button
+    tl.call(() => {
+      const btn = document.getElementById('ctaBtn');
+      btn.classList.add('glitch');
+      setTimeout(() => btn.classList.remove('glitch'), 500);
+    });
+    
+    tl.to({}, { duration: 3 });
+    
+    // Loop back
+    tl.to('#scene3', { opacity: 0, duration: 0.5 });
+  </script>
+</body>
+</html>

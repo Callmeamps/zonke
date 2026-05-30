@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=1080, height=1920"/>
+<title>ZONKE - Brand Reel Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root { --bg:#121414; --lime:#c3f400; --olive:#8e9379; --white:#ffffff; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg);color:var(--white);font-family:'JetBrains Mono',monospace}
+  .scanlines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px);opacity:.03;pointer-events:none;z-index:1000}
+  .scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden}
+  .terminal{font-size:72px;font-weight:800;letter-spacing:-.04em;color:var(--lime);text-shadow:6px 6px 0 var(--olive)}
+  .cursor{display:inline-block;width:12px;height:56px;background:var(--lime);margin-left:4px}
+  .glitch-char{position:relative;display:inline-block}
+  .glitch-char::before,.glitch-char::after{content:attr(data-char);position:absolute;inset:0}
+  .glitch-char::before{color:var(--white);clip-path:inset(0 0 70% 0)}
+  .glitch-char::after{color:var(--lime);clip-path:inset(70% 0 0 0)}
+  .z-logo-container{position:relative;width:300px;height:300px}
+  #z-particles{position:absolute;inset:0;width:300px;height:300px}
+  .z-logo{position:absolute;font-size:220px;font-weight:800;color:var(--lime);text-shadow:6px 6px 0 var(--olive)}
+  .ghost-text{position:absolute;font-size:24px;font-weight:700;letter-spacing:.8em;white-space:nowrap;color:var(--white)}
+  .stamp{font-size:56px;font-weight:800;line-height:1.15;text-align:center;color:var(--lime);text-shadow:6px 6px 0 var(--olive);border:2px solid var(--lime);padding:36px 48px;box-shadow:6px 6px 0 var(--lime);background:var(--bg)}
+  #glitch-overlay{position:absolute;inset:0;background:var(--lime);opacity:0;z-index:50;mix-blend-mode:exclusion;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="12" data-width="1080" data-height="1920">
+  <div class="scanlines"></div>
+  <div id="glitch-overlay"></div>
+  <div class="scene" id="scene1"><div class="terminal"><span id="typed"></span><span class="cursor"></span></div></div>
+  <div class="scene" id="scene2"><div class="z-logo-container"><canvas id="z-particles"></canvas><div class="z-logo" id="z-logo" style="opacity:0">Z</div></div><div class="ghost-text" id="ghost-text" style="opacity:0">AI NATIVE STUDIO</div></div>
+  <div class="scene" id="scene3"><div class="stamp" id="stamp">YOUR COMPETITOR IS ALREADY USING AI</div></div>
+</div>
+
+<script>
+function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+const rng=mulberry32(12345); const random=()=>rng();
+const text='> ZONKE_'; const typedEl=document.getElementById('typed');
+const pCanvas=document.getElementById('z-particles'); const pCtx=pCanvas.getContext('2d'); pCanvas.width=300; pCanvas.height=300;
+const zPath=[[37,37],[262,37],[262,90],[90,262],[262,262],[262,210],[60,37],[60,90],[232,262],[37,262],[37,210],[210,90]];
+const points=[]; zPath.forEach(([x,y])=>{for(let i=0;i<8;i++) points.push({tx:x,ty:y,x:x+(random()-.5)*20,y:y+(random()-.5)*20})});
+class Particle{constructor(tx,ty){this.x=random()*300;this.y=random()*300;this.tx=tx;this.ty=ty;this.vx=(random()-.5)*8;this.vy=(random()-.5)*8;this.s=2}u(p){const e=Math.min(1,p*2);this.x+=(this.tx-this.x)*0.08*e+this.vx*0.95;this.y+=(this.ty-this.y)*0.08*e+this.vy*0.95;this.vx*=0.92;this.vy*=0.92;this.x+=(random()-.5)*2;this.y+=(random()-.5)*2}d(){pCtx.fillStyle='#c3f400';pCtx.fillRect(this.x,this.y,this.s,this.s)}}
+const particles=points.map(p=>new Particle(p.tx,p.ty)); let particleProgress=0;
+
+window.__timelines=window.__timelines||{};
+const tl=gsap.timeline({paused:true,defaults:{ease:'expo.out'}});
+window.__timelines.main=tl;
+
+tl.set('#scene1',{opacity:1,visibility:'visible'},0);
+text.split('').forEach((ch,i)=>{tl.call(()=>{const s=document.createElement('span'); if((i+1)%3===0&&ch!=='_'){s.className='glitch-char';s.setAttribute('data-char',ch)} s.textContent=ch; typedEl.appendChild(s)},null,0.1+i*0.08)});
+tl.to('.cursor',{opacity:0,duration:0.25,yoyo:true,repeat:6},0.1);
+tl.to('#scene1',{opacity:0,duration:0.15},2.85); tl.set('#scene1',{visibility:'hidden'},3.0);
+
+// scene2
+ tl.fromTo('#glitch-overlay',{opacity:0},{opacity:0.8,duration:0.05},3).to('#glitch-overlay',{opacity:0,duration:0.1},3.05);
+ tl.set('#scene2',{opacity:1,visibility:'visible'},3.1);
+ tl.to({v:0},{v:1,duration:5,ease:'none',onUpdate:function(){particleProgress=this.targets()[0].v;pCtx.clearRect(0,0,300,300);particles.forEach(p=>{p.u(particleProgress);p.d();});}},3.1);
+ tl.fromTo('#z-logo',{opacity:0,scale:0.5,rotation:-15},{opacity:1,scale:1,rotation:0,duration:0.6},3.3);
+ tl.fromTo('#ghost-text',{opacity:0,x:-160},{opacity:0.12,x:0,duration:1},3.8);
+ tl.to('#scene2',{opacity:0,duration:0.15},7.85); tl.set('#scene2',{visibility:'hidden'},8.0);
+
+// scene3
+ tl.fromTo('#glitch-overlay',{opacity:0},{opacity:0.6,duration:0.03},8).to('#glitch-overlay',{opacity:0,duration:0.08},8.03);
+ tl.set('#scene3',{opacity:1,visibility:'visible'},8.1);
+ tl.fromTo('#stamp',{opacity:0,scale:1.5,y:50},{opacity:1,scale:1,y:0,duration:0.4,ease:'back.out(3)'},8.2);
+ tl.set({}, {}, 12);
+</script>
+</body>
+</html>

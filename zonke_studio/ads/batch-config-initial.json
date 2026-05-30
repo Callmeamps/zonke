@@ -1,0 +1,34 @@
+{
+  "name": "Initial Validation Creatives - Week 1",
+  "description": "First batch of ads for early-bird validation across Instagram Feed and Stories, both Real Estate and Tenders verticals",
+  "creatives": [
+    {
+      "name": "System Override - Instagram Feed - Real Estate",
+      "template": "a-system-override.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/realestate-system-override-a.png"
+    },
+    {
+      "name": "System Override - Instagram Feed - Tenders",
+      "template": "a-system-override-tenders.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/tenders-system-override-a.png"
+    },
+    {
+      "name": "Terminal Countdown - Instagram Stories - Real Estate",
+      "template": "b-terminal-countdown.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/realestate-countdown-a.png"
+    },
+    {
+      "name": "Terminal Countdown - Instagram Stories - Tenders",
+      "template": "b-terminal-countdown-tenders.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/tenders-countdown-a.png"
+    }
+  ]
+}

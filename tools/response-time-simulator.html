@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Response Time Simulator | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<script src="/assets/js/toolkit.js"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#121414", "surface-dim": "#121414", "surface-bright": "#37393a",
+        "surface-container-lowest": "#0c0f0f", "surface-container-low": "#1a1c1c",
+        "surface-container": "#1e2020", "surface-container-high": "#282a2b",
+        "surface-container-highest": "#333535", "on-surface": "#e2e2e2",
+        "on-surface-variant": "#c4c9ac", "outline": "#8e9379", "outline-variant": "#444933",
+        "primary": "#c3f400", "on-primary": "#283500", "primary-container": "#c3f400",
+        "on-primary-container": "#556d00", "secondary": "#ffb59f",
+        "secondary-container": "#ff571c", "on-secondary-container": "#531300",
+        "error": "#ffb4ab", "error-container": "#93000a", "on-error-container": "#ffdad6"
+      },
+      borderRadius: { DEFAULT: "0px", lg: "0px", xl: "0px", full: "9999px" },
+      spacing: { xs: "4px", unit: "4px", sm: "8px", xl: "64px", lg: "32px", gutter: "24px", margin: "40px", md: "16px" },
+      fontFamily: { mono: ["JetBrains Mono", "monospace"] },
+      fontSize: {
+        "display-lg": ["72px", { lineHeight: "1.0", letterSpacing: "-0.04em", fontWeight: "800" }],
+        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-md": ["24px", { lineHeight: "1.2", letterSpacing: "0em", fontWeight: "700" }],
+        "body-lg": ["18px", { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" }],
+        "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0.02em", fontWeight: "400" }],
+        "label-mono": ["12px", { lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "700" }],
+        "code-snippet": ["14px", { lineHeight: "1.4", letterSpacing: "0em", fontWeight: "400" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+* { font-family: 'JetBrains Mono', monospace; }
+body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
+
+.screen { transition: opacity 0.5s ease, transform 0.5s ease; }
+.screen.hidden { display: none; }
+.screen.active { display: block; animation: fadeSlideIn 0.6s ease forwards; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(195, 244, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(195, 244, 0, 0.6); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+@keyframes gauge-fill {
+  from { width: 0%; }
+}
+
+.scanline-overlay {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.015) 2px,
+    rgba(255,255,255,0.015) 4px
+  );
+}
+
+.cursor-blink::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+  color: #c3f400;
+}
+
+input[type="range"] { accent-color: #c3f400; height: 4px; }
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px;
+  background: #c3f400; border: none; border-radius: 0;
+  cursor: pointer;
+}
+
+.outcome-bar {
+  transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.prob-gauge {
+  transition: width 0.5s ease;
+}
+
+.lead-dot {
+  transition: all 0.2s ease;
+}
+</style>
+</head>
+<body>
+
+<div class="scanline-overlay"></div>
+
+<div class="min-h-screen flex flex-col">
+
+<header class="border-b border-outline-variant p-gutter flex items-center justify-between">
+  <a href="/" class="text-primary font-bold text-headline-md hover:opacity-80 transition-opacity no-underline">ZONKE_</a>
+  <span class="text-code-snippet text-on-surface-variant">&gt; RESPONSE TIME SIMULATOR v1.0</span>
+</header>
+
+<main class="flex-1 flex flex-col items-center justify-center p-gutter max-w-3xl mx-auto w-full">
+
+<!-- SCREEN 1: BOOT / SPLASH -->
+<div id="screen-splash" class="screen active w-full text-center">
+  <div class="mb-xl">
+    <pre class="text-primary text-[10px] sm:text-xs leading-tight opacity-60">
+  ___   ___  ___ _ _ _   ___  ___  ___  ___   _   ___  ___
+ | _ \ | _ \/ __| | | | | _ \| _ \/ __|/ __| /_\ | _ \/ __|
+ |   / |  _/\__ \ |_| | |  _/|   /\__ \ (__ / _ \|  _/\__ \
+ |_|_\ |_|  |___/\___/  |_|  |_|_\|___/\___/_/ \_\_|  |___/
+    </pre>
+  </div>
+  <div class="text-left max-w-lg mx-auto border border-outline-variant p-lg bg-surface-container-low">
+    <p class="text-primary text-body-sm mb-sm">&gt; INITIALIZE RESPONSE SIMULATOR...</p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-1"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-2"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-3"></p>
+    <div class="h-1 bg-surface-container-highest mt-md overflow-hidden">
+      <div id="boot-progress" class="h-full bg-primary" style="width:0%; transition: width 2s ease;"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="boot-status">_</p>
+  </div>
+  <button id="btn-start" class="hidden mt-xl bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none mx-auto">
+    START SIMULATION →
+  </button>
+</div>
+
+<!-- SCREEN 2: INPUT FORM -->
+<div id="screen-input" class="screen hidden w-full">
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-headline-md mb-sm">&gt; CONFIGURE SIMULATION PARAMETERS</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Set your response speed and follow-up cadence to see how they affect conversion rates.</p>
+
+    <div class="space-y-lg">
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Response Speed</span>
+          <span class="text-primary" id="val-responseSpeed">1 sec</span>
+        </label>
+        <input type="range" id="input-responseSpeed" min="0" max="1440" value="0" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1 sec</span><span>24 hrs</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Follow-up Cadence</span>
+          <span class="text-primary" id="val-followUpCadence">1</span>
+        </label>
+        <input type="range" id="input-followUpCadence" min="0" max="10" value="1" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>0</span><span>10</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Monthly Leads</span>
+          <span class="text-primary" id="val-monthlyLeads">50</span>
+        </label>
+        <input type="range" id="input-monthlyLeads" min="10" max="500" value="50" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>10</span><span>500</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Avg Deal Value (ZAR)</span>
+          <span class="text-primary" id="val-avgDealValue">R45,000</span>
+        </label>
+        <input type="range" id="input-avgDealValue" min="10000" max="500000" value="45000" step="5000" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>R10k</span><span>R500k</span></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-analyze" class="w-full bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+    RUN SIMULATION →
+  </button>
+</div>
+
+<!-- SCREEN 3: PROCESSING -->
+<div id="screen-processing" class="screen hidden w-full text-center">
+  <div class="border border-outline-variant p-lg bg-surface-container-low max-w-lg mx-auto">
+    <div class="flex items-center gap-md mb-lg">
+      <div class="w-3 h-3 bg-secondary-container animate-pulse"></div>
+      <p class="text-primary text-headline-md">&gt; SIMULATING LEAD JOURNEYS</p>
+    </div>
+
+    <div id="processing-timer-phase" class="mb-lg">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-sm">Response Timer</p>
+      <p class="text-display-lg text-primary" id="processing-timer">--</p>
+      <div class="mt-md">
+        <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-sm">Conversion Probability</p>
+        <div class="h-4 bg-surface-container-highest overflow-hidden relative">
+          <div id="processing-prob-bar" class="h-full prob-gauge" style="width:85%; background: #c3f400;"></div>
+        </div>
+        <p class="text-headline-md text-primary mt-sm" id="processing-prob-text">85%</p>
+      </div>
+    </div>
+
+    <div id="processing-sim-phase" class="hidden">
+      <div class="h-32 border border-outline-variant bg-surface-container mb-md relative overflow-hidden" id="processing-leads-container">
+      </div>
+      <div class="text-left space-y-sm mb-lg" id="processing-messages">
+      </div>
+      <div class="h-2 bg-surface-container-highest overflow-hidden">
+        <div id="processing-bar" class="h-full bg-primary" style="width:0%"></div>
+      </div>
+      <p class="text-code-snippet text-primary mt-sm text-right" id="processing-pct">0%</p>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: RESULTS -->
+<div id="screen-results" class="screen hidden w-full">
+  <div class="text-center mb-lg">
+    <p class="text-primary text-headline-md">&gt; SIMULATION COMPLETE</p>
+    <p class="text-on-surface-variant text-body-sm">Your response time impact analysis is ready.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-lg">
+    <div class="border border-secondary-container/30 p-lg bg-surface-container-low text-center">
+      <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">YOUR SETUP</p>
+      <p class="text-display-lg text-secondary-container" id="result-your-conversions">0</p>
+      <p class="text-code-snippet text-on-surface-variant">conversions from 100</p>
+    </div>
+    <div class="border border-primary/30 p-lg bg-surface-container-low text-center">
+      <p class="text-primary text-label-mono uppercase tracking-widest mb-md">OPTIMAL SPEED</p>
+      <p class="text-display-lg text-primary" id="result-optimal-conversions">0</p>
+      <p class="text-code-snippet text-on-surface-variant">conversions from 100</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-on-surface-variant text-label-mono uppercase tracking-widest mb-md">LEAKED REVENUE</p>
+      <p class="text-display-lg text-on-surface" id="result-leaked-revenue">R0</p>
+      <p class="text-code-snippet text-on-surface-variant">per month</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-lg">
+    <div class="border border-outline-variant p-lg bg-surface-container-low">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">OUTCOME DISTRIBUTION</p>
+      <div class="space-y-md">
+        <div>
+          <div class="flex justify-between text-body-sm mb-xs">
+            <span class="text-primary">Converted</span>
+            <span class="text-primary font-bold" id="result-dist-converted">0</span>
+          </div>
+          <div class="h-4 bg-surface-container-highest overflow-hidden">
+            <div id="bar-converted" class="h-full outcome-bar" style="width:0%; background: #c3f400;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-body-sm mb-xs">
+            <span class="text-secondary-container">Lost</span>
+            <span class="text-secondary-container font-bold" id="result-dist-lost">0</span>
+          </div>
+          <div class="h-4 bg-surface-container-highest overflow-hidden">
+            <div id="bar-lost" class="h-full outcome-bar" style="width:0%; background: #ff571c;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border border-outline-variant p-lg bg-surface-container-low">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">MONTHLY IMPACT</p>
+      <div class="space-y-md">
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Your Monthly Conversions</p>
+          <p class="text-headline-xl text-secondary-container" id="result-monthly-conversions">0</p>
+        </div>
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Your Monthly Revenue</p>
+          <p class="text-headline-xl text-secondary-container" id="result-monthly-revenue">R0</p>
+        </div>
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Conversion Probability</p>
+          <p class="text-headline-md text-primary" id="result-conv-prob">0%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">SIMULATION PARAMETERS</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-md text-center">
+      <div>
+        <p class="text-code-snippet text-on-surface-variant">Response Speed</p>
+        <p class="text-body-sm text-on-surface font-bold" id="res-param-speed">--</p>
+      </div>
+      <div>
+        <p class="text-code-snippet text-on-surface-variant">Follow-ups</p>
+        <p class="text-body-sm text-on-surface font-bold" id="res-param-followups">--</p>
+      </div>
+      <div>
+        <p class="text-code-snippet text-on-surface-variant">Monthly Leads</p>
+        <p class="text-body-sm text-on-surface font-bold" id="res-param-leads">--</p>
+      </div>
+      <div>
+        <p class="text-code-snippet text-on-surface-variant">Avg Deal Value</p>
+        <p class="text-body-sm text-on-surface font-bold" id="res-param-deal">--</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <p class="text-body-sm text-on-surface-variant mb-md">Want to save this simulation and get personalized recommendations?</p>
+    <button id="btn-gate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+      UNLOCK FULL REPORT →
+    </button>
+    <button id="btn-restart" class="ml-md bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+      RE-RUN SIMULATION
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 5: COMPLETE -->
+<div id="screen-complete" class="screen hidden w-full text-center">
+  <div class="border border-primary/30 p-xl bg-surface-container-low max-w-lg mx-auto">
+    <p class="text-primary text-display-lg mb-md">✓</p>
+    <p class="text-primary text-headline-md mb-sm">&gt; REPORT UNLOCKED</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Your full Response Time Simulation Report has been sent to <span id="complete-email" class="text-primary"></span>. Check your inbox for personalized recommendations.</p>
+    <div class="border-t border-outline-variant pt-lg space-y-md">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest">WHAT HAPPENS NEXT</p>
+      <div class="flex flex-col gap-sm">
+        <p class="text-code-snippet text-on-surface-variant">1. Full simulation report with detailed breakdown</p>
+        <p class="text-code-snippet text-on-surface-variant">2. Custom response optimization roadmap</p>
+        <p class="text-code-snippet text-on-surface-variant">3. Follow-up with a Zonke specialist (optional)</p>
+      </div>
+    </div>
+    <div class="mt-lg flex flex-col sm:flex-row gap-md justify-center">
+      <a href="/lead-reactor" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors no-underline inline-block">
+        EXPLORE LEAD REACTOR →
+      </a>
+      <button id="btn-restart-complete" class="bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+        RUN ANOTHER SIMULATION
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="border-t border-outline-variant p-gutter text-center">
+  <p class="text-code-snippet text-on-surface-variant">ZONKE AI NATIVE STUDIO &copy; 2026</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  const DECAY_CURVE = [
+    { max: 0.0167, rate: 0.85 },
+    { max: 1, rate: 0.65 },
+    { max: 5, rate: 0.45 },
+    { max: 15, rate: 0.30 },
+    { max: 60, rate: 0.15 },
+    { max: 240, rate: 0.08 },
+    { max: Infinity, rate: 0.05 }
+  ];
+
+  let lastResults = null;
+  let lastInputs = null;
+
+  function formatResponseSpeed(val) {
+    if (val === 0) return '1 sec';
+    if (val < 60) return val + ' min';
+    if (val < 1440) {
+      const h = Math.floor(val / 60);
+      const m = val % 60;
+      return h + ' hr' + (m > 0 ? ' ' + m + ' min' : '');
+    }
+    return '24 hrs';
+  }
+
+  function getResponseTimeMinutes(val) {
+    return val === 0 ? 0.0167 : val;
+  }
+
+  function getConversionProb(minutes) {
+    for (const pt of DECAY_CURVE) {
+      if (minutes <= pt.max) return pt.rate;
+    }
+    return 0.05;
+  }
+
+  function getFollowUpBonus(followUps) {
+    return Math.min(0.85, 0.08 * followUps);
+  }
+
+  function getOptimalProb() {
+    return 0.85;
+  }
+
+  function getInputs() {
+    return {
+      responseSpeed: parseInt(document.getElementById('input-responseSpeed').value),
+      followUpCadence: parseInt(document.getElementById('input-followUpCadence').value),
+      monthlyLeads: parseInt(document.getElementById('input-monthlyLeads').value),
+      avgDealValue: parseInt(document.getElementById('input-avgDealValue').value)
+    };
+  }
+
+  function runSimulation(inputs) {
+    const responseMin = getResponseTimeMinutes(inputs.responseSpeed);
+    const baseProb = getConversionProb(responseMin);
+    const followBonus = getFollowUpBonus(inputs.followUpCadence);
+    const effectiveProb = Math.min(0.85, baseProb + followBonus);
+    const optimalProb = getOptimalProb();
+
+    let conversions = 0;
+    for (let i = 0; i < 100; i++) {
+      if (Math.random() < effectiveProb) conversions++;
+    }
+    const optimalConversions = Math.round(100 * optimalProb);
+
+    const monthlyConversionRate = effectiveProb;
+    const monthlyConversions = Math.round(inputs.monthlyLeads * monthlyConversionRate);
+    const monthlyRevenue = monthlyConversions * inputs.avgDealValue;
+    const optimalMonthlyConversions = Math.round(inputs.monthlyLeads * optimalProb);
+    const optimalMonthlyRevenue = optimalMonthlyConversions * inputs.avgDealValue;
+    const leakedRevenue = optimalMonthlyRevenue - monthlyRevenue;
+
+    return {
+      conversions,
+      optimalConversions: Math.round(optimalConversions),
+      monthlyConversions,
+      monthlyRevenue,
+      optimalMonthlyConversions,
+      optimalMonthlyRevenue,
+      leakedRevenue: Math.max(0, leakedRevenue),
+      effectiveProb: +(effectiveProb * 100).toFixed(1),
+      optimalProb: +(optimalProb * 100).toFixed(1),
+      baseProb: +(baseProb * 100).toFixed(1),
+      followBonus: +(followBonus * 100).toFixed(1),
+      responseMin
+    };
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('active');
+  }
+
+  function setupRangeInputs() {
+    const map = {
+      'input-responseSpeed': 'val-responseSpeed',
+      'input-followUpCadence': 'val-followUpCadence',
+      'input-monthlyLeads': 'val-monthlyLeads',
+      'input-avgDealValue': 'val-avgDealValue'
+    };
+    Object.entries(map).forEach(([inputId, displayId]) => {
+      const input = document.getElementById(inputId);
+      const display = document.getElementById(displayId);
+      input.addEventListener('input', () => {
+        const val = parseInt(input.value);
+        switch (inputId) {
+          case 'input-responseSpeed': display.textContent = formatResponseSpeed(val); break;
+          case 'input-followUpCadence': display.textContent = val; break;
+          case 'input-monthlyLeads': display.textContent = val; break;
+          case 'input-avgDealValue': display.textContent = toolFormatZAR(val); break;
+        }
+      });
+    });
+  }
+
+  function runBootSequence() {
+    const line1 = document.getElementById('boot-line-1');
+    const line2 = document.getElementById('boot-line-2');
+    const line3 = document.getElementById('boot-line-3');
+    const progress = document.getElementById('boot-progress');
+    const status = document.getElementById('boot-status');
+
+    const bootMessages = [
+      '> Loading response decay model... OK',
+      '> Fetching industry benchmark data... OK',
+      '> Initializing simulation engine... OK'
+    ];
+
+    toolTerminalType(line1, bootMessages[0], 20, () => {
+      setTimeout(() => {
+        toolTerminalType(line2, bootMessages[1], 20, () => {
+          setTimeout(() => {
+            toolTerminalType(line3, bootMessages[2], 20, () => {
+              progress.style.width = '100%';
+              status.textContent = 'READY';
+              setTimeout(() => {
+                document.getElementById('btn-start').classList.remove('hidden');
+              }, 400);
+            });
+          }, 200);
+        });
+      }, 200);
+    });
+  }
+
+  function runProcessing(inputs, callback) {
+    const timerPhase = document.getElementById('processing-timer-phase');
+    const simPhase = document.getElementById('processing-sim-phase');
+    const timerEl = document.getElementById('processing-timer');
+    const probBar = document.getElementById('processing-prob-bar');
+    const probText = document.getElementById('processing-prob-text');
+    const msgContainer = document.getElementById('processing-messages');
+    const bar = document.getElementById('processing-bar');
+    const pct = document.getElementById('processing-pct');
+    const leadsContainer = document.getElementById('processing-leads-container');
+
+    timerPhase.classList.remove('hidden');
+    simPhase.classList.add('hidden');
+    msgContainer.innerHTML = '';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+
+    const responseMin = getResponseTimeMinutes(inputs.responseSpeed);
+    const baseProb = getConversionProb(responseMin);
+    const followBonus = getFollowUpBonus(inputs.followUpCadence);
+    const effectiveProb = Math.min(0.85, baseProb + followBonus);
+
+    // Phase 1: Timer countdown
+    const totalSteps = 20;
+    let step = 0;
+
+    function timerStep() {
+      if (step <= totalSteps) {
+        const progress = step / totalSteps;
+        const elapsedMin = responseMin * progress;
+        const remainingMin = Math.max(0, responseMin - elapsedMin);
+        const currentProb = getConversionProb(elapsedMin + 0.001);
+        const probWithFollow = Math.min(0.85, currentProb + followBonus);
+
+        // Show timer
+        if (remainingMin < 0.0167) {
+          timerEl.textContent = '0s';
+        } else if (remainingMin < 1) {
+          timerEl.textContent = Math.round(remainingMin * 60) + 's';
+        } else if (remainingMin < 60) {
+          timerEl.textContent = Math.floor(remainingMin) + 'm ' + Math.round((remainingMin % 1) * 60) + 's';
+        } else {
+          timerEl.textContent = Math.floor(remainingMin / 60) + 'h ' + Math.floor(remainingMin % 60) + 'm';
+        }
+
+        probBar.style.width = (probWithFollow * 100) + '%';
+        probText.textContent = (probWithFollow * 100).toFixed(1) + '%';
+
+        step++;
+        if (step <= totalSteps) {
+          setTimeout(timerStep, 200);
+        } else {
+          // Phase 2: Run simulations
+          setTimeout(runSims, 300);
+        }
+      }
+    }
+
+    function runSims() {
+      timerPhase.classList.add('hidden');
+      simPhase.classList.remove('hidden');
+
+      leadsContainer.innerHTML = '';
+      for (let i = 0; i < 100; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'lead-dot';
+        dot.style.cssText = `position:absolute; width:8px; height:8px; border-radius:50%; opacity:0; left:${5 + Math.random() * 90}%; top:${10 + Math.random() * 70}%;`;
+        leadsContainer.appendChild(dot);
+      }
+
+      const messages = [
+        '> Simulating lead journey 1...',
+        '> Applying decay curve to response time...',
+        '> Factoring follow-up sequence...',
+        '> Aggregating outcome distribution...',
+        '> Computing revenue impact...'
+      ];
+
+      const totalSims = 100;
+      let completed = 0;
+      const results = [];
+      const responseMin2 = getResponseTimeMinutes(inputs.responseSpeed);
+      const baseProb2 = getConversionProb(responseMin2);
+      const followBonus2 = getFollowUpBonus(inputs.followUpCadence);
+      const effectiveProb2 = Math.min(0.85, baseProb2 + followBonus2);
+
+      function simStep() {
+        const batchSize = 20;
+        for (let b = 0; b < batchSize && completed < totalSims; b++) {
+          const outcome = Math.random() < effectiveProb2;
+          results.push(outcome);
+          const dot = leadsContainer.children[completed];
+          if (dot) {
+            dot.style.background = outcome ? '#c3f400' : '#ff571c';
+            dot.style.opacity = outcome ? '0.8' : '0.5';
+            dot.style.boxShadow = outcome ? '0 0 4px rgba(195,244,0,0.5)' : 'none';
+          }
+          completed++;
+        }
+
+        const pctDone = Math.round((completed / totalSims) * 100);
+        bar.style.width = pctDone + '%';
+        pct.textContent = pctDone + '%';
+
+        const msgIdx = Math.min(Math.floor(completed / 20), messages.length - 1);
+        if (msgIdx < messages.length) {
+          msgContainer.innerHTML = '<p class="text-code-snippet text-on-surface-variant">' + messages[msgIdx] + '</p>';
+        }
+
+        if (completed < totalSims) {
+          setTimeout(simStep, 300);
+        } else {
+          const conversions = results.filter(r => r).length;
+          const optimalProb = getOptimalProb();
+          const optimalConversions = Math.round(100 * optimalProb);
+
+          const monthlyConversions = Math.round(inputs.monthlyLeads * effectiveProb2);
+          const monthlyRevenue = monthlyConversions * inputs.avgDealValue;
+          const optimalMonthlyConversions = Math.round(inputs.monthlyLeads * optimalProb);
+          const optimalMonthlyRevenue = optimalMonthlyConversions * inputs.avgDealValue;
+          const leakedRevenue = optimalMonthlyRevenue - monthlyRevenue;
+
+          const result = {
+            conversions,
+            optimalConversions,
+            monthlyConversions,
+            monthlyRevenue,
+            optimalMonthlyConversions,
+            optimalMonthlyRevenue,
+            leakedRevenue: Math.max(0, leakedRevenue),
+            effectiveProb: +(effectiveProb2 * 100).toFixed(1),
+            optimalProb: +(optimalProb * 100).toFixed(1),
+            baseProb: +(baseProb2 * 100).toFixed(1),
+            followBonus: +(followBonus2 * 100).toFixed(1),
+            responseMin: responseMin2
+          };
+
+          setTimeout(() => callback(result), 400);
+        }
+      }
+
+      simStep();
+    }
+
+    timerStep();
+  }
+
+  function displayResults(results, inputs) {
+    lastResults = results;
+    lastInputs = inputs;
+
+    toolAnimateValue(document.getElementById('result-your-conversions'), 0, results.conversions, 1200);
+    toolAnimateValue(document.getElementById('result-optimal-conversions'), 0, results.optimalConversions, 1200);
+    toolAnimateValue(document.getElementById('result-leaked-revenue'), 0, results.leakedRevenue, 1200, 'R');
+
+    const total = results.conversions + (100 - results.conversions);
+    const convPct = (results.conversions / total) * 100;
+    const lostPct = 100 - convPct;
+
+    document.getElementById('result-dist-converted').textContent = results.conversions;
+    document.getElementById('result-dist-lost').textContent = 100 - results.conversions;
+
+    requestAnimationFrame(() => {
+      document.getElementById('bar-converted').style.width = convPct + '%';
+      document.getElementById('bar-lost').style.width = lostPct + '%';
+    });
+
+    toolAnimateValue(document.getElementById('result-monthly-conversions'), 0, results.monthlyConversions, 1200);
+    toolAnimateValue(document.getElementById('result-monthly-revenue'), 0, results.monthlyRevenue, 1200, 'R');
+    document.getElementById('result-conv-prob').textContent = results.effectiveProb + '%';
+
+    document.getElementById('res-param-speed').textContent = formatResponseSpeed(inputs.responseSpeed);
+    document.getElementById('res-param-followups').textContent = inputs.followUpCadence;
+    document.getElementById('res-param-leads').textContent = inputs.monthlyLeads;
+    document.getElementById('res-param-deal').textContent = toolFormatZAR(inputs.avgDealValue);
+  }
+
+  function init() {
+    setupRangeInputs();
+    runBootSequence();
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      showScreen('screen-input');
+    });
+
+    document.getElementById('btn-analyze').addEventListener('click', () => {
+      const inputs = getInputs();
+      lastInputs = inputs;
+      showScreen('screen-processing');
+      runProcessing(inputs, (results) => {
+        showScreen('screen-results');
+        displayResults(results, inputs);
+      });
+    });
+
+    document.getElementById('btn-gate').addEventListener('click', () => {
+      const results = lastResults;
+      const inputs = lastInputs;
+      if (!results || !inputs) return;
+      toolShowEmailGate('response-time-simulator', {
+        responseSpeed: inputs.responseSpeed,
+        followUpCadence: inputs.followUpCadence,
+        monthlyLeads: inputs.monthlyLeads,
+        avgDealValue: inputs.avgDealValue,
+        conversions: results.conversions,
+        optimalConversions: results.optimalConversions,
+        monthlyConversions: results.monthlyConversions,
+        monthlyRevenue: results.monthlyRevenue,
+        optimalMonthlyRevenue: results.optimalMonthlyRevenue,
+        leakedRevenue: results.leakedRevenue,
+        effectiveProb: results.effectiveProb,
+        optimalProb: results.optimalProb
+      }, (email) => {
+        document.getElementById('complete-email').textContent = email;
+        showScreen('screen-complete');
+      });
+    });
+
+    const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
+    restartButtons.forEach(btn => {
+      if (btn) btn.addEventListener('click', () => {
+        document.getElementById('input-responseSpeed').value = 0;
+        document.getElementById('input-followUpCadence').value = 1;
+        document.getElementById('input-monthlyLeads').value = 50;
+        document.getElementById('input-avgDealValue').value = 45000;
+        document.getElementById('val-responseSpeed').textContent = '1 sec';
+        document.getElementById('val-followUpCadence').textContent = '1';
+        document.getElementById('val-monthlyLeads').textContent = '50';
+        document.getElementById('val-avgDealValue').textContent = 'R45,000';
+        showScreen('screen-input');
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>System Alert - Zonke</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container': '#1e2020',
+            'on-surface': '#e2e2e2',
+            primary: '#CCFF00',
+            secondary: '#FF4C00',
+            error: '#FF4C00',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535'
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          spacing: {
+            xs: '4px',
+            sm: '8px',
+            md: '16px',
+            lg: '32px',
+            xl: '64px',
+            gutter: '24px',
+            margin: '40px'
+          },
+          borderRadius: { DEFAULT: '0px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #121414;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
+                  linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .alert-blink {
+      animation: blink 0.5s step-end infinite;
+    }
+    @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+    .border-2 { border-width: 2px; }
+    .border-3 { border-width: 3px; }
+    .text-primary { color: #CCFF00; }
+    .text-secondary { color: #FF4C00; }
+    .uppercase-tracked { text-transform: uppercase; letter-spacing: 0.1em; }
+    .clip-corner {
+      clip-path: polygon(0 12px,12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px));
+    }
+    .window-header {
+      background: linear-gradient(90deg, #FF4C00 0%, #FF4C00 4px, transparent 4px);
+    }
+  </style>
+</head>
+<body class="relative scanlines flex flex-col items-center justify-center p-12 bg-surface">
+
+  <!-- Alert header bar -->
+  <div class="absolute top-0 left-0 right-0 h-16 bg-secondary flex items-center px-8 border-b-3 border-black z-50">
+    <div class="flex items-center gap-4">
+      <div class="w-4 h-4 bg-white border border-black relative">
+        <div class="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-black">!</div>
+      </div>
+      <span class="font-bold text-white uppercase-tracked tracking-widest">CRITICAL_ALERT</span>
+    </div>
+    <div class="ml-auto text-xs uppercase-tracked text-white opacity-80">PRIORITY: MAXIMUM</div>
+  </div>
+
+  <!-- Main content -->
+  <div class="w-full max-w-[800px] mt-24">
+
+    <!-- Alert icon -->
+    <div class="flex justify-center mb-12">
+      <div class="w-32 h-32 border-3 border-secondary bg-surface-container flex items-center justify-center relative">
+        <div class="text-6xl text-secondary font-bold">!</div>
+        <div class="absolute inset-0 border-3 border-secondary transform rotate-45 scale-75 opacity-50"></div>
+      </div>
+    </div>
+
+    <!-- Alert type -->
+    <div class="text-center mb-8">
+      <div class="text-xs uppercase-tracked text-primary mb-2">SYSTEM_DIAGNOSTIC // ERROR_CODE_0x4C</div>
+      <h1 class="text-5xl font-black uppercase leading-none text-white mb-4">
+        MANUAL RESPONSE<br/>SYSTEM FAILURE
+      </h1>
+    </div>
+
+    <!-- Alert message -->
+    <div class="bg-surface-container border-2 border-secondary p-8 mb-10">
+      <div class="text-sm text-on-surface-variant mb-6 uppercase-tracked text-secondary">
+        Detected anomalies in lead response protocol:
+      </div>
+      <ul class="space-y-4 text-lg">
+        <li class="flex items-start gap-4">
+          <span class="text-secondary font-bold mt-1">►</span>
+          <span>Average response time: <span class="text-white font-bold">4.2 hours</span></span>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="text-secondary font-bold mt-1">►</span>
+          <span>After-hours coverage: <span class="text-white font-bold">0%</span></span>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="text-secondary font-bold mt-1">►</span>
+          <span>Competitor advantage: <span class="text-secondary font-bold">+4.1 hours</span></span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Solution block -->
+    <div class="border-2 border-primary p-8 mb-12 relative">
+      <div class="absolute -top-4 left-8 bg-primary px-4 py-1 text-xs font-bold uppercase text-surface">
+        PROPOSED_FIX
+      </div>
+      <div class="text-lg mb-6">
+        <span class="text-primary font-bold">Zonke AI Command Center</span> auto-responds in <span class="text-primary font-bold">&lt;1 second</span>, 24/7/365.
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-on-surface-variant uppercase-tracked">
+          SEVERITY: <span class="text-secondary font-bold">CRITICAL</span>
+        </div>
+        <a href="https://zonke.ai/earlybird" class="bg-primary text-surface px-10 py-4 font-bold uppercase border-2 border-black sticker glitch cursor-pointer">
+          DEPLOY_FIX_NOW
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center">
+      <div class="text-xs uppercase-tracked text-on-surface-variant mb-2">SCAN FOR IMMEDIATE DEPLOYMENT</div>
+      <div class="text-[10px] text-surface-variant uppercase-tracked">AI NATIVE OR LEFT BEHIND</div>
+    </div>
+
+  </div>
+
+  <!-- QR code bottom right -->
+  <div class="absolute bottom-12 right-12 flex flex-col items-center">
+    <div class="w-28 h-28 bg-white border-2 border-black p-2 mb-2">
+      <svg viewBox="0 0 100 100" width="96" height="96">
+        <rect x="10" y="10" width="30" height="30" fill="black"/>
+        <rect x="60" y="10" width="30" height="30" fill="black"/>
+        <rect x="10" y="60" width="30" height="30" fill="black"/>
+        <rect x="15" y="15" width="20" height="20" fill="white"/>
+        <rect x="65" y="15" width="20" height="20" fill="white"/>
+        <rect x="15" y="65" width="20" height="20" fill="white"/>
+        <rect x="50" y="50" width="10" height="10" fill="black"/>
+      </svg>
+    </div>
+    <div class="text-[10px] uppercase-tracked text-primary">[ DEPLOY ]</div>
+  </div>
+
+</body>
+</html>

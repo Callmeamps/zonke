@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Performance Comparison - Zonke</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container': '#1e2020',
+            'on-surface': '#e2e2e2',
+            primary: '#CCFF00',
+            secondary: '#FF4C00',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535'
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'monospace'] },
+          spacing: {
+            xs: '4px', sm: '8px', md: '16px', lg: '32px', xl: '64px',
+            gutter: '24px', margin: '40px'
+          },
+          borderRadius: { DEFAULT: '0px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #121414;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
+                  linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .border-2 { border-width: 2px; }
+    .border-3 { border-width: 3px; }
+    .text-primary { color: #CCFF00; }
+    .text-secondary { color: #FF4C00; }
+    .uppercase-tracked { text-transform: uppercase; letter-spacing: 0.1em; }
+    .comp-box {
+      border: 2px solid;
+      padding: 20px;
+      position: relative;
+    }
+    .comp-box.winner {
+      border-color: #CCFF00;
+      background: rgba(204, 255, 0, 0.05);
+    }
+    .comp-box.loser {
+      border-color: #333535;
+      opacity: 0.7;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #333535;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .winner-badge {
+      position: absolute;
+      top: -12px;
+      right: 12px;
+      background: #CCFF00;
+      color: #121414;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="relative scanlines p-12">
+
+  <!-- Header -->
+  <div class="mb-10 border-b-2 border-surface-variant pb-6">
+    <div class="text-xs uppercase-tracked text-primary mb-2">BENCHMARK_RESULTS</div>
+    <h1 class="text-3xl font-bold uppercase text-white mb-2">Performance Comparison</h1>
+    <div class="text-lg text-on-surface-variant">
+      Zonke AI vs Manual Response Systems (n=12,421 leads)
+    </div>
+  </div>
+
+  <!-- Comparison containers -->
+  <div class="flex gap-6 mb-12" style="height: 700px;">
+
+    <!-- Left: Manual -->
+    <div class="w-1/2 comp-box loser relative">
+      <div class="text-center mb-6">
+        <div class="text-lg font-bold text-on-surface-variant uppercase-tracked mb-1">Manual Teams</div>
+        <div class="text-sm text-on-surface-variant">Current State</div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Avg Response</span>
+          <span class="text-white font-bold">4.2 hours</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">24/7 Coverage</span>
+          <span class="text-secondary font-bold">0%</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Lead Capture</span>
+          <span class="text-white font-bold">62%</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Conversion</span>
+          <span class="text-white">8%</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">After-Hours</span>
+          <span class="text-secondary font-bold">OFFLINE</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Competitor Intel</span>
+          <span class="text-secondary">NONE</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Status</span>
+          <span class="text-secondary">VULNERABLE</span>
+        </div>
+      </div>
+
+      <div class="absolute bottom-8 left-4 right-4">
+        <div class="text-xs uppercase-tracked text-on-surface-variant mb-2">Lead Loss Rate</div>
+        <div class="h-8 bg-surface-variant">
+          <div class="h-full bg-secondary" style="width: 85%;"></div>
+        </div>
+        <div class="text-sm text-secondary mt-1 text-right">85% lost</div>
+      </div>
+    </div>
+
+    <!-- Right: Zonke -->
+    <div class="w-1/2 comp-box winner relative">
+      <div class="winner-badge">BEST</div>
+      <div class="text-center mb-6">
+        <div class="text-lg font-bold text-primary uppercase-tracked mb-1">Zonke AI</div>
+        <div class="text-sm text-primary">AI-Native System</div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Avg Response</span>
+          <span class="text-primary font-bold">&lt;1 sec</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">24/7 Coverage</span>
+          <span class="text-check-green font-bold">100%</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Lead Capture</span>
+          <span class="text-primary font-bold">98%</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Conversion</span>
+          <span class="text-primary">25%</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">After-Hours</span>
+          <span class="text-check-green">ACTIVE</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Competitor Intel</span>
+          <span class="text-primary">AUTOMATED</span>
+        </div>
+        <div class="stat-row">
+          <span class="text-on-surface-variant uppercase-tracked text-xs">Status</span>
+          <span class="text-primary">DOMINANT</span>
+        </div>
+      </div>
+
+      <div class="absolute bottom-8 left-4 right-4">
+        <div class="text-xs uppercase-tracked text-on-surface-variant mb-2">Lead Capture Rate</div>
+        <div class="h-8 bg-surface-variant">
+          <div class="h-full bg-primary" style="width: 98%;"></div>
+        </div>
+        <div class="text-sm text-primary mt-1 text-right">98% captured</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Improvement summary -->
+  <div class="bg-primary border-3 border-black p-8 mb-10">
+    <div class="text-center">
+      <div class="text-xl font-bold text-surface mb-6 uppercase-tracked">
+        Performance Gap Analysis
+      </div>
+      <div class="grid grid-cols-3 gap-8 text-surface">
+        <div>
+          <div class="text-4xl font-bold mb-1">37,800x</div>
+          <div class="text-sm uppercase-tracked opacity-80">Faster Response</div>
+        </div>
+        <div>
+          <div class="text-4xl font-bold mb-1">+312%</div>
+          <div class="text-sm uppercase-tracked opacity-80">More Leads Captured</div>
+        </div>
+        <div>
+          <div class="text-4xl font-bold mb-1">3.1x</div>
+          <div class="text-sm uppercase-tracked opacity-80">Higher Conversion</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom sections -->
+  <div class="grid grid-cols-2 gap-12">
+    <div>
+      <div class="text-sm font-bold text-secondary uppercase-tracked mb-3">Risk of Inaction</div>
+      <div class="space-y-3 text-sm text-on-surface-variant">
+        <p>• Competitors gain <span class="text-secondary font-bold">4+ hour</span> advantage</p>
+        <p>• Missed leads compound at <span class="text-secondary font-bold">62%</span> monthly</p>
+        <p>• Market share erosion: <span class="text-secondary font-bold">15-23%</span> annually</p>
+      </div>
+    </div>
+    <div>
+      <div class="text-sm font-bold text-primary uppercase-tracked mb-3">Early Bird Advantage</div>
+      <div class="space-y-3 text-sm text-on-surface-variant">
+        <p>• <span class="text-primary font-bold">50% discount</span> on implementation</p>
+        <p>• <span class="text-primary font-bold">Priority support</span> and setup</p>
+        <p>• <span class="text-primary font-bold">30-day free trial</span>, cancel anytime</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="mt-12 text-center border-t-2 border-surface-variant pt-12">
+    <a href="https://zonke.ai/earlybird" class="inline-block bg-primary text-surface px-16 py-5 font-bold text-xl uppercase border-2 border-black sticker cursor-pointer">
+      CHOOSE_AI_NATIVE
+    </a>
+    <div class="text-xs text-on-surface-variant mt-4 uppercase-tracked">
+      Join 12,421 agencies already benchmarked
+    </div>
+  </div>
+
+</body>
+</html>

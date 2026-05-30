@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Workflow Automator | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<script src="/assets/js/toolkit.js"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#121414", "surface-dim": "#121414", "surface-bright": "#37393a",
+        "surface-container-lowest": "#0c0f0c", "surface-container-low": "#1a1c1c",
+        "surface-container": "#1e2020", "surface-container-high": "#282a2b",
+        "surface-container-highest": "#333535", "on-surface": "#e2e2e2",
+        "on-surface-variant": "#c4c9ac", "outline": "#8e9379", "outline-variant": "#444933",
+        "primary": "#c3f400", "on-primary": "#283500", "primary-container": "#c3f400",
+        "on-primary-container": "#556d00", "secondary": "#ffb59f",
+        "secondary-container": "#ff571c", "on-secondary-container": "#531300",
+        "error": "#ffb4ab", "error-container": "#93000a", "on-error-container": "#ffdad6"
+      },
+      borderRadius: { DEFAULT: "0px", lg: "0px", xl: "0px", full: "9999px" },
+      spacing: { xs: "4px", unit: "4px", sm: "8px", xl: "64px", lg: "32px", gutter: "24px", margin: "40px", md: "16px" },
+      fontFamily: { mono: ["JetBrains Mono", "monospace"] },
+      fontSize: {
+        "display-lg": ["72px", { lineHeight: "1.0", letterSpacing: "-0.04em", fontWeight: "800" }],
+        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-md": ["24px", { lineHeight: "1.2", letterSpacing: "0em", fontWeight: "700" }],
+        "body-lg": ["18px", { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" }],
+        "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0.02em", fontWeight: "400" }],
+        "label-mono": ["12px", { lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "700" }],
+        "code-snippet": ["14px", { lineHeight: "1.4", letterSpacing: "0em", fontWeight: "400" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+* { font-family: 'JetBrains Mono', monospace; }
+body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
+.screen { transition: opacity 0.5s ease, transform 0.5s ease; }
+.screen.hidden { display: none; }
+.screen.active { display: block; animation: fadeSlideIn 0.6s ease forwards; }
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.scanline-overlay {
+  pointer-events: none; position: fixed; inset: 0; z-index: 9999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px);
+}
+.cursor-blink::after { content: "_"; animation: blink 1s step-end infinite; color: #c3f400; }
+input[type="range"] { accent-color: #c3f400; height: 4px; }
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px; background: #c3f400; border: none; border-radius: 0; cursor: pointer;
+}
+input[type="text"], select, textarea {
+  background: #1a1c1c; border: 1px solid #444933; color: #e2e2e2; font-family: 'JetBrains Mono', monospace; font-size: 14px; padding: 8px; outline: none;
+}
+input[type="text"]:focus, select:focus, textarea:focus { border-color: #c3f400; }
+textarea { resize: vertical; min-height: 80px; }
+.flowchart-step {
+  border: 1px solid #444933; padding: 16px; background: #1a1c1c; position: relative;
+}
+.flowchart-step.high-auto { border-color: #c3f400; box-shadow: 0 0 8px rgba(195,244,0,0.1); }
+.flowchart-step.medium-auto { border-color: #ffb59f; }
+.flowchart-step.low-auto { border-color: #ff571c; }
+.flowchart-connector {
+  width: 2px; height: 24px; background: #444933; margin: 0 auto;
+}
+.template-btn {
+  border: 1px solid #444933; padding: 8px 12px; background: transparent;
+  color: #c4c9ac; cursor: pointer; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; transition: all 0.2s ease;
+}
+.template-btn:hover {
+  border-color: #c3f400; color: #c3f400;
+}
+.quick-win-badge {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%,100% { box-shadow: 0 0 5px rgba(195,244,0,0.3); }
+  50% { box-shadow: 0 0 20px rgba(195,244,0,0.6); }
+}
+</style>
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="min-h-screen flex flex-col">
+<header class="border-b border-outline-variant p-gutter flex items-center justify-between">
+  <a href="/" class="text-primary font-bold text-headline-md hover:opacity-80 transition-opacity no-underline">ZONKE_</a>
+  <span class="text-code-snippet text-on-surface-variant">&gt; WORKFLOW AUTOMATOR v1.0</span>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center p-gutter max-w-3xl mx-auto w-full">
+
+<!-- SCREEN 1: SPLASH -->
+<div id="screen-splash" class="screen active w-full text-center">
+  <div class="mb-xl">
+    <pre class="text-primary text-[10px] sm:text-xs leading-tight opacity-60">
+    _     ___    _     ___    _  ___
+   | |   / _ \  | |   / _ \  | || __|
+   | |  | | | | | |  | | | | | ||__ \
+   | |__| |_| | | |__| |_| | |_||__) |
+   |_____\___/  |_____\___/  (_)____/
+    </pre>
+  </div>
+  <div class="text-left max-w-lg mx-auto border border-outline-variant p-lg bg-surface-container-low">
+    <p class="text-primary text-body-sm mb-sm">&gt; INITIALIZE WORKFLOW SCANNER...</p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-1"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-2"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-3"></p>
+    <div class="h-1 bg-surface-container-highest mt-md overflow-hidden">
+      <div id="boot-progress" class="h-full bg-primary" style="width:0%; transition: width 2s ease;"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="boot-status">_</p>
+  </div>
+  <button id="btn-start" class="hidden mt-xl bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none mx-auto">
+    START ANALYSIS →
+  </button>
+</div>
+
+<!-- SCREEN 2: INPUT -->
+<div id="screen-input" class="screen hidden w-full">
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-headline-md mb-sm">&gt; DESCRIBE YOUR WORKFLOW</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Tell us about a manual workflow you want to automate.</p>
+
+    <div class="space-y-lg">
+      <div>
+        <label class="text-body-sm text-on-surface mb-xs block">Workflow Name</label>
+        <input type="text" id="input-name" placeholder="e.g. Weekly reporting process" class="w-full" />
+      </div>
+
+      <div>
+        <label class="text-body-sm text-on-surface mb-xs block">Describe the workflow in detail (min. 20 characters)</label>
+        <textarea id="input-description" placeholder="Describe each step of the manual process, who does what, what tools are used, where the bottlenecks are..." class="w-full" minlength="20"></textarea>
+        <p class="text-code-snippet text-outline mt-xs" id="desc-char-count">0 characters (min 20)</p>
+      </div>
+
+      <div>
+        <p class="text-body-sm text-on-surface mb-xs">Quick templates</p>
+        <div class="flex flex-wrap gap-sm">
+          <button class="template-btn" data-template="lead-handoff">📋 Lead Handoff</button>
+          <button class="template-btn" data-template="tender-doc">📄 Tender Document Review</button>
+          <button class="template-btn" data-template="client-followup">✉️ Client Follow-up Sequence</button>
+          <button class="template-btn" data-template="weekly-report">📊 Weekly Report Compilation</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">People touching this workflow</span>
+          <span class="text-primary" id="val-people">3</span>
+        </label>
+        <input type="range" id="input-people" min="1" max="50" value="3" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1</span><span>50</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Hours per week spent on this workflow</span>
+          <span class="text-primary" id="val-hours">20 hrs</span>
+        </label>
+        <input type="range" id="input-hours" min="1" max="100" value="20" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1 hr</span><span>100 hrs</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Error sensitivity (10 = errors cost a lot)</span>
+          <span class="text-primary" id="val-error">5</span>
+        </label>
+        <input type="range" id="input-error" min="1" max="10" value="5" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>Low cost</span><span>High cost</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Team hourly rate (ZAR)</span>
+          <span class="text-primary" id="val-rate">R500/hr</span>
+        </label>
+        <input type="range" id="input-rate" min="100" max="2000" value="500" step="50" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>R100</span><span>R2,000</span></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-analyze" class="w-full bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+    ANALYZE WORKFLOW →
+  </button>
+</div>
+
+<!-- SCREEN 3: PROCESSING -->
+<div id="screen-processing" class="screen hidden w-full text-center">
+  <div class="border border-outline-variant p-lg bg-surface-container-low max-w-lg mx-auto">
+    <div class="flex items-center gap-md mb-lg">
+      <div class="w-3 h-3 bg-secondary-container animate-pulse"></div>
+      <p class="text-primary text-headline-md">&gt; SCANNING WORKFLOW</p>
+    </div>
+    <div id="processing-messages" class="text-left space-y-sm mb-lg"></div>
+    <div class="h-2 bg-surface-container-highest overflow-hidden">
+      <div id="processing-bar" class="h-full bg-primary" style="width:0%"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="processing-pct">0%</p>
+  </div>
+</div>
+
+<!-- SCREEN 4: RESULTS -->
+<div id="screen-results" class="screen hidden w-full">
+  <div class="text-center mb-lg">
+    <p class="text-primary text-headline-md">&gt; WORKFLOW ANALYSIS COMPLETE</p>
+    <p class="text-on-surface-variant text-body-sm">Your automation playbook is ready.</p>
+  </div>
+
+  <div class="border border-primary/30 p-lg bg-surface-container-low mb-lg text-center">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">AUTOMATION POTENTIAL</p>
+    <p class="text-display-lg text-primary" id="result-score">0%</p>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">WORKFLOW FLOWCHART</p>
+    <div id="flowchart-container" class="flex flex-col items-center"></div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-lg">
+    <div class="border border-outline-variant p-md bg-surface-container-low text-center">
+      <p class="text-code-snippet text-on-surface-variant">Weekly Hours Saved</p>
+      <p class="text-headline-md text-primary" id="result-weekly-saved">0</p>
+    </div>
+    <div class="border border-outline-variant p-md bg-surface-container-low text-center">
+      <p class="text-code-snippet text-on-surface-variant">Annual Cost Saved</p>
+      <p class="text-headline-md text-primary" id="result-annual-cost">R0</p>
+    </div>
+    <div class="border border-outline-variant p-md bg-surface-container-low text-center">
+      <p class="text-code-snippet text-on-surface-variant">Error Reduction</p>
+      <p class="text-headline-md text-primary" id="result-error-reduction">0%</p>
+    </div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">AUTOMATION PLAYBOOK</p>
+    <div id="playbook" class="space-y-md"></div>
+  </div>
+
+  <div class="text-center">
+    <p class="text-body-sm text-on-surface-variant mb-md">Want to save this playbook and get personalized recommendations?</p>
+    <button id="btn-gate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+      UNLOCK FULL PLAYBOOK →
+    </button>
+    <button id="btn-restart" class="ml-md bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+      ANALYZE ANOTHER WORKFLOW
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 5: COMPLETE -->
+<div id="screen-complete" class="screen hidden w-full text-center">
+  <div class="border border-primary/30 p-xl bg-surface-container-low max-w-lg mx-auto">
+    <p class="text-primary text-display-lg mb-md">✓</p>
+    <p class="text-primary text-headline-md mb-sm">&gt; PLAYBOOK UNLOCKED</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Your full Automation Playbook has been sent to <span id="complete-email" class="text-primary"></span>.</p>
+    <div class="border-t border-outline-variant pt-lg space-y-md">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest">WHAT HAPPENS NEXT</p>
+      <div class="flex flex-col gap-sm">
+        <p class="text-code-snippet text-on-surface-variant">1. Detailed workflow analysis with step-by-step breakdown</p>
+        <p class="text-code-snippet text-on-surface-variant">2. Custom automation implementation roadmap</p>
+        <p class="text-code-snippet text-on-surface-variant">3. Follow-up with a Zonke specialist (optional)</p>
+      </div>
+    </div>
+    <div class="mt-lg flex flex-col sm:flex-row gap-md justify-center">
+      <a href="/real-estate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors no-underline inline-block">
+        EXPLORE AUTOMATION →
+      </a>
+      <button id="btn-restart-complete" class="bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+        ANALYZE ANOTHER
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+<footer class="border-t border-outline-variant p-gutter text-center">
+  <p class="text-code-snippet text-on-surface-variant">ZONKE AI NATIVE STUDIO &copy; 2026</p>
+</footer>
+</div>
+
+<script>
+(function () {
+  const WORKFLOW_TEMPLATES = {
+    'lead-handoff': {
+      name: 'Lead Handoff',
+      description: 'Our agents receive leads from property portals and manually assign them to the right agent. Leads often go cold before being contacted. The handoff process involves multiple spreadsheets and WhatsApp groups, with no central tracking.',
+      keywords: ['lead', 'handoff', 'transfer', 'assign', 'estate', 'agent', 'client', 'property', 'referral', 'cold'],
+      people: 5, hours: 20, errorSensitivity: 7,
+      steps: [
+        { name: 'Lead Capture', potential: 'Medium', auto: false },
+        { name: 'Qualification Call', potential: 'Low', auto: false },
+        { name: 'Property Matching', potential: 'High', auto: true },
+        { name: 'Schedule Viewing', potential: 'Medium', auto: false },
+        { name: 'Client Follow-up', potential: 'High', auto: true },
+        { name: 'Close & Handoff', potential: 'Medium', auto: false }
+      ],
+      playbook: [
+        'Automate lead capture with web-to-CRM integration that pulls enquiries directly from your portal listings, website, and social media into your CRM in real-time.',
+        'Implement AI-powered property matching that automatically matches leads to listings based on budget, location, and preferences without manual sorting.',
+        'Set up automated client follow-up sequences triggered after property viewings, with personalised email and WhatsApp messages on a schedule.',
+        'Create automated lead scoring to prioritise hot leads and route them to the right agent instantly based on territory and expertise.',
+        'Deploy a handoff notification system that alerts the receiving agent with full lead context, history, and next-best-action recommendations.',
+        'Monitor handoff completion rates with a real-time dashboard showing lead journey stages and where drop-off occurs.'
+      ]
+    },
+    'tender-doc': {
+      name: 'Tender Document Review',
+      description: 'Our tender team manually collects RFP documents, reviews requirements, drafts responses, checks compliance, gets internal approvals, and submits. The process is slow and error-prone with tight deadlines.',
+      keywords: ['tender', 'document', 'review', 'bid', 'proposal', 'submission', 'rfp', 'procurement', 'compliance', 'deadline'],
+      people: 4, hours: 30, errorSensitivity: 8,
+      steps: [
+        { name: 'Document Collection', potential: 'High', auto: true },
+        { name: 'Requirements Analysis', potential: 'Medium', auto: false },
+        { name: 'Response Drafting', potential: 'Low', auto: false },
+        { name: 'Compliance Check', potential: 'High', auto: true },
+        { name: 'Internal Approval', potential: 'Medium', auto: false },
+        { name: 'Submission', potential: 'High', auto: true }
+      ],
+      playbook: [
+        'Automate document collection with a tender aggregator that monitors multiple RFP portals and downloads relevant bid documents into a structured repository.',
+        'Deploy AI-powered requirements extraction that reads RFP documents and auto-generates a compliance matrix, reducing analysis time by 60%.',
+        'Create a response template library with clause suggestions and past successful responses, cutting drafting time for common sections.',
+        'Implement automated compliance checking that compares your response against RFP requirements and flags missing or incomplete sections before submission.',
+        'Set up an automated approval workflow that routes the tender pack to the right approvers with deadlines, reminders, and escalation for bottlenecks.',
+        'Build a submission scheduler with auto-upload, confirmation capture, and status tracking across all active tender opportunities.'
+      ]
+    },
+    'client-followup': {
+      name: 'Client Follow-up Sequence',
+      description: 'We manually track which clients need follow-up calls and emails. The team uses sticky notes and spreadsheets. Many leads fall through the cracks because follow-ups are inconsistent.',
+      keywords: ['client', 'follow', 'up', 'sequence', 'email', 'nurture', 'drip', 'campaign', 'lead', 'outreach', 'call'],
+      people: 6, hours: 15, errorSensitivity: 6,
+      steps: [
+        { name: 'Initial Outreach', potential: 'Medium', auto: false },
+        { name: 'Follow-up Email 1', potential: 'High', auto: true },
+        { name: 'Follow-up Email 2', potential: 'High', auto: true },
+        { name: 'Phone Call Attempt', potential: 'Low', auto: false },
+        { name: 'Proposal Send', potential: 'Medium', auto: false },
+        { name: 'Close Loop', potential: 'High', auto: true }
+      ],
+      playbook: [
+        'Deploy an automated multi-channel outreach sequence that sends personalised email and WhatsApp messages on a cadence you define, triggered by lead source and segment.',
+        'Set up behavioural triggers that adjust follow-up frequency based on client engagement — opens, clicks, and replies automatically change the sequence path.',
+        'Create smart lead scoring that ranks follow-up priority so your team calls the hottest leads first, with context from previous interactions.',
+        'Implement automated proposal delivery with read tracking, so you know exactly when the client opens your proposal and can time your follow-up call.',
+        'Build a closed-loop reporting system that tracks every follow-up touchpoint and shows which sequence has the highest conversion rate.',
+        'Automate the re-assignment of unresponsive leads back to the pool after a configurable timeout period.'
+      ]
+    },
+    'weekly-report': {
+      name: 'Weekly Report Compilation',
+      description: 'Our team manually gathers data from multiple systems, cleans it in Excel, creates charts, and compiles a weekly report for management. The process takes a full day every week.',
+      keywords: ['weekly', 'report', 'compilation', 'data', 'gather', 'spreadsheet', 'metrics', 'kpi', 'excel', 'dashboard', 'chart'],
+      people: 3, hours: 12, errorSensitivity: 5,
+      steps: [
+        { name: 'Data Collection', potential: 'High', auto: true },
+        { name: 'Data Cleaning', potential: 'High', auto: true },
+        { name: 'Analysis', potential: 'Medium', auto: false },
+        { name: 'Visualization', potential: 'High', auto: true },
+        { name: 'Review & Approve', potential: 'Low', auto: false },
+        { name: 'Distribute', potential: 'High', auto: true }
+      ],
+      playbook: [
+        'Automate data collection with API connectors that pull data from your CRM, accounting software, and operational tools into a central data warehouse on a schedule.',
+        'Deploy automated data cleaning pipelines that standardise formats, remove duplicates, flag outliers, and handle missing values without manual intervention.',
+        'Create a live analytics dashboard with pre-built metrics and KPIs that updates automatically — no more manual Excel charts every week.',
+        'Implement automated distribution that sends the report as a beautifully formatted PDF or interactive dashboard link to stakeholders on a fixed schedule.',
+        'Set up anomaly detection alerts that notify the team when key metrics deviate from expected ranges, before the weekly report is even generated.',
+        'Build a self-serve reporting layer where managers can drill into their own metrics without waiting for the weekly report cycle.'
+      ]
+    }
+  };
+
+  let lastResults = null;
+
+  function getInputs() {
+    return {
+      name: document.getElementById('input-name').value.trim(),
+      description: document.getElementById('input-description').value.trim(),
+      people: parseInt(document.getElementById('input-people').value),
+      hours: parseInt(document.getElementById('input-hours').value),
+      errorSensitivity: parseInt(document.getElementById('input-error').value),
+      rate: parseInt(document.getElementById('input-rate').value)
+    };
+  }
+
+  function matchWorkflow(description) {
+    const desc = description.toLowerCase();
+    let bestScore = 0;
+    let bestTemplate = null;
+
+    for (const [key, tmpl] of Object.entries(WORKFLOW_TEMPLATES)) {
+      let score = 0;
+      for (const kw of tmpl.keywords) {
+        if (desc.includes(kw)) score += 2;
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        bestTemplate = { key, ...tmpl };
+      }
+    }
+
+    if (bestTemplate && bestScore >= 2) return bestTemplate;
+
+    return {
+      key: 'custom',
+      name: 'Custom Workflow',
+      steps: [
+        { name: 'Information Gathering', potential: 'High', auto: true },
+        { name: 'Processing', potential: 'Medium', auto: false },
+        { name: 'Review & Approval', potential: 'Low', auto: false },
+        { name: 'Output Generation', potential: 'High', auto: true },
+        { name: 'Delivery & Monitoring', potential: 'Medium', auto: false }
+      ],
+      playbook: [
+        'Automate data collection with integrated forms and API connections to eliminate manual data entry and consolidate information from multiple sources.',
+        'Implement workflow triggers that automatically route tasks to the right team members based on workload, skillset, and availability.',
+        'Set up approval workflows with automated notifications, reminders, and escalation paths to eliminate approval bottlenecks.',
+        'Deploy template-based output generation to reduce manual document creation and ensure consistent formatting across all deliverables.',
+        'Create automated follow-up and monitoring sequences for delivery confirmation, feedback collection, and performance tracking.',
+        'Monitor the entire workflow with a real-time dashboard showing cycle times, bottlenecks, and team productivity metrics.'
+      ]
+    };
+  }
+
+  function calculateScore(steps) {
+    const highCount = steps.filter(s => s.potential === 'High').length;
+    return Math.round((highCount / steps.length) * 100);
+  }
+
+  function findQuickWin(steps) {
+    let bestIdx = -1;
+    for (let i = 0; i < steps.length; i++) {
+      if (steps[i].potential === 'High') {
+        if (bestIdx === -1 || steps[i].auto) bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }
+
+  function calculate(inputs, matched) {
+    const score = calculateScore(matched.steps);
+    const hoursSaved = inputs.hours * (score / 100) * 0.8;
+    const annualHoursSaved = hoursSaved * 52;
+    const annualCostSaved = annualHoursSaved * inputs.rate;
+    const errorReduction = Math.round(Math.min(90, inputs.errorSensitivity * (score / 100) * 9));
+
+    return {
+      matched,
+      score,
+      hoursSaved: +hoursSaved.toFixed(1),
+      annualHoursSaved: Math.round(annualHoursSaved),
+      annualCostSaved: Math.round(annualCostSaved),
+      errorReduction,
+      weeklyHours: inputs.hours,
+      people: inputs.people,
+      rate: inputs.rate,
+      workflowName: inputs.name || matched.name
+    };
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('active');
+  }
+
+  function setupInputs() {
+    const rateMap = {
+      'input-people': 'val-people',
+      'input-error': 'val-error',
+      'input-rate': 'val-rate'
+    };
+    Object.entries(rateMap).forEach(([inputId, displayId]) => {
+      const input = document.getElementById(inputId);
+      const display = document.getElementById(displayId);
+      input.addEventListener('input', () => {
+        const v = parseInt(input.value);
+        if (inputId === 'input-rate') display.textContent = 'R' + v.toLocaleString() + '/hr';
+        else display.textContent = v;
+      });
+    });
+
+    document.getElementById('input-hours').addEventListener('input', function () {
+      document.getElementById('val-hours').textContent = this.value + ' hrs';
+    });
+
+    document.getElementById('input-description').addEventListener('input', function () {
+      const len = this.value.length;
+      const el = document.getElementById('desc-char-count');
+      el.textContent = len + ' characters (min 20)';
+      el.className = 'text-code-snippet ' + (len < 20 ? 'text-secondary-container' : 'text-outline');
+    });
+
+    document.querySelectorAll('.template-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const key = this.dataset.template;
+        const tmpl = WORKFLOW_TEMPLATES[key];
+        if (!tmpl) return;
+        document.getElementById('input-name').value = tmpl.name;
+        document.getElementById('input-description').value = tmpl.description;
+        document.getElementById('input-people').value = tmpl.people;
+        document.getElementById('val-people').textContent = tmpl.people;
+        document.getElementById('input-hours').value = tmpl.hours;
+        document.getElementById('val-hours').textContent = tmpl.hours + ' hrs';
+        document.getElementById('input-error').value = tmpl.errorSensitivity;
+        document.getElementById('val-error').textContent = tmpl.errorSensitivity;
+        const len = tmpl.description.length;
+        document.getElementById('desc-char-count').textContent = len + ' characters (min 20)';
+        document.getElementById('desc-char-count').className = 'text-code-snippet text-outline';
+      });
+    });
+  }
+
+  function runBootSequence() {
+    const bootMessages = [
+      '> Loading workflow analysis engine... OK',
+      '> Fetching automation patterns... OK',
+      '> Initializing workflow scanner... OK'
+    ];
+    toolTerminalType(document.getElementById('boot-line-1'), bootMessages[0], 20, () => {
+      setTimeout(() => {
+        toolTerminalType(document.getElementById('boot-line-2'), bootMessages[1], 20, () => {
+          setTimeout(() => {
+            toolTerminalType(document.getElementById('boot-line-3'), bootMessages[2], 20, () => {
+              document.getElementById('boot-progress').style.width = '100%';
+              document.getElementById('boot-status').textContent = 'READY';
+              setTimeout(() => {
+                document.getElementById('btn-start').classList.remove('hidden');
+              }, 400);
+            });
+          }, 200);
+        });
+      }, 200);
+    });
+  }
+
+  function runProcessing(callback) {
+    const msgContainer = document.getElementById('processing-messages');
+    const bar = document.getElementById('processing-bar');
+    const pct = document.getElementById('processing-pct');
+    msgContainer.innerHTML = '';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+
+    const messages = [
+      '> Parsing workflow description...',
+      '> Mapping process steps...',
+      '> Identifying automation opportunities...',
+      '> Calculating efficiency gains...',
+      '> Generating automation playbook...'
+    ];
+    let step = 0;
+    function nextStep() {
+      if (step < messages.length) {
+        const p = document.createElement('p');
+        p.className = 'text-code-snippet text-on-surface-variant';
+        p.textContent = messages[step];
+        msgContainer.appendChild(p);
+        bar.style.width = Math.round(((step + 1) / messages.length) * 100) + '%';
+        pct.textContent = Math.round(((step + 1) / messages.length) * 100) + '%';
+        step++;
+        setTimeout(nextStep, 700);
+      } else {
+        setTimeout(() => {
+          bar.style.width = '100%';
+          pct.textContent = '100%';
+          setTimeout(callback, 500);
+        }, 300);
+      }
+    }
+    nextStep();
+  }
+
+  function renderFlowchart(steps, quickWinIndex) {
+    const container = document.getElementById('flowchart-container');
+    container.innerHTML = '';
+
+    steps.forEach((step, i) => {
+      const stepEl = document.createElement('div');
+      stepEl.className = 'flowchart-step ' + step.potential.toLowerCase() + '-auto w-full';
+
+      const isQuickWin = i === quickWinIndex;
+
+      stepEl.innerHTML = `
+        <div class="flex items-center justify-between gap-sm flex-wrap">
+          <span class="text-body-sm text-on-surface font-bold">${i + 1}. ${step.name}</span>
+          ${isQuickWin ? '<span class="bg-primary text-on-primary text-code-snippet px-sm py-xs quick-win-badge">⚡ QUICK WIN</span>' : ''}
+        </div>
+        <div class="flex items-center gap-sm mt-sm flex-wrap">
+          <span class="text-code-snippet text-on-surface-variant">Automation:</span>
+          <span class="text-code-snippet font-bold ${step.potential === 'High' ? 'text-primary' : step.potential === 'Medium' ? 'text-secondary' : 'text-secondary-container'}">${step.potential}</span>
+          ${step.auto ? '<span class="bg-primary/20 text-primary text-code-snippet px-sm py-xs border border-primary/30">✓ Automate</span>' : ''}
+        </div>
+      `;
+      container.appendChild(stepEl);
+
+      if (i < steps.length - 1) {
+        const connector = document.createElement('div');
+        connector.className = 'flowchart-connector';
+        container.appendChild(connector);
+      }
+    });
+  }
+
+  function displayResults(results) {
+    lastResults = results;
+
+    toolAnimateValue(document.getElementById('result-score'), 0, results.score, 1500, '', '%');
+    document.getElementById('result-weekly-saved').textContent = results.hoursSaved + ' hrs';
+    toolAnimateValue(document.getElementById('result-annual-cost'), 0, results.annualCostSaved, 1200, 'R');
+    toolAnimateValue(document.getElementById('result-error-reduction'), 0, results.errorReduction, 1200, '', '%');
+
+    renderFlowchart(results.matched.steps, findQuickWin(results.matched.steps));
+
+    const playbookEl = document.getElementById('playbook');
+    playbookEl.innerHTML = results.matched.playbook.map((item, i) => `
+      <div class="flex items-start gap-md p-md bg-surface-container border border-outline-variant">
+        <span class="text-primary text-headline-md flex-shrink-0">${i + 1}</span>
+        <p class="text-body-sm text-on-surface">${item}</p>
+      </div>
+    `).join('');
+  }
+
+  function init() {
+    setupInputs();
+    runBootSequence();
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      showScreen('screen-input');
+    });
+
+    document.getElementById('btn-analyze').addEventListener('click', () => {
+      const inputs = getInputs();
+      if (!inputs.name) {
+        document.getElementById('input-name').focus();
+        document.getElementById('input-name').style.borderColor = '#ff571c';
+        return;
+      }
+      if (inputs.description.length < 20) {
+        document.getElementById('input-description').focus();
+        document.getElementById('input-description').style.borderColor = '#ff571c';
+        return;
+      }
+      const matched = matchWorkflow(inputs.description);
+      showScreen('screen-processing');
+      runProcessing(() => {
+        const results = calculate(inputs, matched);
+        showScreen('screen-results');
+        displayResults(results);
+      });
+    });
+
+    document.getElementById('btn-gate').addEventListener('click', () => {
+      if (!lastResults) return;
+      toolShowEmailGate('workflow-automator', {
+        workflowName: lastResults.workflowName,
+        score: lastResults.score,
+        hoursSaved: lastResults.hoursSaved,
+        annualCostSaved: lastResults.annualCostSaved,
+        errorReduction: lastResults.errorReduction,
+        steps: lastResults.matched.steps
+      }, (email) => {
+        document.getElementById('complete-email').textContent = email;
+        showScreen('screen-complete');
+      });
+    });
+
+    const restartBtns = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
+    restartBtns.forEach(btn => {
+      if (btn) btn.addEventListener('click', () => {
+        location.reload();
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

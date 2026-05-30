@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Early Bird Countdown - Zonke Tenders</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container-lowest': '#0c0f0f',
+            'on-surface': '#e2e2e2',
+            primary: '#CCFF00',
+            secondary: '#FF4C00',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535'
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          spacing: {
+            xs: '4px',
+            sm: '8px',
+            md: '16px',
+            lg: '32px',
+            xl: '64px',
+            gutter: '24px',
+            margin: '40px'
+          },
+          borderRadius: {
+            DEFAULT: '0px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0c0f0f;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.3) 50%),
+                  linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+      background-size: 100% 3px, 3px 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .terminal-frame {
+      border: 2px solid #333535;
+      border-radius: 0;
+      background: #121414;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    .terminal-cursor {
+      display: inline-block;
+      width: 12px;
+      height: 1em;
+      background-color: #CCFF00;
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    .text-primary { color: #CCFF00; }
+    .text-secondary { color: #FF4C00; }
+
+    .uppercase-tracked {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .border-2 { border-width: 2px; }
+
+    .clip-corner {
+      clip-path: polygon(
+        0 15px,
+        15px 0,
+        calc(100% - 15px) 0,
+        100% 15px,
+        100% calc(100% - 15px),
+        calc(100% - 15px) 100%,
+        15px 100%,
+        0 calc(100% - 15px)
+      );
+    }
+  </style>
+</head>
+<body class="relative scanlines flex flex-col items-center justify-center p-12">
+
+  <!-- Top: Status banner -->
+  <div class="absolute top-12 left-12 right-12 flex justify-between items-center">
+    <div class="text-xs uppercase-tracked text-secondary">[ TENDER_MISS_CHECKER ]</div>
+    <div class="text-xs uppercase-tracked text-on-surface-variant">ZONKE_AI_STUDIO</div>
+  </div>
+
+  <!-- Center content container -->
+  <div class="flex flex-col items-center justify-center w-full max-w-[800px] mt-20">
+
+    <!-- Terminal prompt line -->
+    <div class="mb-12">
+      <span class="text-primary font-bold">zonke@studio:~$</span>
+      <span class="terminal-cursor"></span>
+    </div>
+
+    <!-- Main heading -->
+    <div class="text-center mb-16">
+      <h1 class="text-3xl font-bold uppercase-tracked text-on-surface-variant mb-4">
+        TENDER HEALTH CHECK
+        <br>WINDOW CLOSES IN
+      </h1>
+    </div>
+
+    <!-- Countdown timer (big) -->
+    <div class="text-[120px] font-bold leading-none tracking-tighter text-secondary mb-8 font-mono" id="countdown">
+      72:14:33:09
+    </div>
+
+    <!-- CTA block (sticker style) -->
+    <div class="sticker bg-primary text-surface px-16 py-8 text-center mb-12 w-full max-w-[600px] glitch">
+      <div class="text-2xl font-black uppercase mb-2">RUN TENDER MISS CHECKER</div>
+      <div class="text-sm font-bold uppercase-tracked">Free tool for early adopters &mdash; Limited spots</div>
+    </div>
+
+    <!-- QR Code section -->
+    <div class="flex flex-col items-center gap-6">
+      <div class="w-40 h-40 bg-white border-2 border-black p-3">
+        <div class="w-full h-full bg-black grid place-items-center text-white text-[10px] font-mono break-all text-center px-2">
+          <svg viewBox="0 0 120 120" width="120" height="120">
+            <rect x="10" y="10" width="40" height="40" fill="white"/>
+            <rect x="70" y="10" width="40" height="40" fill="white"/>
+            <rect x="10" y="70" width="40" height="40" fill="white"/>
+            <rect x="20" y="20" width="20" height="20" fill="black"/>
+            <rect x="80" y="20" width="20" height="20" fill="black"/>
+            <rect x="20" y="80" width="20" height="20" fill="black"/>
+            <rect x="100" y="100" width="10" height="10" fill="white"/>
+            <rect x="50" y="50" width="20" height="20" fill="black"/>
+          </svg>
+        </div>
+      </div>
+      <div class="text-center">
+        <div class="text-sm uppercase-tracked text-primary mb-1">[ SCAN TO SECURE SPOT ]</div>
+        <div class="text-xs text-on-surface-variant">zonke.ai/earlybird-tenders</div>
+      </div>
+    </div>
+
+    <!-- Footer warning -->
+    <div class="absolute bottom-12 left-12 right-12 text-center">
+      <div class="text-xs uppercase-tracked text-secondary">
+        NO DEADLINE DRIFT. NO SUBMISSION ERRORS. AI PRECISION.
+      </div>
+      <div class="text-[10px] text-on-surface-variant mt-2 uppercase-tracked">
+        VER 2.0.77 // BUILD 20250514
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Decorative terminal data lines (dim) -->
+  <div class="absolute left-12 top-[40%] text-[10px] text-on-surface-variant opacity-30" style="writing-mode: vertical-rl;">
+    #Tender scan active #Submission validator v3 #Deadline monitor: ON
+    #Database: 12,421 tenders #Accuracy: 99.97% #Status: NOMINAL
+  </div>
+
+</body>
+</html>

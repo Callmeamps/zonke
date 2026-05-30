@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1080, height=1920" />
+  <title>Tender Vault Mobile</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root { --bg:#121414; --lime:#c3f400; --olive:#8e9379; --white:#ffffff; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg);font-family:'JetBrains Mono', monospace}
+    #root{position:relative;width:1080px;height:1920px}
+    .scanlines{position:absolute;inset:0;pointer-events:none;opacity:.03;z-index:1000;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px)}
+    .scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden}
+
+    .radar{width:560px;height:560px;border:2px solid var(--lime);position:relative}
+    .ring{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(195,244,0,.25)}
+    .r1{width:180px;height:180px}.r2{width:340px;height:340px}.r3{width:500px;height:500px}
+    .sweep{position:absolute;left:50%;top:50%;width:50%;height:2px;background:linear-gradient(90deg,var(--lime),transparent);transform-origin:left center}
+    .dot{position:absolute;width:10px;height:10px;background:var(--lime);opacity:0}
+    .label{position:absolute;bottom:-70px;left:50%;transform:translateX(-50%);color:var(--lime);font-size:24px;letter-spacing:5px}
+
+    .list-wrap{width:82%}
+    .list-title{color:var(--lime);font-size:28px;letter-spacing:4px;margin-bottom:20px}
+    .item{padding:16px 18px;border-left:2px solid #343; color:#5f6650; margin-bottom:10px; font-size:22px}
+
+    .scan-wrap{text-align:center}
+    .scan-btn{width:260px;height:260px;border:3px solid var(--lime);display:flex;align-items:center;justify-content:center;box-shadow:6px 6px 0 var(--olive)}
+    .scan-icon{width:100px;height:100px;border:3px solid var(--lime);position:relative}
+    .scan-icon::after{content:'';position:absolute;width:30px;height:30px;background:var(--lime);left:50%;top:50%;transform:translate(-50%,-50%)}
+    .scan-line{position:absolute;left:0;top:0;width:100%;height:4px;background:var(--lime);opacity:.85}
+    .scan-label{color:var(--lime);font-size:26px;letter-spacing:4px;margin-top:30px}
+  </style>
+</head>
+<body>
+  <div id="root" data-composition-id="main" data-start="0" data-duration="30" data-width="1080" data-height="1920">
+    <div class="scanlines"></div>
+
+    <section id="scene1" class="scene">
+      <div class="radar">
+        <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+        <div class="sweep" id="sweep"></div>
+        <div class="dot" style="left:66%;top:36%"></div>
+        <div class="dot" style="left:34%;top:62%"></div>
+        <div class="dot" style="left:57%;top:72%"></div>
+        <div class="label">SCANNING</div>
+      </div>
+    </section>
+
+    <section id="scene2" class="scene">
+      <div class="list-wrap">
+        <div class="list-title">DETECTED TENDERS</div>
+        <div class="item">Tender_001.dat</div>
+        <div class="item">Tender_002.dat</div>
+        <div class="item">Tender_003.dat</div>
+        <div class="item">Tender_004.dat</div>
+        <div class="item">Tender_005.dat</div>
+      </div>
+    </section>
+
+    <section id="scene3" class="scene">
+      <div class="scan-wrap">
+        <div class="scan-btn" id="scanBtn"><div class="scan-line" id="scanLine"></div><div class="scan-icon"></div></div>
+        <div class="scan-label">INITIALIZE</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused:true, defaults:{ ease:'expo.out' } });
+    window.__timelines.main = tl;
+
+    // scene 1
+    tl.set('#scene1',{opacity:1,visibility:'visible'},0);
+    tl.to('#sweep',{rotation:360,duration:7,ease:'none'},0.3);
+    tl.to('.dot',{opacity:1,duration:0.2,stagger:0.7},1.2);
+    tl.to('.dot',{opacity:0,duration:0.2,stagger:0.5},4.8);
+    tl.to('#scene1',{opacity:0,duration:0.4},9.6);
+    tl.set('#scene1',{visibility:'hidden'},10.0);
+
+    // scene 2
+    tl.set('#scene2',{opacity:1,visibility:'visible'},10.0);
+    tl.fromTo('.item',{x:-24,opacity:0},{x:0,opacity:1,duration:0.3,stagger:0.22},10.3);
+    tl.to('.item',{color:'#c3f400',borderColor:'#c3f400',backgroundColor:'rgba(195,244,0,.08)',duration:0.24,stagger:0.28},12.0);
+    tl.to('#scene2',{opacity:0,duration:0.4},19.6);
+    tl.set('#scene2',{visibility:'hidden'},20.0);
+
+    // scene 3
+    tl.set('#scene3',{opacity:1,visibility:'visible'},20.0);
+    tl.fromTo('#scanBtn',{scale:0.7,rotation:-20,opacity:0},{scale:1,rotation:0,opacity:1,duration:0.8,ease:'back.out(1.6)'},20.2);
+    tl.fromTo('.scan-label',{y:14,opacity:0},{y:0,opacity:1,duration:0.5},20.8);
+    tl.fromTo('#scanLine',{y:-4},{y:250,duration:1.6,ease:'power2.inOut'},22.0);
+    tl.to('#scanBtn',{boxShadow:'0 0 30px #c3f400',duration:0.3},24.0);
+    tl.to('#scanBtn',{boxShadow:'0 0 60px #c3f400',duration:0.4},24.3);
+    tl.to('#scanBtn',{boxShadow:'6px 6px 0 #8e9379',duration:0.5},24.8);
+    tl.to('#scene3',{opacity:0,duration:0.4},29.6);
+    tl.set('#scene3',{visibility:'hidden'},30.0);
+  </script>
+</body>
+</html>

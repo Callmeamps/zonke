@@ -1,0 +1,188 @@
+{
+  "name": "Complete Ad Creative Suite - All Templates",
+  "description": "Full automated batch render for all 17 ad templates across platforms for early-bird validation. Includes Real Estate and Tenders vertical variants.",
+  "creatives": [
+    // === FEED ADS (1080x1080) ===
+    {
+      "name": "A: System Override - Real Estate Feed",
+      "template": "a-system-override.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/a-system-override-re.png"
+    },
+    {
+      "name": "A: System Override - Tenders Feed",
+      "template": "a-system-override-tenders.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/a-system-override-te.png"
+    },
+    {
+      "name": "C: Alert Style - Real Estate Feed",
+      "template": "c-alert-style.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/c-alert-style-re.png"
+    },
+    {
+      "name": "D: Data Visualization - Tenders Feed",
+      "template": "d-data-viz.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/d-data-viz-te.png"
+    },
+    {
+      "name": "F: Before/After Comparison - Real Estate Feed",
+      "template": "f-before-after.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/f-before-after-re.png"
+    },
+    {
+      "name": "I: Search Results - Tenders Feed",
+      "template": "i-search-results.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/i-search-results-te.png"
+    },
+    {
+      "name": "J: Directory Tree - Real Estate Feed",
+      "template": "j-directory-tree.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/j-directory-tree-re.png"
+    },
+    {
+      "name": "O: Performance Compare - Tenders Feed",
+      "template": "o-perf-compare.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/o-perf-compare-te.png"
+    },
+
+    // === STORIES ADS (1080x1920) ===
+    {
+      "name": "B: Terminal Countdown - Real Estate Stories",
+      "template": "b-terminal-countdown.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/b-terminal-countdown-re.png"
+    },
+    {
+      "name": "B: Terminal Countdown - Tenders Stories",
+      "template": "b-terminal-countdown-tenders.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/b-terminal-countdown-te.png"
+    },
+    {
+      "name": "E: Code Command - Real Estate Stories",
+      "template": "e-code-command.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/e-code-command-re.png"
+    },
+    {
+      "name": "G: Error 404 - Tenders Stories",
+      "template": "g-error-404.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/g-error-404-te.png"
+    },
+    {
+      "name": "H: System Update - Real Estate Stories",
+      "template": "h-system-update.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/h-system-update-re.png"
+    },
+    {
+      "name": "K: Setup Wizard - Tenders Stories",
+      "template": "k-setup-wizard.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/k-setup-wizard-te.png"
+    },
+    {
+      "name": "L: Chat Interface - Real Estate Stories",
+      "template": "l-chat-interface.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/l-chat-interface-re.png"
+    },
+    {
+      "name": "M: Timeline - Tenders Stories",
+      "template": "m-timeline.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/m-timeline-te.png"
+    },
+    {
+      "name": "N: Network Graph - Real Estate Stories",
+      "template": "n-network-graph.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "insta-stories/n-network-graph-re.png"
+    },
+
+    // === TIKTOK (1080x1920) - Some Stories templates can double ===
+    {
+      "name": "B: Terminal Countdown - Tenders TikTok",
+      "template": "b-terminal-countdown-tenders.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "tiktok/b-terminal-countdown-te.png"
+    },
+    {
+      "name": "G: Error 404 - Real Estate TikTok",
+      "template": "g-error-404.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "tiktok/g-error-404-re.png"
+    },
+    {
+      "name": "L: Chat Interface - Tenders TikTok",
+      "template": "l-chat-interface.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "tiktok/l-chat-interface-te.png"
+    },
+    {
+      "name": "N: Network Graph - Real Estate TikTok",
+      "template": "n-network-graph.html",
+      "width": 1080,
+      "height": 1920,
+      "output": "tiktok/n-network-graph-re.png"
+    },
+
+    // === FACEBOOK FEED (1200x628 landscape) ===
+    {
+      "name": "A: System Override - Real Estate FB",
+      "template": "a-system-override.html",
+      "width": 1200,
+      "height": 628,
+      "output": "facebook/feed/a-system-override-re.jpg"
+    },
+    {
+      "name": "F: Before/After - Tenders FB",
+      "template": "f-before-after.html",
+      "width": 1200,
+      "height": 628,
+      "output": "facebook/feed/f-before-after-te.jpg"
+    },
+    {
+      "name": "I: Search Results - Real Estate FB",
+      "template": "i-search-results.html",
+      "width": 1200,
+      "height": 628,
+      "output": "facebook/feed/i-search-results-re.jpg"
+    },
+    {
+      "name": "O: Performance Compare - Tenders FB",
+      "template": "o-perf-compare.html",
+      "width": 1200,
+      "height": 628,
+      "output": "facebook/feed/o-perf-compare-te.jpg"
+    }
+  ]
+}

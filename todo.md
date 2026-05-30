@@ -36,6 +36,19 @@
 - [x] Ensure no private keys in client
 - [x] All pages linked correctly
 
+### Tool Audit Issues (from TOOL_AUDIT_REPORT.md)
+
+#### P2 — Fix Now
+- [ ] `zonke-xi8` Extract tailwind.config to shared assets/js/tailwind-config.js
+- [ ] `zonke-8pv` Reorganize server.js route ordering
+- [ ] `zonke-2zw` Replace inline ZAR formatting with toolFormatZAR() in 2 tools
+- [ ] `zonke-o7i` Animate additional counters in compliance-radar and deadline-drift-calculator
+- [ ] `zonke-53k` Replace hardcoded inline hex colors with design token classes
+
+#### P3 — Fix Next
+- [ ] `zonke-zlz` Decompose monolithic JS in commission-forecaster (tracer bullet)
+- [ ] `zonke-0tx` Standardize restart UX across all tools
+
 ### Recent Fixes
 - [x] Fixed `real-estate.html` class typo (`neo-brutalist-button-alt`)
 - [x] Hardened animation fallback on `index.html`, `real-estate.html`, `tenders.html`, `pricing.html` (content visible even if Motion/CDN fails)

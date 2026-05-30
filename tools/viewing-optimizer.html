@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Viewing Optimizer | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<script src="/assets/js/toolkit.js"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#121414", "surface-dim": "#121414", "surface-bright": "#37393a",
+        "surface-container-lowest": "#0c0f0f", "surface-container-low": "#1a1c1c",
+        "surface-container": "#1e2020", "surface-container-high": "#282a2b",
+        "surface-container-highest": "#333535", "on-surface": "#e2e2e2",
+        "on-surface-variant": "#c4c9ac", "outline": "#8e9379", "outline-variant": "#444933",
+        "primary": "#c3f400", "on-primary": "#283500", "primary-container": "#c3f400",
+        "on-primary-container": "#556d00", "secondary": "#ffb59f",
+        "secondary-container": "#ff571c", "on-secondary-container": "#531300",
+        "error": "#ffb4ab", "error-container": "#93000a", "on-error-container": "#ffdad6"
+      },
+      borderRadius: { DEFAULT: "0px", lg: "0px", xl: "0px", full: "9999px" },
+      spacing: { xs: "4px", unit: "4px", sm: "8px", xl: "64px", lg: "32px", gutter: "24px", margin: "40px", md: "16px" },
+      fontFamily: { mono: ["JetBrains Mono", "monospace"] },
+      fontSize: {
+        "display-lg": ["72px", { lineHeight: "1.0", letterSpacing: "-0.04em", fontWeight: "800" }],
+        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-md": ["24px", { lineHeight: "1.2", letterSpacing: "0em", fontWeight: "700" }],
+        "body-lg": ["18px", { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" }],
+        "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0.02em", fontWeight: "400" }],
+        "label-mono": ["12px", { lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "700" }],
+        "code-snippet": ["14px", { lineHeight: "1.4", letterSpacing: "0em", fontWeight: "400" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+* { font-family: 'JetBrains Mono', monospace; }
+body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
+
+.screen { transition: opacity 0.5s ease, transform 0.5s ease; }
+.screen.hidden { display: none; }
+.screen.active { display: block; animation: fadeSlideIn 0.6s ease forwards; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(195, 244, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(195, 244, 0, 0.6); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+.scanline-overlay {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.015) 2px,
+    rgba(255,255,255,0.015) 4px
+  );
+}
+
+.cursor-blink::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+  color: #c3f400;
+}
+
+input[type="range"] { accent-color: #c3f400; height: 4px; }
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px;
+  background: #c3f400; border: none; border-radius: 0;
+  cursor: pointer;
+}
+
+.viewing-block {
+  transition: all 0.3s ease;
+}
+
+.util-bar {
+  transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+input[type="checkbox"] {
+  appearance: none; width: 20px; height: 20px;
+  border: 2px solid #8e9379; background: transparent;
+  cursor: pointer; position: relative;
+  flex-shrink: 0;
+}
+input[type="checkbox"]:checked {
+  border-color: #c3f400; background: #c3f400;
+}
+input[type="checkbox"]:checked::after {
+  content: "✓"; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #283500; font-size: 14px; font-weight: 700;
+}
+</style>
+</head>
+<body>
+
+<div class="scanline-overlay"></div>
+
+<div class="min-h-screen flex flex-col">
+
+<header class="border-b border-outline-variant p-gutter flex items-center justify-between">
+  <a href="/" class="text-primary font-bold text-headline-md hover:opacity-80 transition-opacity no-underline">ZONKE_</a>
+  <span class="text-code-snippet text-on-surface-variant">&gt; VIEWING OPTIMIZER v1.0</span>
+</header>
+
+<main class="flex-1 flex flex-col items-center justify-center p-gutter max-w-3xl mx-auto w-full">
+
+<!-- SCREEN 1: BOOT / SPLASH -->
+<div id="screen-splash" class="screen active w-full text-center">
+  <div class="mb-xl">
+    <pre class="text-primary text-[10px] sm:text-xs leading-tight opacity-60">
+  __     ___    _   _      ___    _   _
+ / _|   / _ \  | \ | |   / _ \  | \ | |
+| |_   | | | | |  \| |  | | | | |  \| |
+|  _|  | |_| | | |\  |  | |_| | | |\  |
+|_|     \___/  |_| \_|   \___/  |_| \_|
+    </pre>
+  </div>
+  <div class="text-left max-w-lg mx-auto border border-outline-variant p-lg bg-surface-container-low">
+    <p class="text-primary text-body-sm mb-sm">&gt; INITIALIZE VIEWING OPTIMIZER...</p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-1"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-2"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-3"></p>
+    <div class="h-1 bg-surface-container-highest mt-md overflow-hidden">
+      <div id="boot-progress" class="h-full bg-primary" style="width:0%; transition: width 2s ease;"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="boot-status">_</p>
+  </div>
+  <button id="btn-start" class="hidden mt-xl bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none mx-auto">
+    START OPTIMIZER →
+  </button>
+</div>
+
+<!-- SCREEN 2: INPUT FORM -->
+<div id="screen-input" class="screen hidden w-full">
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-headline-md mb-sm">&gt; SCHEDULE PARAMETERS</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Configure your availability and we'll optimize your viewing schedule.</p>
+
+    <div class="space-y-lg">
+      <div>
+        <label class="text-body-sm text-on-surface mb-xs block">Available Days</label>
+        <div class="flex gap-sm flex-wrap" id="day-checkboxes">
+          <label class="flex items-center gap-xs text-code-snippet text-on-surface-variant cursor-pointer">
+            <input type="checkbox" value="0" checked class="day-check"/> MON
+          </label>
+          <label class="flex items-center gap-xs text-code-snippet text-on-surface-variant cursor-pointer">
+            <input type="checkbox" value="1" checked class="day-check"/> TUE
+          </label>
+          <label class="flex items-center gap-xs text-code-snippet text-on-surface-variant cursor-pointer">
+            <input type="checkbox" value="2" checked class="day-check"/> WED
+          </label>
+          <label class="flex items-center gap-xs text-code-snippet text-on-surface-variant cursor-pointer">
+            <input type="checkbox" value="3" checked class="day-check"/> THU
+          </label>
+          <label class="flex items-center gap-xs text-code-snippet text-on-surface-variant cursor-pointer">
+            <input type="checkbox" value="4" checked class="day-check"/> FRI
+          </label>
+          <label class="flex items-center gap-xs text-code-snippet text-on-surface-variant cursor-pointer">
+            <input type="checkbox" value="5" class="day-check"/> SAT
+          </label>
+          <label class="flex items-center gap-xs text-code-snippet text-on-surface-variant cursor-pointer">
+            <input type="checkbox" value="6" class="day-check"/> SUN
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Viewings Per Day</span>
+          <span class="text-primary" id="val-viewingsPerDay">4</span>
+        </label>
+        <input type="range" id="input-viewingsPerDay" min="1" max="10" value="4" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1</span><span>10</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Avg Travel Time</span>
+          <span class="text-primary" id="val-travelTime">15 min</span>
+        </label>
+        <input type="range" id="input-travelTime" min="5" max="60" value="15" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>5 min</span><span>60 min</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Lead Response Time</span>
+          <span class="text-primary" id="val-responseTime">5 min</span>
+        </label>
+        <input type="range" id="input-responseTime" min="1" max="60" value="5" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1 min</span><span>60 min</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Desired Close Timeframe</span>
+          <span class="text-primary" id="val-closeTimeframe">1 month</span>
+        </label>
+        <select id="input-closeTimeframe" class="w-full bg-surface border border-outline-variant p-md text-on-surface text-body-sm outline-none focus:border-primary transition-colors">
+          <option value="1">This week</option>
+          <option value="2">2 weeks</option>
+          <option value="4" selected>1 month</option>
+          <option value="12">3 months</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-analyze" class="w-full bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+    OPTIMIZE SCHEDULE →
+  </button>
+</div>
+
+<!-- SCREEN 3: PROCESSING -->
+<div id="screen-processing" class="screen hidden w-full text-center">
+  <div class="border border-outline-variant p-lg bg-surface-container-low max-w-lg mx-auto">
+    <div class="flex items-center gap-md mb-lg">
+      <div class="w-3 h-3 bg-secondary-container animate-pulse"></div>
+      <p class="text-primary text-headline-md">&gt; OPTIMIZING SCHEDULE</p>
+    </div>
+    <div id="processing-messages" class="text-left space-y-sm mb-lg">
+      <p class="text-code-snippet text-on-surface-variant">&gt; Calculating weekly capacity...</p>
+    </div>
+    <div class="h-2 bg-surface-container-highest overflow-hidden">
+      <div id="processing-bar" class="h-full bg-primary" style="width:0%"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="processing-pct">0%</p>
+  </div>
+</div>
+
+<!-- SCREEN 4: RESULTS -->
+<div id="screen-results" class="screen hidden w-full">
+  <div class="text-center mb-lg">
+    <p class="text-primary text-headline-md">&gt; OPTIMIZATION COMPLETE</p>
+    <p class="text-on-surface-variant text-body-sm">Your optimized viewing schedule is ready.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-lg">
+    <div class="border border-primary/30 p-lg bg-surface-container-low">
+      <p class="text-primary text-label-mono uppercase tracking-widest mb-md">WEEKLY CAPACITY</p>
+      <p class="text-display-lg text-primary" id="result-capacity">0</p>
+      <p class="text-code-snippet text-on-surface-variant">viewings / week</p>
+    </div>
+    <div class="border border-secondary-container/30 p-lg bg-surface-container-low">
+      <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">VIEWING HOURS</p>
+      <p class="text-display-lg text-secondary-container" id="result-viewing-hours">0</p>
+      <p class="text-code-snippet text-on-surface-variant">hrs / week</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low">
+      <p class="text-on-surface-variant text-label-mono uppercase tracking-widest mb-md">UTILIZATION</p>
+      <p class="text-display-lg text-on-surface" id="result-utilization">0%</p>
+      <p class="text-code-snippet text-on-surface-variant">productive time</p>
+    </div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">TIME UTILIZATION BREAKDOWN</p>
+    <div class="h-6 bg-surface-container-highest overflow-hidden flex">
+      <div id="util-viewing" class="h-full bg-primary util-bar" style="width:0%"></div>
+      <div id="util-travel" class="h-full bg-secondary-container util-bar" style="width:0%"></div>
+      <div id="util-idle" class="h-full bg-surface-container-high util-bar" style="width:0%"></div>
+    </div>
+    <div class="flex justify-between text-code-snippet text-on-surface-variant mt-sm">
+      <span><span class="text-primary">■</span> Viewing</span>
+      <span><span class="text-secondary-container">■</span> Travel</span>
+      <span><span class="text-on-surface-variant">■</span> Idle</span>
+    </div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">OPTIMIZED WEEKLY SCHEDULE</p>
+    <div id="weekly-grid" class="grid grid-cols-7 gap-xs mb-md"></div>
+    <p class="text-code-snippet text-on-surface-variant text-center">Viewing blocks optimized to minimize travel gaps</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-lg">
+    <div class="border border-secondary-container/30 p-lg bg-surface-container-low">
+      <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">CLOSE PROJECTION</p>
+      <p class="text-headline-xl text-secondary-container" id="result-viewings-to-close">0</p>
+      <p class="text-code-snippet text-on-surface-variant">viewings needed to close 1 deal</p>
+      <p class="text-code-snippet text-on-surface-variant mt-sm" id="result-close-weeks">Based on 20% avg close rate</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low">
+      <p class="text-primary text-label-mono uppercase tracking-widest mb-md">BACKTRACK ESTIMATE</p>
+      <p class="text-headline-md text-primary" id="result-backtrack">—</p>
+      <p class="text-code-snippet text-on-surface-variant" id="result-backtrack-detail">—</p>
+    </div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">RECOMMENDATION</p>
+    <p class="text-body-sm text-on-surface" id="result-recommendation">—</p>
+  </div>
+
+  <div class="text-center">
+    <p class="text-body-sm text-on-surface-variant mb-md">Want to save this optimized schedule and get personalized tips?</p>
+    <button id="btn-gate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+      SAVE & UNLOCK TIPS →
+    </button>
+    <button id="btn-restart" class="ml-md bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+      RE-RUN OPTIMIZER
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 5: COMPLETE -->
+<div id="screen-complete" class="screen hidden w-full text-center">
+  <div class="border border-primary/30 p-xl bg-surface-container-low max-w-lg mx-auto">
+    <p class="text-primary text-display-lg mb-md">✓</p>
+    <p class="text-primary text-headline-md mb-sm">&gt; SCHEDULE SAVED</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Your optimized schedule has been sent to <span id="complete-email" class="text-primary"></span>. Check your inbox for personalized time-saving tips.</p>
+    <div class="border-t border-outline-variant pt-lg space-y-md">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest">WHAT HAPPENS NEXT</p>
+      <div class="flex flex-col gap-sm">
+        <p class="text-code-snippet text-on-surface-variant">1. Full optimized schedule with travel-efficient routing</p>
+        <p class="text-code-snippet text-on-surface-variant">2. Custom tips to reclaim lost time in your week</p>
+        <p class="text-code-snippet text-on-surface-variant">3. Follow-up with a Zonke specialist (optional)</p>
+      </div>
+    </div>
+    <div class="mt-lg flex flex-col sm:flex-row gap-md justify-center">
+      <a href="/real-estate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors no-underline inline-block">
+        EXPLORE LEAD REACTOR →
+      </a>
+      <button id="btn-restart-complete" class="bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+        RE-RUN OPTIMIZER
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="border-t border-outline-variant p-gutter text-center">
+  <p class="text-code-snippet text-on-surface-variant">ZONKE AI NATIVE STUDIO &copy; 2026</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  const DAY_NAMES = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const CLOSE_RATE = 0.20;
+  const AVG_VIEWING_DURATION = 30;
+
+  let lastResults = null;
+
+  function getInputs() {
+    const checkboxes = document.querySelectorAll('.day-check:checked');
+    const days = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    return {
+      availableDays: days,
+      viewingsPerDay: parseInt(document.getElementById('input-viewingsPerDay').value),
+      travelTime: parseInt(document.getElementById('input-travelTime').value),
+      responseTime: parseInt(document.getElementById('input-responseTime').value),
+      closeTimeframe: parseInt(document.getElementById('input-closeTimeframe').value)
+    };
+  }
+
+  function calculate(inputs) {
+    const { availableDays, viewingsPerDay, travelTime, responseTime, closeTimeframe } = inputs;
+    const daysSelected = availableDays.length;
+
+    const weeklyCapacity = daysSelected * viewingsPerDay;
+    const totalViewingHours = weeklyCapacity * AVG_VIEWING_DURATION / 60;
+    const gapTimePerDay = (viewingsPerDay > 1) ? (viewingsPerDay - 1) * travelTime / 60 : 0;
+    const totalGapHours = gapTimePerDay * daysSelected;
+    const totalProductiveHours = totalViewingHours + totalGapHours;
+
+    const totalSlots = daysSelected * viewingsPerDay;
+    const idleHours = Math.max(0, (daysSelected * 8) - totalProductiveHours);
+    const utilization = totalSlots > 0 ? Math.min(100, Math.round((totalProductiveHours / (daysSelected * 8)) * 100)) : 0;
+    const viewingPct = totalProductiveHours > 0 ? Math.round((totalViewingHours / totalProductiveHours) * 100) : 0;
+    const travelPct = totalProductiveHours > 0 ? Math.round((totalGapHours / totalProductiveHours) * 100) : 0;
+    const idlePct = Math.max(0, 100 - viewingPct - travelPct);
+
+    const viewingsPerWeek = weeklyCapacity;
+    const viewingsToClose = Math.ceil(1 / CLOSE_RATE);
+    const weeksForClose = Math.max(1, closeTimeframe);
+    const viewingsNeededPerWeek = Math.ceil(viewingsToClose / weeksForClose);
+    const canMeetDemand = viewingsNeededPerWeek <= viewingsPerWeek;
+
+    const optimalResponseRate = 1;
+    const responseRatio = Math.min(1, optimalResponseRate / Math.max(responseTime, 1));
+    const speedLeakViewings = responseTime > 5 ? Math.round(weeklyCapacity * (1 - responseRatio)) : 0;
+    const addedViewings = responseTime > 5 ? Math.round(weeklyCapacity * (1 - (5 / Math.max(responseTime, 1)))) : 0;
+
+    let recommendation = '';
+    if (responseTime > 15) {
+      recommendation = `Speed leak detected: Your ${responseTime}min response time is costing you. Reducing to 5min could add ${addedViewings} viewings/week (${Math.round(addedViewings / weeklyCapacity * 100)}% more capacity).`;
+    } else if (responseTime > 5) {
+      recommendation = `Good response time (${responseTime}min). Shaving it to 5min could unlock ${addedViewings} more viewings/week.`;
+    } else {
+      recommendation = `Excellent response time (${responseTime}min). You're maximizing lead conversion potential. Focus on reducing travel gaps for even more efficiency.`;
+    }
+
+    let backtrackText = '';
+    if (canMeetDemand) {
+      backtrackText = `To close by ${closeTimeframe === 1 ? 'this week' : closeTimeframe === 2 ? '2 weeks' : closeTimeframe === 4 ? '1 month' : '3 months'}, aim for ${viewingsNeededPerWeek} viewings per week. Your capacity of ${viewingsPerWeek}/week is sufficient.`;
+    } else {
+      backtrackText = `To close by ${closeTimeframe === 1 ? 'this week' : closeTimeframe === 2 ? '2 weeks' : closeTimeframe === 4 ? '1 month' : '3 months'}, you need ${viewingsNeededPerWeek} viewings/week, but your capacity is only ${viewingsPerWeek}/week. Consider adding more available days.`;
+    }
+
+    return {
+      availableDays, viewingsPerDay, travelTime, responseTime, closeTimeframe,
+      weeklyCapacity, totalViewingHours, totalGapHours, totalProductiveHours,
+      idleHours, utilization, viewingPct, travelPct, idlePct,
+      viewingsToClose, viewingsNeededPerWeek, canMeetDemand,
+      speedLeakViewings, addedViewings, recommendation, backtrackText,
+      daysSelected
+    };
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('active');
+  }
+
+  function setupRangeInputs() {
+    const map = {
+      'input-viewingsPerDay': 'val-viewingsPerDay',
+      'input-travelTime': 'val-travelTime',
+      'input-responseTime': 'val-responseTime'
+    };
+    Object.entries(map).forEach(([inputId, displayId]) => {
+      const input = document.getElementById(inputId);
+      const display = document.getElementById(displayId);
+      input.addEventListener('input', () => {
+        const val = parseInt(input.value);
+        switch (inputId) {
+          case 'input-viewingsPerDay': display.textContent = val; break;
+          case 'input-travelTime': display.textContent = val + ' min'; break;
+          case 'input-responseTime': display.textContent = val + ' min'; break;
+        }
+      });
+    });
+
+    document.getElementById('input-closeTimeframe').addEventListener('change', function() {
+      const labels = { '1': 'This week', '2': '2 weeks', '4': '1 month', '12': '3 months' };
+      document.getElementById('val-closeTimeframe').textContent = labels[this.value] || '1 month';
+    });
+  }
+
+  function runBootSequence() {
+    const line1 = document.getElementById('boot-line-1');
+    const line2 = document.getElementById('boot-line-2');
+    const line3 = document.getElementById('boot-line-3');
+    const progress = document.getElementById('boot-progress');
+    const status = document.getElementById('boot-status');
+
+    const bootMessages = [
+      '> Loading travel time model... OK',
+      '> Fetching optimized scheduling algorithms... OK',
+      '> Initializing route planner engine... OK'
+    ];
+
+    toolTerminalType(line1, bootMessages[0], 20, () => {
+      setTimeout(() => {
+        toolTerminalType(line2, bootMessages[1], 20, () => {
+          setTimeout(() => {
+            toolTerminalType(line3, bootMessages[2], 20, () => {
+              progress.style.width = '100%';
+              status.textContent = 'READY';
+              setTimeout(() => {
+                document.getElementById('btn-start').classList.remove('hidden');
+              }, 400);
+            });
+          }, 200);
+        });
+      }, 200);
+    });
+  }
+
+  function runProcessing(inputs, callback) {
+    const msgContainer = document.getElementById('processing-messages');
+    const bar = document.getElementById('processing-bar');
+    const pct = document.getElementById('processing-pct');
+    msgContainer.innerHTML = '';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+
+    const messages = [
+      '> Calculating weekly capacity...',
+      '> Optimizing travel routes...',
+      '> Minimizing inter-viewing gaps...',
+      '> Computing close projection...',
+      '> Generating optimized schedule...'
+    ];
+
+    let step = 0;
+    function nextStep() {
+      if (step < messages.length) {
+        const p = document.createElement('p');
+        p.className = 'text-code-snippet text-on-surface-variant';
+        p.textContent = messages[step];
+        msgContainer.appendChild(p);
+        const progress = Math.round(((step + 1) / messages.length) * 100);
+        bar.style.width = progress + '%';
+        pct.textContent = progress + '%';
+        step++;
+        setTimeout(nextStep, 700);
+      } else {
+        setTimeout(() => {
+          bar.style.width = '100%';
+          pct.textContent = '100%';
+          setTimeout(callback, 500);
+        }, 300);
+      }
+    }
+    nextStep();
+  }
+
+  function renderWeeklyGrid(results) {
+    const container = document.getElementById('weekly-grid');
+    container.innerHTML = '';
+
+    const days = results.availableDays;
+    const perDay = results.viewingsPerDay;
+    const travelMin = results.travelTime;
+
+    for (let d = 0; d < 7; d++) {
+      const dayCell = document.createElement('div');
+      dayCell.className = 'border border-outline-variant bg-surface-container-low p-xs min-h-[120px]';
+
+      const dayLabel = document.createElement('p');
+      dayLabel.className = 'text-label-mono text-outline text-center mb-xs';
+      dayLabel.textContent = DAY_NAMES[d];
+      dayCell.appendChild(dayLabel);
+
+      if (days.includes(d)) {
+        for (let v = 0; v < perDay; v++) {
+          const block = document.createElement('div');
+          const viewingStart = 8 + v;
+          const viewingEnd = viewingStart + 0.5;
+          const isLast = v === perDay - 1;
+          block.className = 'viewing-block bg-primary/20 border-l-2 border-primary px-xs py-[2px] mb-[2px] text-code-snippet';
+          block.style.fontSize = '8px';
+          block.innerHTML = `<span class="text-primary">●</span> ${viewingStart}:00-${String(Math.floor(viewingEnd)).padStart(2,'0')}:${viewingEnd % 1 === 0 ? '00' : '30'}`;
+          dayCell.appendChild(block);
+
+          if (!isLast && travelMin > 0) {
+            const gap = document.createElement('div');
+            gap.className = 'text-code-snippet text-secondary-container text-center';
+            gap.style.fontSize = '7px';
+            gap.textContent = `▬${travelMin}min`;
+            dayCell.appendChild(gap);
+          }
+        }
+      } else {
+        const off = document.createElement('p');
+        off.className = 'text-code-snippet text-outline text-center mt-md opacity-50';
+        off.style.fontSize = '10px';
+        off.textContent = 'OFF';
+        dayCell.appendChild(off);
+      }
+
+      container.appendChild(dayCell);
+    }
+  }
+
+  function displayResults(results) {
+    lastResults = results;
+
+    toolAnimateValue(document.getElementById('result-capacity'), 0, results.weeklyCapacity, 1200);
+    toolAnimateValue(document.getElementById('result-viewing-hours'), 0, results.totalViewingHours, 1200, '', 'h');
+
+    const utilEl = document.getElementById('result-utilization');
+    toolAnimateValue(utilEl, 0, results.utilization, 1200, '', '%');
+
+    setTimeout(() => {
+      document.getElementById('util-viewing').style.width = results.viewingPct + '%';
+      document.getElementById('util-travel').style.width = results.travelPct + '%';
+      document.getElementById('util-idle').style.width = results.idlePct + '%';
+    }, 300);
+
+    renderWeeklyGrid(results);
+
+    document.getElementById('result-viewings-to-close').textContent = results.viewingsToClose;
+    document.getElementById('result-close-weeks').textContent = `Based on ${Math.round(CLOSE_RATE * 100)}% avg close rate`;
+
+    const backEl = document.getElementById('result-backtrack');
+    backEl.textContent = results.canMeetDemand ? `✓ ${results.viewingsNeededPerWeek}/wk` : `⚠ ${results.viewingsNeededPerWeek}/wk needed`;
+
+    document.getElementById('result-backtrack-detail').textContent = results.backtrackText;
+    document.getElementById('result-recommendation').textContent = results.recommendation;
+  }
+
+  function init() {
+    setupRangeInputs();
+    runBootSequence();
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      showScreen('screen-input');
+    });
+
+    document.getElementById('btn-analyze').addEventListener('click', () => {
+      const inputs = getInputs();
+      if (inputs.availableDays.length === 0) {
+        alert('Please select at least one available day.');
+        return;
+      }
+      showScreen('screen-processing');
+      runProcessing(inputs, () => {
+        const results = calculate(inputs);
+        showScreen('screen-results');
+        displayResults(results);
+      });
+    });
+
+    document.getElementById('btn-gate').addEventListener('click', () => {
+      const results = lastResults;
+      if (!results) return;
+      toolShowEmailGate('viewing-optimizer', {
+        availableDays: results.availableDays,
+        viewingsPerDay: results.viewingsPerDay,
+        travelTime: results.travelTime,
+        responseTime: results.responseTime,
+        weeklyCapacity: results.weeklyCapacity,
+        totalViewingHours: results.totalViewingHours,
+        utilization: results.utilization,
+        viewingsToClose: results.viewingsToClose,
+        viewingsNeededPerWeek: results.viewingsNeededPerWeek
+      }, (email) => {
+        document.getElementById('complete-email').textContent = email;
+        showScreen('screen-complete');
+      });
+    });
+
+    const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
+    restartButtons.forEach(btn => {
+      if (btn) btn.addEventListener('click', () => {
+        document.getElementById('input-viewingsPerDay').value = 4;
+        document.getElementById('input-travelTime').value = 15;
+        document.getElementById('input-responseTime').value = 5;
+        document.getElementById('input-closeTimeframe').value = 4;
+        document.getElementById('val-viewingsPerDay').textContent = '4';
+        document.getElementById('val-travelTime').textContent = '15 min';
+        document.getElementById('val-responseTime').textContent = '5 min';
+        document.getElementById('val-closeTimeframe').textContent = '1 month';
+        document.querySelectorAll('.day-check').forEach(cb => cb.checked = cb.value <= 4);
+        showScreen('screen-input');
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Deadline Drift Calculator | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<script src="/assets/js/toolkit.js"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#121414", "surface-dim": "#121414", "surface-bright": "#37393a",
+        "surface-container-lowest": "#0c0f0f", "surface-container-low": "#1a1c1c",
+        "surface-container": "#1e2020", "surface-container-high": "#282a2b",
+        "surface-container-highest": "#333535", "on-surface": "#e2e2e2",
+        "on-surface-variant": "#c4c9ac", "outline": "#8e9379", "outline-variant": "#444933",
+        "primary": "#c3f400", "on-primary": "#283500", "primary-container": "#c3f400",
+        "on-primary-container": "#556d00", "secondary": "#ffb59f",
+        "secondary-container": "#ff571c", "on-secondary-container": "#531300",
+        "error": "#ffb4ab", "error-container": "#93000a", "on-error-container": "#ffdad6"
+      },
+      borderRadius: { DEFAULT: "0px", lg: "0px", xl: "0px", full: "9999px" },
+      spacing: { xs: "4px", unit: "4px", sm: "8px", xl: "64px", lg: "32px", gutter: "24px", margin: "40px", md: "16px" },
+      fontFamily: { mono: ["JetBrains Mono", "monospace"] },
+      fontSize: {
+        "display-lg": ["72px", { lineHeight: "1.0", letterSpacing: "-0.04em", fontWeight: "800" }],
+        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-md": ["24px", { lineHeight: "1.2", letterSpacing: "0em", fontWeight: "700" }],
+        "body-lg": ["18px", { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" }],
+        "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0.02em", fontWeight: "400" }],
+        "label-mono": ["12px", { lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "700" }],
+        "code-snippet": ["14px", { lineHeight: "1.4", letterSpacing: "0em", fontWeight: "400" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+* { font-family: 'JetBrains Mono', monospace; }
+body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
+.screen { transition: opacity 0.5s ease, transform 0.5s ease; }
+.screen.hidden { display: none; }
+.screen.active { display: block; animation: fadeSlideIn 0.6s ease forwards; }
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(195, 244, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(195, 244, 0, 0.6); }
+}
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 87, 28, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(255, 87, 28, 0.6); }
+}
+.scanline-overlay {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px
+  );
+}
+.cursor-blink::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+  color: #c3f400;
+}
+input[type="range"] { accent-color: #c3f400; height: 4px; }
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px;
+  background: #c3f400; border: none; border-radius: 0;
+  cursor: pointer;
+}
+input[type="date"] {
+  color-scheme: dark;
+  background: #1a1c1c; border: 1px solid #444933;
+  color: #e2e2e2; padding: 12px; font-family: 'JetBrains Mono', monospace;
+  font-size: 14px; outline: none; width: 100%;
+}
+input[type="date"]:focus { border-color: #c3f400; }
+select {
+  background: #1a1c1c; border: 1px solid #444933;
+  color: #e2e2e2; padding: 12px; font-family: 'JetBrains Mono', monospace;
+  font-size: 14px; outline: none; width: 100%;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c4c9ac' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+select:focus { border-color: #c3f400; }
+.timeline-marker { transition: all 0.5s ease; }
+.timeline-zone { transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.countdown-number { transition: all 0.3s ease; }
+</style>
+</head>
+<body>
+
+<div class="scanline-overlay"></div>
+
+<div class="min-h-screen flex flex-col">
+
+<header class="border-b border-outline-variant p-gutter flex items-center justify-between">
+  <a href="/" class="text-primary font-bold text-headline-md hover:opacity-80 transition-opacity no-underline">ZONKE_</a>
+  <span class="text-code-snippet text-on-surface-variant">&gt; DEADLINE DRIFT CALCULATOR v1.0</span>
+</header>
+
+<main class="flex-1 flex flex-col items-center justify-center p-gutter max-w-3xl mx-auto w-full">
+
+<!-- SCREEN 1: SPLASH -->
+<div id="screen-splash" class="screen active w-full text-center">
+  <div class="mb-xl">
+    <pre class="text-primary text-[10px] sm:text-xs leading-tight opacity-60">
+  _     ___    _     ___    _  ___
+ | |   / _ \  | |   / _ \  | || __|
+ | |  | | | | | |  | | | | | ||__ \
+ | |__| |_| | | |__| |_| | |_||__) |
+ |_____\___/  |_____\___/  (_)____/
+    </pre>
+  </div>
+  <div class="text-left max-w-lg mx-auto border border-outline-variant p-lg bg-surface-container-low">
+    <p class="text-primary text-body-sm mb-sm">&gt; INITIALIZE DEADLINE DRIFT SCAN...</p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-1"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-2"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-3"></p>
+    <div class="h-1 bg-surface-container-highest mt-md overflow-hidden">
+      <div id="boot-progress" class="h-full bg-primary" style="width:0%; transition: width 2s ease;"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="boot-status">_</p>
+  </div>
+  <button id="btn-start" class="hidden mt-xl bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none mx-auto">
+    START CALCULATION →
+  </button>
+</div>
+
+<!-- SCREEN 2: INPUT -->
+<div id="screen-input" class="screen hidden w-full">
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-headline-md mb-sm">&gt; ENTER DEADLINE DETAILS</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">We'll analyze your timeline and calculate drift risk.</p>
+
+    <div class="space-y-lg">
+      <div>
+        <label class="text-body-sm text-on-surface mb-xs block">Tender Deadline</label>
+        <input type="date" id="input-deadline" class="w-full" />
+      </div>
+
+      <div>
+        <label class="text-body-sm text-on-surface mb-xs block">Current Stage</label>
+        <select id="input-stage">
+          <option value="0">Research — 0% complete</option>
+          <option value="25">Documentation — 25% complete</option>
+          <option value="50" selected>Drafting — 50% complete</option>
+          <option value="75">Review — 75% complete</option>
+          <option value="100">Ready to Submit — 100% complete</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Team Members</span>
+          <span class="text-primary" id="val-teamMembers">3</span>
+        </label>
+        <input type="range" id="input-teamMembers" min="1" max="10" value="3" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1</span><span>10</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Working Days Per Week</span>
+          <span class="text-primary" id="val-workingDays">5</span>
+        </label>
+        <input type="range" id="input-workingDays" min="1" max="7" value="5" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1</span><span>7</span></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-analyze" class="w-full bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+    ANALYZE DEADLINE RISK →
+  </button>
+</div>
+
+<!-- SCREEN 3: PROCESSING -->
+<div id="screen-processing" class="screen hidden w-full text-center">
+  <div class="border border-outline-variant p-lg bg-surface-container-low max-w-lg mx-auto">
+    <div class="flex items-center gap-md mb-lg">
+      <div class="w-3 h-3 bg-secondary-container animate-pulse"></div>
+      <p class="text-primary text-headline-md">&gt; ANALYZING TIMELINE</p>
+    </div>
+    <div id="processing-messages" class="text-left space-y-sm mb-lg">
+      <p class="text-code-snippet text-on-surface-variant">&gt; Calculating buffer erosion...</p>
+    </div>
+    <div class="h-2 bg-surface-container-highest overflow-hidden">
+      <div id="processing-bar" class="h-full bg-primary" style="width:0%"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="processing-pct">0%</p>
+  </div>
+</div>
+
+<!-- SCREEN 4: RESULTS -->
+<div id="screen-results" class="screen hidden w-full">
+  <div class="text-center mb-lg">
+    <p class="text-primary text-headline-md">&gt; TIMELINE ANALYSIS COMPLETE</p>
+    <p class="text-on-surface-variant text-body-sm">Your deadline drift assessment is ready.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-lg">
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">DAYS REMAINING</p>
+      <p class="text-display-lg text-primary" id="result-daysRemaining">0</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">DRIFT SCORE</p>
+      <p class="text-display-lg text-secondary-container" id="result-driftScore">0%</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">RISK LEVEL</p>
+      <span id="result-riskBadge" class="inline-block bg-primary/20 text-primary font-bold py-md px-lg text-body-sm uppercase tracking-widest mt-sm">CALCULATING...</span>
+    </div>
+  </div>
+
+  <!-- TIMELINE VISUALIZATION -->
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">DEADLINE TIMELINE</p>
+    <div id="timeline-container" class="relative pt-lg pb-md">
+      <div class="relative h-16 bg-surface-container-highest overflow-hidden">
+        <div id="zone-green" class="timeline-zone absolute inset-y-0 left-0 bg-primary/20" style="width:0%"></div>
+        <div id="zone-amber" class="timeline-zone absolute inset-y-0 bg-[#ffb59f]/20" style="width:0%"></div>
+        <div id="zone-red" class="timeline-zone absolute inset-y-0 right-0 bg-secondary-container/20" style="width:0%"></div>
+        <div id="timeline-marker-today" class="timeline-marker absolute top-0 w-0.5 h-full bg-primary" style="left:0%">
+          <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-code-snippet text-primary whitespace-nowrap text-xs">Today</span>
+        </div>
+        <div id="timeline-marker-deadline" class="timeline-marker absolute top-0 w-0.5 h-full bg-secondary-container" style="left:100%">
+          <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-code-snippet text-secondary-container whitespace-nowrap text-xs">Deadline</span>
+        </div>
+        <div id="timeline-marker-current" class="timeline-marker absolute top-0 w-1 h-full bg-on-surface" style="left:0%">
+          <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-code-snippet text-on-surface whitespace-nowrap text-xs">Current</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-center gap-lg mt-sm">
+      <div class="flex items-center gap-xs"><div class="w-3 h-3 bg-primary/40"></div><span class="text-code-snippet text-on-surface-variant">Comfortable</span></div>
+      <div class="flex items-center gap-xs"><div class="w-3 h-3 bg-[#ffb59f]/40"></div><span class="text-code-snippet text-on-surface-variant">Warning</span></div>
+      <div class="flex items-center gap-xs"><div class="w-3 h-3 bg-secondary-container/40"></div><span class="text-code-snippet text-on-surface-variant">Critical</span></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-lg">
+    <div class="border border-outline-variant p-lg bg-surface-container-low">
+      <p class="text-primary text-label-mono uppercase tracking-widest mb-md">TIMELINE BREAKDOWN</p>
+      <div class="space-y-md" id="breakdown-container"></div>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low">
+      <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">RECOMMENDATIONS</p>
+      <div id="recommendations-container" class="space-y-sm"></div>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <p class="text-body-sm text-on-surface-variant mb-md">Want to save this analysis and get a detailed project recovery plan?</p>
+    <button id="btn-gate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+      UNLOCK FULL REPORT →
+    </button>
+    <button id="btn-restart" class="ml-md bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+      RE-RUN ANALYSIS
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 5: COMPLETE -->
+<div id="screen-complete" class="screen hidden w-full text-center">
+  <div class="border border-primary/30 p-xl bg-surface-container-low max-w-lg mx-auto">
+    <p class="text-primary text-display-lg mb-md">✓</p>
+    <p class="text-primary text-headline-md mb-sm">&gt; REPORT UNLOCKED</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Your full Deadline Drift Report has been sent to <span id="complete-email" class="text-primary"></span>. Check your inbox for your personalized recovery plan.</p>
+    <div class="border-t border-outline-variant pt-lg space-y-md">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest">WHAT HAPPENS NEXT</p>
+      <div class="flex flex-col gap-sm">
+        <p class="text-code-snippet text-on-surface-variant">1. Full timeline breakdown with milestone analysis</p>
+        <p class="text-code-snippet text-on-surface-variant">2. Custom task re-prioritization plan to recover time</p>
+        <p class="text-code-snippet text-on-surface-variant">3. Follow-up with a Zonke tender specialist (optional)</p>
+      </div>
+    </div>
+    <div class="mt-lg flex flex-col sm:flex-row gap-md justify-center">
+      <a href="/tenders" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors no-underline inline-block">
+        EXPLORE TENDER VAULT →
+      </a>
+      <button id="btn-restart-complete" class="bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+        RUN ANOTHER ANALYSIS
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="border-t border-outline-variant p-gutter text-center">
+  <p class="text-code-snippet text-on-surface-variant">ZONKE AI NATIVE STUDIO &copy; 2026</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  const STAGES = [
+    { label: 'Research', pct: 0, erosion: 0.35 },
+    { label: 'Documentation', pct: 25, erosion: 0.25 },
+    { label: 'Drafting', pct: 50, erosion: 0.18 },
+    { label: 'Review', pct: 75, erosion: 0.10 },
+    { label: 'Ready to Submit', pct: 100, erosion: 0.05 }
+  ];
+
+  const MILESTONES = [
+    { label: 'Research Complete', offset: 0 },
+    { label: 'Documentation Done', offset: 25 },
+    { label: 'Drafting Complete', offset: 50 },
+    { label: 'Review Complete', offset: 75 },
+    { label: 'Submit', offset: 100 }
+  ];
+
+  const RECOMMENDATIONS = {
+    LOW: [
+      'Maintain your current pace. Schedule regular check-ins to stay on track.',
+      'Use the extra buffer to refine your submission quality and review documents thoroughly.',
+      'Consider allocating 1-2 team members to contingency planning for unexpected delays.'
+    ],
+    MODERATE: [
+      'Prioritize remaining tasks using an impact-effort matrix to focus on critical path items.',
+      'Increase meeting frequency to daily stand-ups until the deadline to catch drift early.',
+      'Consider adding one additional team member or redistributing workload from bottlenecked roles.'
+    ],
+    HIGH: [
+      'Immediately identify and eliminate non-critical tasks. Freeze scope changes until submission.',
+      'Extend working hours or add weekend shifts if feasible to recover buffer time.',
+      'Assign a dedicated project coordinator to track daily progress against milestones.'
+    ],
+    CRITICAL: [
+      'Escalate to leadership immediately. Consider requesting a deadline extension if possible.',
+      'Strip the submission to mandatory requirements only. deprioritize optional enhancements.',
+      'Work in parallel pods with clear ownership for each remaining deliverable. No task handoffs.'
+    ]
+  };
+
+  let lastResults = null;
+
+  function getInputs() {
+    const deadlineVal = document.getElementById('input-deadline').value;
+    const deadline = deadlineVal ? new Date(deadlineVal + 'T00:00:00') : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    return {
+      deadline,
+      stagePct: parseInt(document.getElementById('input-stage').value),
+      teamMembers: parseInt(document.getElementById('input-teamMembers').value),
+      workingDays: parseInt(document.getElementById('input-workingDays').value)
+    };
+  }
+
+  function calculate(inputs) {
+    const now = new Date();
+    const totalDays = Math.max(1, Math.round((inputs.deadline - now) / (1000 * 60 * 60 * 24)));
+    const daysUsed = Math.round(totalDays * (inputs.stagePct / 100));
+    const daysRemaining = totalDays - daysUsed;
+
+    const stage = STAGES.find(s => s.pct === inputs.stagePct) || STAGES[2];
+    const erosionRate = stage.erosion;
+
+    const teamFactor = 1 - ((inputs.teamMembers - 1) * 0.05);
+    const daysFactor = 7 / inputs.workingDays;
+    const driftScore = Math.min(100, Math.round(erosionRate * 100 * teamFactor * daysFactor));
+
+    let riskLevel;
+    if (driftScore < 25) riskLevel = 'LOW';
+    else if (driftScore < 51) riskLevel = 'MODERATE';
+    else if (driftScore < 76) riskLevel = 'HIGH';
+    else riskLevel = 'CRITICAL';
+
+    const effectiveDaysRemaining = Math.round(daysRemaining * (inputs.workingDays / 7));
+    const pctRemaining = Math.max(0, Math.round((daysRemaining / totalDays) * 100));
+
+    const milestones = MILESTONES.map((m, i) => {
+      const offset = m.offset;
+      const isPast = offset <= inputs.stagePct;
+      const position = Math.max(0, Math.min(100, (offset / 100) * (totalDays / Math.max(totalDays, 1)) * 100));
+      return { ...m, isPast, position, offset };
+    });
+
+    const greenPct = Math.max(0, Math.min(100, pctRemaining > 40 ? 100 : (pctRemaining / 40) * 100));
+    const amberPct = Math.max(0, Math.min(100, pctRemaining > 20 && pctRemaining <= 40 ? 100 : 0));
+    const redPct = Math.max(0, Math.min(100, pctRemaining <= 20 ? 100 : 0));
+
+    const currentPosition = Math.min(100, Math.round((daysUsed / Math.max(totalDays, 1)) * 100));
+
+    return {
+      totalDays, daysUsed, daysRemaining, effectiveDaysRemaining,
+      pctRemaining, driftScore, riskLevel, stage: stage.label,
+      erosionRate, teamFactor, daysFactor, currentPosition,
+      milestones, greenPct, amberPct, redPct
+    };
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('active');
+  }
+
+  function setupInputs() {
+    const today = new Date();
+    const defaultDeadline = new Date(today);
+    defaultDeadline.setDate(today.getDate() + 30);
+    document.getElementById('input-deadline').value = defaultDeadline.toISOString().split('T')[0];
+
+    document.getElementById('input-teamMembers').addEventListener('input', function () {
+      document.getElementById('val-teamMembers').textContent = this.value;
+    });
+
+    document.getElementById('input-workingDays').addEventListener('input', function () {
+      document.getElementById('val-workingDays').textContent = this.value;
+    });
+  }
+
+  function runBootSequence() {
+    const line1 = document.getElementById('boot-line-1');
+    const line2 = document.getElementById('boot-line-2');
+    const line3 = document.getElementById('boot-line-3');
+    const progress = document.getElementById('boot-progress');
+    const status = document.getElementById('boot-status');
+
+    const bootMessages = [
+      '> Loading drift prediction model... OK',
+      '> Fetching project timeline data... OK',
+      '> Initializing buffer erosion engine... OK'
+    ];
+
+    toolTerminalType(line1, bootMessages[0], 20, () => {
+      setTimeout(() => {
+        toolTerminalType(line2, bootMessages[1], 20, () => {
+          setTimeout(() => {
+            toolTerminalType(line3, bootMessages[2], 20, () => {
+              progress.style.width = '100%';
+              status.textContent = 'READY';
+              setTimeout(() => {
+                document.getElementById('btn-start').classList.remove('hidden');
+              }, 400);
+            });
+          }, 200);
+        });
+      }, 200);
+    });
+  }
+
+  function runProcessing(inputs, callback) {
+    const msgContainer = document.getElementById('processing-messages');
+    const bar = document.getElementById('processing-bar');
+    const pct = document.getElementById('processing-pct');
+    msgContainer.innerHTML = '';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+
+    const messages = [
+      '> Calculating timeline buffer...',
+      '> Analyzing stage progression...',
+      '> Computing erosion rate...',
+      '> Evaluating drift risk factors...',
+      '> Generating recovery recommendations...'
+    ];
+
+    let step = 0;
+    function nextStep() {
+      if (step < messages.length) {
+        const p = document.createElement('p');
+        p.className = 'text-code-snippet text-on-surface-variant';
+        p.textContent = messages[step];
+        msgContainer.appendChild(p);
+        const progress = Math.round(((step + 1) / messages.length) * 100);
+        bar.style.width = progress + '%';
+        pct.textContent = progress + '%';
+        step++;
+        setTimeout(nextStep, 700);
+      } else {
+        setTimeout(() => {
+          bar.style.width = '100%';
+          pct.textContent = '100%';
+          setTimeout(callback, 500);
+        }, 300);
+      }
+    }
+    nextStep();
+  }
+
+  function displayResults(results) {
+    lastResults = results;
+
+    document.getElementById('result-daysRemaining').textContent = results.effectiveDaysRemaining;
+
+    const driftEl = document.getElementById('result-driftScore');
+    toolAnimateValue(driftEl, 0, results.driftScore, 1200, '', '%');
+
+    const badge = document.getElementById('result-riskBadge');
+    badge.textContent = results.riskLevel;
+    const badgeColors = {
+      LOW: 'bg-primary/20 text-primary',
+      MODERATE: 'bg-[#ffb59f]/20 text-[#ffb59f]',
+      HIGH: 'bg-secondary-container/20 text-secondary-container',
+      CRITICAL: 'bg-error/20 text-error'
+    };
+    badge.className = 'inline-block font-bold py-md px-lg text-body-sm uppercase tracking-widest mt-sm ' + (badgeColors[results.riskLevel] || '');
+    if (results.riskLevel === 'CRITICAL') {
+      badge.style.animation = 'pulse-red 2s infinite';
+    }
+
+    // Timeline
+    document.getElementById('zone-green').style.width = results.greenPct + '%';
+    document.getElementById('zone-amber').style.width = results.amberPct + '%';
+    document.getElementById('zone-red').style.width = results.redPct + '%';
+
+    document.getElementById('timeline-marker-current').style.left = results.currentPosition + '%';
+
+    // Milestones on timeline
+    const existingMarkers = document.querySelectorAll('.milestone-marker');
+    existingMarkers.forEach(m => m.remove());
+
+    results.milestones.forEach(m => {
+      const marker = document.createElement('div');
+      marker.className = 'milestone-marker absolute top-0 w-0.5 h-full';
+      const isPast = m.offset <= (lastResults ? lastResults.stagePct : 50);
+      marker.style.cssText = `left:${m.position}%;background:${isPast ? '#c3f400' : '#444933'};`;
+      const label = document.createElement('span');
+      label.className = 'absolute -bottom-6 left-1/2 -translate-x-1/2 text-code-snippet whitespace-nowrap text-xs';
+      label.style.cssText = `color:${isPast ? '#c3f400' : '#8e9379'};`;
+      label.textContent = m.label;
+      marker.appendChild(label);
+      document.getElementById('timeline-container').querySelector('.relative').appendChild(marker);
+    });
+
+    // Breakdown
+    const breakdown = document.getElementById('breakdown-container');
+    breakdown.innerHTML = `
+      <div class="flex justify-between text-body-sm">
+        <span class="text-on-surface-variant">Total timeline</span>
+        <span class="text-on-surface font-bold">${results.totalDays} days</span>
+      </div>
+      <div class="flex justify-between text-body-sm">
+        <span class="text-on-surface-variant">Days used</span>
+        <span class="text-secondary-container font-bold">${results.daysUsed} days</span>
+      </div>
+      <div class="flex justify-between text-body-sm">
+        <span class="text-on-surface-variant">Days remaining</span>
+        <span class="text-primary font-bold">${results.daysRemaining} days</span>
+      </div>
+      <div class="flex justify-between text-body-sm">
+        <span class="text-on-surface-variant">Effective working days</span>
+        <span class="text-primary font-bold">${results.effectiveDaysRemaining}</span>
+      </div>
+      <div class="flex justify-between text-body-sm">
+        <span class="text-on-surface-variant">Current stage</span>
+        <span class="text-on-surface font-bold">${results.stage}</span>
+      </div>
+      <div class="flex justify-between text-body-sm">
+        <span class="text-on-surface-variant">Buffer erosion rate</span>
+        <span class="text-secondary-container font-bold">${Math.round(results.erosionRate * 100)}%</span>
+      </div>
+      <div class="border-t border-outline-variant pt-md mt-md flex justify-between text-body-sm">
+        <span class="text-on-surface font-bold">Time remaining</span>
+        <span class="text-display-lg text-primary">${results.effectiveDaysRemaining}d</span>
+      </div>
+    `;
+
+    // Recommendations
+    const recs = document.getElementById('recommendations-container');
+    const riskRecs = RECOMMENDATIONS[results.riskLevel] || RECOMMENDATIONS.MODERATE;
+    recs.innerHTML = riskRecs.map((r, i) => `
+      <div class="flex gap-sm">
+        <span class="text-primary text-body-sm font-bold">${i + 1}.</span>
+        <p class="text-body-sm text-on-surface-variant">${r}</p>
+      </div>
+    `).join('');
+  }
+
+  function init() {
+    setupInputs();
+    runBootSequence();
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      showScreen('screen-input');
+    });
+
+    document.getElementById('btn-analyze').addEventListener('click', () => {
+      const inputs = getInputs();
+      showScreen('screen-processing');
+      runProcessing(inputs, () => {
+        const results = calculate(inputs);
+        showScreen('screen-results');
+        displayResults(results);
+      });
+    });
+
+    document.getElementById('btn-gate').addEventListener('click', () => {
+      const results = lastResults;
+      if (!results) return;
+      toolShowEmailGate('deadline-drift-calculator', {
+        totalDays: results.totalDays,
+        daysRemaining: results.daysRemaining,
+        effectiveDaysRemaining: results.effectiveDaysRemaining,
+        driftScore: results.driftScore,
+        riskLevel: results.riskLevel,
+        stage: results.stage
+      }, (email) => {
+        document.getElementById('complete-email').textContent = email;
+        showScreen('screen-complete');
+      });
+    });
+
+    const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
+    restartButtons.forEach(btn => {
+      if (btn) btn.addEventListener('click', () => {
+        showScreen('screen-input');
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

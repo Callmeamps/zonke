@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1080, height=1920" />
+  <title>Lead Reactor Mobile</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root { --bg:#121414; --lime:#c3f400; --olive:#8e9379; --white:#ffffff; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:1080px; height:1920px; overflow:hidden; background:var(--bg); font-family:'JetBrains Mono', monospace; color:var(--white); }
+    #root { position:relative; width:1080px; height:1920px; }
+    .scanlines { position:absolute; inset:0; pointer-events:none; z-index:1000; opacity:.03; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px); }
+    .scene { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; }
+
+    .scene1-wrap { display:flex; flex-direction:column; gap:28px; align-items:center; }
+    .init-text { color:var(--lime); font-size:28px; letter-spacing:3px; }
+    .progress-bar { display:flex; gap:3px; font-size:44px; }
+    .progress-char { opacity:.2; color:var(--lime); }
+    .progress-percent { color:var(--olive); font-size:28px; min-width:90px; text-align:left; }
+
+    .scene2-wrap { width:90%; }
+    .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+    .card { border:2px solid var(--olive); box-shadow:6px 6px 0 var(--lime); padding:20px; min-height:130px; opacity:0; transform:translateY(24px); }
+    .label { font-size:13px; color:var(--olive); letter-spacing:2px; margin-bottom:10px; text-transform:uppercase; }
+    .value { font-size:34px; font-weight:700; color:var(--white); }
+    .value.h { color:var(--lime); }
+
+    .scene3-wrap { width:84%; display:flex; flex-direction:column; gap:34px; align-items:flex-start; }
+    .headline { font-size:68px; line-height:1.15; font-weight:700; opacity:0; }
+    .headline span { color:var(--lime); }
+    .cta { border:2px solid var(--lime); background:var(--lime); color:var(--bg); box-shadow:6px 6px 0 var(--olive); font-family:'JetBrains Mono', monospace; font-weight:800; font-size:28px; padding:22px 36px; opacity:0; }
+  </style>
+</head>
+<body>
+  <div id="root" data-composition-id="main" data-start="0" data-duration="30" data-width="1080" data-height="1920">
+    <div class="scanlines"></div>
+
+    <section id="scene1" class="scene">
+      <div class="scene1-wrap">
+        <div class="init-text">&gt; INITIALIZING LEAD REACTOR...</div>
+        <div class="progress-bar" id="bar">
+          <span class="progress-char">█</span><span class="progress-char">█</span><span class="progress-char">█</span><span class="progress-char">█</span><span class="progress-char">█</span><span class="progress-char">█</span><span class="progress-char">█</span><span class="progress-char">█</span><span class="progress-char">░</span><span class="progress-char">░</span>
+        </div>
+        <div class="progress-percent" id="pct">0%</div>
+      </div>
+    </section>
+
+    <section id="scene2" class="scene">
+      <div class="scene2-wrap">
+        <div class="grid">
+          <div class="card"><div class="label">Leads</div><div class="value h" data-target="1247">0</div></div>
+          <div class="card"><div class="label">Qualified</div><div class="value" data-target="892">0</div></div>
+          <div class="card"><div class="label">Converted</div><div class="value h" data-target="341">0</div></div>
+          <div class="card"><div class="label">Revenue</div><div class="value" data-target="2.4" data-prefix="$" data-suffix="M">$0M</div></div>
+          <div class="card"><div class="label">Response</div><div class="value h" data-target="0.3" data-suffix="s">0s</div></div>
+          <div class="card"><div class="label">Bookings</div><div class="value" data-target="156">0</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="scene3" class="scene">
+      <div class="scene3-wrap">
+        <div class="headline"><span>Instant response.</span><br/>Automated qualification.</div>
+        <button class="cta" id="cta">GET STARTED →</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' } });
+    window.__timelines.main = tl;
+
+    // scene 1
+    tl.set('#scene1', { opacity: 1, visibility: 'visible' }, 0);
+    const chars = document.querySelectorAll('.progress-char');
+    chars.forEach((el, i) => {
+      tl.to(el, { opacity: i < 8 ? 1 : 0.2, duration: 0.25 }, 0.6 + i * 0.22);
+    });
+    tl.to({v:0}, { v:87, duration:6, ease:'power2.inOut', onUpdate:function(){ document.getElementById('pct').textContent = Math.round(this.targets()[0].v) + '%'; }}, 0.7);
+    tl.to('#scene1', { opacity:0, duration:0.4 }, 9.6);
+    tl.set('#scene1', { visibility:'hidden' }, 10.0);
+
+    // scene 2
+    tl.set('#scene2', { opacity:1, visibility:'visible' }, 10.0);
+    tl.fromTo('.card', { opacity:0, y:24 }, { opacity:1, y:0, duration:0.35, stagger:0.16, ease:'back.out(1.6)' }, 10.2);
+    document.querySelectorAll('.value').forEach((el, idx) => {
+      const target = parseFloat(el.dataset.target || '0');
+      const prefix = el.dataset.prefix || '';
+      const suffix = el.dataset.suffix || '';
+      const dec = String(target).includes('.');
+      tl.to({n:0}, { n:target, duration:1.8, ease:'power2.out', onUpdate:function(){ const n = this.targets()[0].n; el.textContent = prefix + (dec ? n.toFixed(1) : Math.round(n)) + suffix; } }, 12.0 + idx * 0.12);
+    });
+    tl.to('#scene2', { opacity:0, duration:0.4 }, 19.6);
+    tl.set('#scene2', { visibility:'hidden' }, 20.0);
+
+    // scene 3
+    tl.set('#scene3', { opacity:1, visibility:'visible' }, 20.0);
+    tl.fromTo('.headline', { x:-80, opacity:0 }, { x:0, opacity:1, duration:0.9, ease:'power3.out' }, 20.2);
+    tl.fromTo('#cta', { x:-40, opacity:0 }, { x:0, opacity:1, duration:0.7, ease:'power3.out' }, 20.7);
+    tl.to('#cta', { x:2, yoyo:true, repeat:7, duration:0.06 }, 23.0);
+    tl.to('#scene3', { opacity:0, duration:0.4 }, 29.6);
+    tl.set('#scene3', { visibility:'hidden' }, 30.0);
+  </script>
+</body>
+</html>

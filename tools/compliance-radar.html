@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Compliance Radar | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<script src="/assets/js/toolkit.js"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#121414", "surface-dim": "#121414", "surface-bright": "#37393a",
+        "surface-container-lowest": "#0c0f0f", "surface-container-low": "#1a1c1c",
+        "surface-container": "#1e2020", "surface-container-high": "#282a2b",
+        "surface-container-highest": "#333535", "on-surface": "#e2e2e2",
+        "on-surface-variant": "#c4c9ac", "outline": "#8e9379", "outline-variant": "#444933",
+        "primary": "#c3f400", "on-primary": "#283500", "primary-container": "#c3f400",
+        "on-primary-container": "#556d00", "secondary": "#ffb59f",
+        "secondary-container": "#ff571c", "on-secondary-container": "#531300",
+        "error": "#ffb4ab", "error-container": "#93000a", "on-error-container": "#ffdad6"
+      },
+      borderRadius: { DEFAULT: "0px", lg: "0px", xl: "0px", full: "9999px" },
+      spacing: { xs: "4px", unit: "4px", sm: "8px", xl: "64px", lg: "32px", gutter: "24px", margin: "40px", md: "16px" },
+      fontFamily: { mono: ["JetBrains Mono", "monospace"] },
+      fontSize: {
+        "display-lg": ["72px", { lineHeight: "1.0", letterSpacing: "-0.04em", fontWeight: "800" }],
+        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-md": ["24px", { lineHeight: "1.2", letterSpacing: "0em", fontWeight: "700" }],
+        "body-lg": ["18px", { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" }],
+        "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0.02em", fontWeight: "400" }],
+        "label-mono": ["12px", { lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "700" }],
+        "code-snippet": ["14px", { lineHeight: "1.4", letterSpacing: "0em", fontWeight: "400" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+* { font-family: 'JetBrains Mono', monospace; }
+body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
+.screen { transition: opacity 0.5s ease, transform 0.5s ease; }
+.screen.hidden { display: none; }
+.screen.active { display: block; animation: fadeSlideIn 0.6s ease forwards; }
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(195, 244, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(195, 244, 0, 0.6); }
+}
+@keyframes fill-circle {
+  from { stroke-dashoffset: 283; }
+}
+.scanline-overlay {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px
+  );
+}
+.cursor-blink::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+  color: #c3f400;
+}
+input[type="range"] { accent-color: #c3f400; height: 4px; }
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px;
+  background: #c3f400; border: none; border-radius: 0;
+  cursor: pointer;
+}
+input[type="checkbox"] {
+  accent-color: #c3f400;
+  width: 16px; height: 16px;
+  border-radius: 0 !important;
+}
+.plan-step { transition: all 0.3s ease; }
+.priority-high { color: #ff571c; }
+.priority-medium { color: #ffb59f; }
+.priority-low { color: #c4c9ac; }
+.circle-progress { transition: stroke-dashoffset 2s ease; }
+</style>
+</head>
+<body>
+
+<div class="scanline-overlay"></div>
+
+<div class="min-h-screen flex flex-col">
+
+<header class="border-b border-outline-variant p-gutter flex items-center justify-between">
+  <a href="/" class="text-primary font-bold text-headline-md hover:opacity-80 transition-opacity no-underline">ZONKE_</a>
+  <span class="text-code-snippet text-on-surface-variant">&gt; COMPLIANCE RADAR v1.0</span>
+</header>
+
+<main class="flex-1 flex flex-col items-center justify-center p-gutter max-w-3xl mx-auto w-full">
+
+<!-- SCREEN 1: SPLASH -->
+<div id="screen-splash" class="screen active w-full text-center">
+  <div class="mb-xl">
+    <pre class="text-primary text-[10px] sm:text-xs leading-tight opacity-60">
+  _     ___    _     ___    _  ___
+ | |   / _ \  | |   / _ \  | || __|
+ | |  | | | | | |  | | | | | ||__ \
+ | |__| |_| | | |__| |_| | |_||__) |
+ |_____\___/  |_____\___/  (_)____/
+    </pre>
+  </div>
+  <div class="text-left max-w-lg mx-auto border border-outline-variant p-lg bg-surface-container-low">
+    <p class="text-primary text-body-sm mb-sm">&gt; INITIALIZE COMPLIANCE SCAN...</p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-1"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-2"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-3"></p>
+    <div class="h-1 bg-surface-container-highest mt-md overflow-hidden">
+      <div id="boot-progress" class="h-full bg-primary" style="width:0%; transition: width 2s ease;"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="boot-status">_</p>
+  </div>
+  <button id="btn-start" class="hidden mt-xl bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none mx-auto">
+    START SCAN →
+  </button>
+</div>
+
+<!-- SCREEN 2: INPUT -->
+<div id="screen-input" class="screen hidden w-full">
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-headline-md mb-sm">&gt; COMPLIANCE PROFILE</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Select your target categories and current documents.</p>
+
+    <div class="mb-lg">
+      <p class="text-label-mono text-primary uppercase tracking-widest mb-md">TENDER CATEGORIES</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md" id="categories-container">
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Construction" class="category-checkbox" />
+          <span class="text-body-sm text-on-surface">Construction</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="IT Services" class="category-checkbox" />
+          <span class="text-body-sm text-on-surface">IT Services</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Consulting" class="category-checkbox" />
+          <span class="text-body-sm text-on-surface">Consulting</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Healthcare" class="category-checkbox" />
+          <span class="text-body-sm text-on-surface">Healthcare</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Education" class="category-checkbox" />
+          <span class="text-body-sm text-on-surface">Education</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Transport" class="category-checkbox" />
+          <span class="text-body-sm text-on-surface">Transport</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Energy" class="category-checkbox" />
+          <span class="text-body-sm text-on-surface">Energy</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Security" class="category-checkbox" />
+          <span class="text-body-sm text-on-surface">Security</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mb-lg">
+      <label class="flex justify-between text-body-sm mb-xs">
+        <span class="text-on-surface">Staff Count</span>
+        <span class="text-primary" id="val-staffCount">10</span>
+      </label>
+      <input type="range" id="input-staffCount" min="1" max="500" value="10" class="w-full" />
+      <div class="flex justify-between text-code-snippet text-outline"><span>1</span><span>500</span></div>
+    </div>
+
+    <div>
+      <p class="text-label-mono text-primary uppercase tracking-widest mb-md">CURRENT DOCUMENTS</p>
+      <p class="text-code-snippet text-on-surface-variant mb-md">Check which compliance documents you already have.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-md" id="docs-container">
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Tax Clearance" class="doc-checkbox" />
+          <span class="text-body-sm text-on-surface">Tax Clearance</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="B-BBEE Certificate" class="doc-checkbox" />
+          <span class="text-body-sm text-on-surface">B-BBEE Certificate</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="CIDB Registration" class="doc-checkbox" />
+          <span class="text-body-sm text-on-surface">CIDB Registration</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="SARS Compliance" class="doc-checkbox" />
+          <span class="text-body-sm text-on-surface">SARS Compliance</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Company Registration" class="doc-checkbox" />
+          <span class="text-body-sm text-on-surface">Company Registration</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="Insurance COI" class="doc-checkbox" />
+          <span class="text-body-sm text-on-surface">Insurance COI</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="SAFE Certification" class="doc-checkbox" />
+          <span class="text-body-sm text-on-surface">SAFE Certification</span>
+        </label>
+        <label class="flex items-center gap-md p-md bg-surface-container cursor-pointer border border-outline-variant hover:border-primary transition-colors">
+          <input type="checkbox" value="OHS Compliance" class="doc-checkbox" />
+          <span class="text-body-sm text-on-surface">OHS Compliance</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-analyze" class="w-full bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+    ANALYZE COMPLIANCE →
+  </button>
+</div>
+
+<!-- SCREEN 3: PROCESSING -->
+<div id="screen-processing" class="screen hidden w-full text-center">
+  <div class="border border-outline-variant p-lg bg-surface-container-low max-w-lg mx-auto">
+    <div class="flex items-center gap-md mb-lg">
+      <div class="w-3 h-3 bg-secondary-container animate-pulse"></div>
+      <p class="text-primary text-headline-md">&gt; SCANNING COMPLIANCE GAPS</p>
+    </div>
+    <div id="processing-messages" class="text-left space-y-sm mb-lg">
+      <p class="text-code-snippet text-on-surface-variant">&gt; Analyzing category requirements...</p>
+    </div>
+    <div class="h-2 bg-surface-container-highest overflow-hidden">
+      <div id="processing-bar" class="h-full bg-primary" style="width:0%"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="processing-pct">0%</p>
+  </div>
+</div>
+
+<!-- SCREEN 4: RESULTS -->
+<div id="screen-results" class="screen hidden w-full">
+  <div class="text-center mb-lg">
+    <p class="text-primary text-headline-md">&gt; COMPLIANCE ANALYSIS COMPLETE</p>
+    <p class="text-on-surface-variant text-body-sm">Your compliance gap assessment is ready.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-lg">
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">COMPLIANCE PROGRESS</p>
+      <div class="flex justify-center mb-md">
+        <svg width="140" height="140" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#333535" stroke-width="8"/>
+          <circle id="progress-circle" cx="50" cy="50" r="42" fill="none" stroke="#c3f400" stroke-width="8"
+            stroke-linecap="butt" stroke-dasharray="264"
+            stroke-dashoffset="264" transform="rotate(-90 50 50)"/>
+          <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="#e2e2e2" font-family="JetBrains Mono" font-size="24" font-weight="700" id="circle-text">0/0</text>
+        </svg>
+      </div>
+      <p class="text-code-snippet text-on-surface-variant" id="result-progress-text">No categories selected</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">COST TO COMPLIANCE</p>
+      <p class="text-display-lg text-primary" id="result-total-cost">R0</p>
+      <p class="text-code-snippet text-on-surface-variant mt-sm" id="result-total-days">0 days to complete</p>
+    </div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">MISSING DOCUMENTS</p>
+    <div id="gap-table" class="space-y-md"></div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">30-DAY COMPLIANCE PLAN</p>
+    <p class="text-code-snippet text-on-surface-variant mb-md">Prioritized action plan to close your compliance gaps.</p>
+    <div id="plan-container" class="space-y-md"></div>
+  </div>
+
+  <div class="text-center">
+    <p class="text-body-sm text-on-surface-variant mb-md">Want to save this compliance audit and get a detailed action plan?</p>
+    <button id="btn-gate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+      UNLOCK FULL REPORT →
+    </button>
+    <button id="btn-restart" class="ml-md bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+      RE-RUN SCAN
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 5: COMPLETE -->
+<div id="screen-complete" class="screen hidden w-full text-center">
+  <div class="border border-primary/30 p-xl bg-surface-container-low max-w-lg mx-auto">
+    <p class="text-primary text-display-lg mb-md">✓</p>
+    <p class="text-primary text-headline-md mb-sm">&gt; REPORT UNLOCKED</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Your full Compliance Radar Report has been sent to <span id="complete-email" class="text-primary"></span>. Check your inbox for your 30-day compliance plan.</p>
+    <div class="border-t border-outline-variant pt-lg space-y-md">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest">WHAT HAPPENS NEXT</p>
+      <div class="flex flex-col gap-sm">
+        <p class="text-code-snippet text-on-surface-variant">1. Full gap analysis with document-by-document breakdown</p>
+        <p class="text-code-snippet text-on-surface-variant">2. Detailed 30-day compliance roadmap with cost estimates</p>
+        <p class="text-code-snippet text-on-surface-variant">3. Follow-up with a Zonke compliance specialist (optional)</p>
+      </div>
+    </div>
+    <div class="mt-lg flex flex-col sm:flex-row gap-md justify-center">
+      <a href="/tenders" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors no-underline inline-block">
+        EXPLORE TENDER VAULT →
+      </a>
+      <button id="btn-restart-complete" class="bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+        RUN ANOTHER SCAN
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="border-t border-outline-variant p-gutter text-center">
+  <p class="text-code-snippet text-on-surface-variant">ZONKE AI NATIVE STUDIO &copy; 2026</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  const CATEGORY_DOCS = {
+    Construction: ['Tax Clearance', 'B-BBEE Certificate', 'CIDB Registration', 'SARS Compliance', 'Company Registration', 'Insurance COI', 'OHS Compliance'],
+    'IT Services': ['Tax Clearance', 'B-BBEE Certificate', 'SARS Compliance', 'Company Registration', 'Insurance COI'],
+    Consulting: ['Tax Clearance', 'B-BBEE Certificate', 'SARS Compliance', 'Company Registration', 'Insurance COI'],
+    Healthcare: ['Tax Clearance', 'B-BBEE Certificate', 'SARS Compliance', 'Company Registration', 'Insurance COI', 'OHS Compliance', 'SAFE Certification'],
+    Education: ['Tax Clearance', 'B-BBEE Certificate', 'SARS Compliance', 'Company Registration', 'Insurance COI'],
+    Transport: ['Tax Clearance', 'B-BBEE Certificate', 'SARS Compliance', 'Company Registration', 'Insurance COI', 'OHS Compliance'],
+    Energy: ['Tax Clearance', 'B-BBEE Certificate', 'CIDB Registration', 'SARS Compliance', 'Company Registration', 'Insurance COI', 'OHS Compliance'],
+    Security: ['Tax Clearance', 'B-BBEE Certificate', 'SARS Compliance', 'Company Registration', 'Insurance COI', 'SAFE Certification']
+  };
+
+  const DOC_DETAILS = {
+    'Tax Clearance': { cost: 2500, days: 7, priority: 'High', difficulty: 'Easy' },
+    'B-BBEE Certificate': { cost: 15000, days: 30, priority: 'High', difficulty: 'Moderate' },
+    'CIDB Registration': { cost: 3000, days: 14, priority: 'High', difficulty: 'Easy' },
+    'SARS Compliance': { cost: 0, days: 3, priority: 'High', difficulty: 'Easy' },
+    'Company Registration': { cost: 500, days: 5, priority: 'Medium', difficulty: 'Easy' },
+    'Insurance COI': { cost: 8000, days: 7, priority: 'Medium', difficulty: 'Easy' },
+    'SAFE Certification': { cost: 12000, days: 21, priority: 'Low', difficulty: 'Moderate' },
+    'OHS Compliance': { cost: 6000, days: 14, priority: 'Medium', difficulty: 'Moderate' }
+  };
+
+  const ALL_DOCS = Object.keys(DOC_DETAILS);
+
+  let lastResults = null;
+
+  function getInputs() {
+    const categoryEls = document.querySelectorAll('.category-checkbox:checked');
+    const categories = Array.from(categoryEls).map(el => el.value);
+    const docEls = document.querySelectorAll('.doc-checkbox:checked');
+    const currentDocs = Array.from(docEls).map(el => el.value);
+    const staffCount = parseInt(document.getElementById('input-staffCount').value);
+    return { categories, currentDocs, staffCount };
+  }
+
+  function calculate(inputs) {
+    const { categories, currentDocs } = inputs;
+    const requiredSet = new Set();
+    categories.forEach(cat => {
+      (CATEGORY_DOCS[cat] || []).forEach(d => requiredSet.add(d));
+    });
+    const required = Array.from(requiredSet);
+    const have = required.filter(d => currentDocs.includes(d));
+    const missing = required.filter(d => !currentDocs.includes(d));
+
+    const gaps = missing.map(d => ({
+      name: d,
+      ...DOC_DETAILS[d],
+      difficulty: DOC_DETAILS[d] ? DOC_DETAILS[d].difficulty : 'Unknown'
+    }));
+
+    const priorityOrder = { High: 0, Medium: 1, Low: 2 };
+    gaps.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+    const totalCost = gaps.reduce((s, g) => s + g.cost, 0);
+    const totalDays = gaps.reduce((s, g) => s + g.days, 0);
+
+    // Generate 30-day plan
+    let plan = [];
+    let currentDay = 1;
+    gaps.forEach(g => {
+      if (currentDay <= 30) {
+        plan.push({
+          day: currentDay,
+          action: g.days <= 7 ? 'Start immediately' : 'Schedule and begin',
+          doc: g.name,
+          cost: g.cost,
+          duration: g.days,
+          difficulty: g.difficulty
+        });
+        currentDay += g.days;
+      }
+    });
+
+    return { required, have, missing, gaps, totalCost, totalDays, plan, categories };
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('active');
+  }
+
+  function setupInputs() {
+    document.getElementById('input-staffCount').addEventListener('input', function () {
+      document.getElementById('val-staffCount').textContent = this.value;
+    });
+  }
+
+  function runBootSequence() {
+    const line1 = document.getElementById('boot-line-1');
+    const line2 = document.getElementById('boot-line-2');
+    const line3 = document.getElementById('boot-line-3');
+    const progress = document.getElementById('boot-progress');
+    const status = document.getElementById('boot-status');
+
+    const bootMessages = [
+      '> Loading compliance framework... OK',
+      '> Fetching tender category requirements... OK',
+      '> Initializing gap analysis engine... OK'
+    ];
+
+    toolTerminalType(line1, bootMessages[0], 20, () => {
+      setTimeout(() => {
+        toolTerminalType(line2, bootMessages[1], 20, () => {
+          setTimeout(() => {
+            toolTerminalType(line3, bootMessages[2], 20, () => {
+              progress.style.width = '100%';
+              status.textContent = 'READY';
+              setTimeout(() => {
+                document.getElementById('btn-start').classList.remove('hidden');
+              }, 400);
+            });
+          }, 200);
+        });
+      }, 200);
+    });
+  }
+
+  function runProcessing(inputs, callback) {
+    const msgContainer = document.getElementById('processing-messages');
+    const bar = document.getElementById('processing-bar');
+    const pct = document.getElementById('processing-pct');
+    msgContainer.innerHTML = '';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+
+    const messages = [
+      '> Analyzing category requirements...',
+      '> Mapping current documents...',
+      '> Identifying compliance gaps...',
+      '> Calculating cost estimates...',
+      '> Generating 30-day action plan...'
+    ];
+
+    let step = 0;
+    function nextStep() {
+      if (step < messages.length) {
+        const p = document.createElement('p');
+        p.className = 'text-code-snippet text-on-surface-variant';
+        p.textContent = messages[step];
+        msgContainer.appendChild(p);
+        const prog = Math.round(((step + 1) / messages.length) * 100);
+        bar.style.width = prog + '%';
+        pct.textContent = prog + '%';
+        step++;
+        setTimeout(nextStep, 700);
+      } else {
+        setTimeout(() => {
+          bar.style.width = '100%';
+          pct.textContent = '100%';
+          setTimeout(callback, 500);
+        }, 300);
+      }
+    }
+    nextStep();
+  }
+
+  function displayResults(results) {
+    lastResults = results;
+    const { required, have, missing, gaps, totalCost, totalDays, plan } = results;
+
+    // Circular progress
+    const total = required.length;
+    const completed = have.length;
+    const pct = total > 0 ? (completed / total) : 0;
+    const circumference = 264;
+    const offset = circumference * (1 - pct);
+
+    document.getElementById('circle-text').textContent = completed + '/' + total;
+    document.getElementById('progress-circle').style.strokeDashoffset = offset;
+
+    if (total === 0) {
+      document.getElementById('result-progress-text').textContent = 'Select at least one category';
+    } else {
+      document.getElementById('result-progress-text').textContent = completed + ' of ' + total + ' required documents complete';
+    }
+
+    // Cost + time
+    toolAnimateValue(document.getElementById('result-total-cost'), 0, totalCost, 1200, 'R');
+    document.getElementById('result-total-days').textContent = totalDays + ' days to complete';
+
+    // Gap table
+    const gapTable = document.getElementById('gap-table');
+    if (gaps.length === 0) {
+      gapTable.innerHTML = `
+        <div class="border border-primary/30 p-lg bg-surface-container-low text-center">
+          <p class="text-primary text-headline-md mb-sm">> NO GAPS</p>
+          <p class="text-on-surface-variant text-body-sm">You have all required compliance documents. Stay current with renewals.</p>
+        </div>
+      `;
+    } else {
+      gapTable.innerHTML = gaps.map(g => {
+        const pClass = 'priority-' + g.priority.toLowerCase();
+        return `
+          <div class="border border-outline-variant p-md bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-md">
+            <div class="flex-1">
+              <p class="text-body-sm text-on-surface font-bold">${g.name}</p>
+              <p class="text-code-snippet text-on-surface-variant">${g.difficulty} · ${g.days} days</p>
+            </div>
+            <div class="flex items-center gap-lg">
+              <span class="text-code-snippet ${pClass} uppercase">${g.priority}</span>
+              <span class="text-body-sm text-primary font-bold">${toolFormatZAR(g.cost)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 30-day plan
+    const planContainer = document.getElementById('plan-container');
+    if (plan.length === 0) {
+      planContainer.innerHTML = `
+        <div class="border border-primary/30 p-lg bg-surface-container-low text-center">
+          <p class="text-primary text-body-sm">All compliance documents are accounted for. No action plan needed.</p>
+        </div>
+      `;
+    } else {
+      planContainer.innerHTML = plan.map((p, i) => {
+        const dayLabel = 'Day ' + p.day + (p.day + p.duration - 1 > p.day ? '-' + (p.day + p.duration - 1) : '');
+        return `
+          <div class="plan-step border border-outline-variant p-md bg-surface-container-low flex gap-md">
+            <div class="flex flex-col items-center">
+              <div class="w-3 h-3 bg-primary rounded-full"></div>
+              ${i < plan.length - 1 ? '<div class="w-0.5 flex-1 bg-outline-variant min-h-[40px]"></div>' : ''}
+            </div>
+            <div class="flex-1 pb-md">
+              <p class="text-label-mono text-primary uppercase tracking-widest mb-xs">${dayLabel}</p>
+              <p class="text-body-sm text-on-surface font-bold mb-xs">${p.doc}</p>
+              <p class="text-code-snippet text-on-surface-variant mb-xs">${p.action} — ${p.difficulty} difficulty</p>
+              <p class="text-code-snippet text-primary">${toolFormatZAR(p.cost)}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  function init() {
+    setupInputs();
+    runBootSequence();
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      showScreen('screen-input');
+    });
+
+    document.getElementById('btn-analyze').addEventListener('click', () => {
+      const inputs = getInputs();
+      if (inputs.categories.length === 0) {
+        alert('Please select at least one tender category.');
+        return;
+      }
+      showScreen('screen-processing');
+      runProcessing(inputs, () => {
+        const results = calculate(inputs);
+        showScreen('screen-results');
+        displayResults(results);
+      });
+    });
+
+    document.getElementById('btn-gate').addEventListener('click', () => {
+      const results = lastResults;
+      if (!results) return;
+      toolShowEmailGate('compliance-radar', {
+        categories: results.categories,
+        required: results.required,
+        have: results.have,
+        missing: results.missing,
+        totalCost: results.totalCost,
+        totalDays: results.totalDays
+      }, (email) => {
+        document.getElementById('complete-email').textContent = email;
+        showScreen('screen-complete');
+      });
+    });
+
+    const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
+    restartButtons.forEach(btn => {
+      if (btn) btn.addEventListener('click', () => {
+        showScreen('screen-input');
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

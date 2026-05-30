@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{%TITLE%} - Zonke</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            // Core palette from DESIGN.md
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container-lowest': '#0c0f0f',
+            'surface-container-low': '#1a1c1c',
+            'surface-container': '#1e2020',
+            'surface-container-high': '#282a2b',
+            'surface-container-highest': '#333535',
+            'on-surface': '#e2e2e2',
+            'on-surface-variant': '#c4c9ac',
+            'inverse-surface': '#e2e2e2',
+            'inverse-on-surface': '#2f3131',
+            outline: '#8e9379',
+            'outline-variant': '#444933',
+            primary: '#CCFF00',      // Lime green (primary action)
+            'primary-fixed': '#c3f400',
+            'primary-fixed-dim': '#abd600',
+            'on-primary': '#283500',
+            'on-primary-container': '#556d00',
+            'on-primary-fixed': '#161e00',
+            'on-primary-fixed-variant': '#3c4d00',
+            secondary: '#FF4C00',    // Orange (warning/accent)
+            'secondary-container': '#ff571c',
+            'secondary-fixed': '#ffdbd0',
+            'secondary-fixed-dim': '#ffb59f',
+            'on-secondary': '#5e1700',
+            'on-secondary-container': '#531300',
+            'on-secondary-fixed': '#3a0a00',
+            'on-secondary-fixed-variant': '#852400',
+            tertiary: '#ffffff',
+            'tertiary-container': '#d2e5f5',
+            'tertiary-fixed': '#d2e5f5',
+            'tertiary-fixed-dim': '#b6c9d8',
+            'on-tertiary': '#21323e',
+            'on-tertiary-container': '#556774',
+            'on-tertiary-fixed': '#0b1d29',
+            'on-tertiary-fixed-variant': '#374956',
+            error: '#ffb4ab',
+            'on-error': '#690005',
+            'error-container': '#93000a',
+            'on-error-container': '#ffdad6',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535',
+            'inverse-primary': '#506600'
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          spacing: {
+            xs: '4px',
+            sm: '8px',
+            md: '16px',
+            lg: '32px',
+            xl: '64px',
+            gutter: '24px',
+            margin: '40px'
+          },
+          borderRadius: {
+            DEFAULT: '0px',
+            lg: '0px',
+            xl: '0px',
+            full: '9999px'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Global body styles */
+    body {
+      background-color: #121414;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* Scanlines overlay (CRT effect) */
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.06),
+        rgba(0, 255, 0, 0.02),
+        rgba(0, 0, 255, 0.06)
+      );
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Sticker effect: thick border + hard shadow */
+    .sticker {
+      border: 3px solid #000;
+      box-shadow: 8px 8px 0 0 rgba(0, 0, 0, 0.8);
+    }
+
+    /* Thin sticker (2px) */
+    .sticker-thin {
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.6);
+    }
+
+    /* Glitch animation */
+    @keyframes glitch-anim {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+      100% { transform: translate(0); }
+    }
+    .glitch:hover {
+      animation: glitch-anim 0.2s linear infinite;
+    }
+
+    /* Blinking cursor */
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    .cursor-blink {
+      display: inline-block;
+      width: 10px;
+      height: 1em;
+      background-color: currentColor;
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+    }
+
+    /* Hard borders */
+    .border-1 { border-width: 1px; }
+    .border-2 { border-width: 2px; }
+    .border-3 { border-width: 3px; }
+
+    /* Utility: all caps tracked out */
+    .uppercase-tracked {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Utility: clipped corners (45 degree cut) */
+    .clip-corner {
+      clip-path: polygon(
+        0 10px,
+        10px 0,
+        calc(100% - 10px) 0,
+        100% 10px,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        10px 100%,
+        0 calc(100% - 10px)
+      );
+    }
+
+    /* Grid background pattern */
+    .grid-pattern {
+      background-image:
+        linear-gradient(to right, #333333 1px, transparent 1px),
+        linear-gradient(to bottom, #333333 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+  </style>
+</head>
+<body class="relative scanlines">
+  {%CONTENT%}
+</body>
+</html>

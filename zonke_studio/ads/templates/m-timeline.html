@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Timeline - Zonke</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container': '#1e2020',
+            'on-surface': '#e2e2e2',
+            primary: '#CCFF00',
+            secondary: '#FF4C00',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535'
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'monospace'] },
+          spacing: {
+            xs: '4px', sm: '8px', md: '16px', lg: '32px', xl: '64px',
+            gutter: '24px', margin: '40px'
+          },
+          borderRadius: { DEFAULT: '0px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #121414;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
+                  linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .border-2 { border-width: 2px; }
+    .text-primary { color: #CCFF00; }
+    .text-secondary { color: #FF4C00; }
+    .uppercase-tracked { text-transform: uppercase; letter-spacing: 0.1em; }
+    .timeline-line {
+      position: absolute;
+      left: 80px;
+      top: 200px;
+      bottom: 200px;
+      width: 4px;
+      background: #333535;
+    }
+    .timeline-line::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -4px;
+      right: -4px;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 20px,
+        #333535 20px,
+        #333535 21px
+      );
+    }
+    .timeline-event {
+      position: relative;
+      margin-left: 120px;
+    }
+    .timeline-event::before {
+      content: '';
+      position: absolute;
+      left: -56px;
+      top: 8px;
+      width: 12px;
+      height: 12px;
+      background: currentColor;
+      border: 3px solid #121414;
+    }
+    .event-marker {
+      width: 24px;
+      height: 24px;
+      border-radius: 0;
+      background: currentColor;
+      border: 3px solid #121414;
+      position: absolute;
+      left: -64px;
+      top: 0;
+    }
+    .skew-box {
+      transform: skewX(-5deg);
+    }
+    .skew-box-inner {
+      transform: skewX(5deg);
+    }
+  </style>
+</head>
+<body class="relative scanlines">
+
+  <!-- Header -->
+  <div class="p-12 pb-8">
+    <div class="text-xs uppercase-tracked text-primary mb-2">MIGRATION_PATH</div>
+    <h1 class="text-4xl font-black uppercase text-white leading-none">
+      Manual → AI<br/>Evolution
+    </h1>
+    <div class="text-lg text-on-surface-variant mt-4">
+      Your 90-day journey to AI-native dominance
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="px-12 relative">
+    <!-- Vertical line -->
+    <div class="timeline-line"></div>
+
+    <!-- Event 1: Current state -->
+    <div class="timeline-event mb-16 text-secondary" style="top: 0;">
+      <div class="event-marker bg-secondary"></div>
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="text-xs uppercase-tracked mb-2">DAY 0 - CURRENT</div>
+          <h3 class="text-xl font-bold mb-2">Manual Chaos</h3>
+          <div class="bg-surface border-2 border-secondary p-4 skew-box">
+            <div class="skew-box-inner">
+              <ul class="space-y-2 text-sm">
+                <li>• Lead response: 4.2 hours</li>
+                <li>• After-hours: OFFLINE</li>
+                <li>• Competitor intel: NONE</li>
+                <li>• Status: <span class="font-bold text-secondary">VULNERABLE</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 2: Decision -->
+    <div class="timeline-event mb-16 text-primary" style="margin-left: 140px;">
+      <div class="event-marker bg-primary"></div>
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="text-xs uppercase-tracked mb-2">DAY 1</div>
+          <h3 class="text-xl font-bold mb-2">Decision Point</h3>
+          <div class="bg-surface border-2 border-primary p-4 skew-box">
+            <div class="skew-box-inner">
+              <div class="text-sm mb-2">Trigger:</div>
+              <div class="text-lg font-bold text-primary">"AI Readiness Sprint Started"</div>
+              <div class="text-sm text-on-surface-variant mt-2">Early bird discount secured: 50% off</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 3: Installation -->
+    <div class="timeline-event mb-16 text-primary" style="margin-left: 80px;">
+      <div class="event-marker bg-primary"></div>
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="text-xs uppercase-tracked mb-2">DAY 3</div>
+          <h3 class="text-xl font-bold mb-2">Installation Complete</h3>
+          <div class="bg-surface border-2 border-primary p-4 skew-box">
+            <div class="skew-box-inner">
+              <div class="space-y-2 text-sm">
+                <div>✓ AI Command Center deployed</div>
+                <div>✓ API integrations connected</div>
+                <div>✓ Calendar sync active</div>
+                <div class="text-primary font-bold">Status: SYSTEM ONLINE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 4: First win -->
+    <div class="timeline-event mb-16 text-chat-green" style="margin-left: 60px;">
+      <div class="event-marker" style="background: #00CC66;"></div>
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="text-xs uppercase-tracked mb-2" style="color: #00CC66;">DAY 7</div>
+          <h3 class="text-xl font-bold mb-2" style="color: #00CC66;">First Instant Booking</h3>
+          <div class="bg-surface border-2" style="border-color: #00CC66; background: rgba(0, 204, 102, 0.05);" class="skew-box">
+            <div class="skew-box-inner p-4">
+              <div class="text-sm mb-2">Lead contacted at:</div>
+              <div class="text-3xl font-bold text-chat-green mb-2">2:14 AM</div>
+              <div class="text-sm text-on-surface-variant">Response sent: <span class="text-chat-green font-bold">&lt;1 second</span></div>
+              <div class="text-sm text-on-surface-variant">Viewing booked: <span class="text-chat-green font-bold">8:03 AM</span></div>
+              <div class="text-xs text-chat-green mt-2 uppercase-tracked">NO MANUAL INTERVENTION</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 5: Gap closes -->
+    <div class="timeline-event mb-16 text-primary" style="margin-left: 40px;">
+      <div class="event-marker bg-primary"></div>
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="text-xs uppercase-tracked mb-2">DAY 30</div>
+          <h3 class="text-xl font-bold mb-2">Competitive Gap Closed</h3>
+          <div class="bg-surface border-2 border-primary p-4 skew-box">
+            <div class="skew-box-inner">
+              <div class="flex items-end gap-4 mb-2">
+                <div>
+                  <div class="text-xs uppercase-tracked text-on-surface-variant">Before</div>
+                  <div class="text-2xl font-bold text-secondary">-4.1 hrs</div>
+                </div>
+                <div class="text-4xl font-bold text-primary mb-2">→</div>
+                <div>
+                  <div class="text-xs uppercase-tracked text-on-surface-variant">After</div>
+                  <div class="text-2xl font-bold text-chat-green">+3.8 hrs</div>
+                </div>
+              </div>
+              <div class="text-sm text-on-surface-variant">Now <span class="text-primary font-bold">you're faster</span> than every competitor</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 6: Full automation -->
+    <div class="timeline-event mb-8 text-primary" style="margin-left: 20px;">
+      <div class="event-marker bg-primary"></div>
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="text-xs uppercase-tracked mb-2">DAY 90</div>
+          <h3 class="text-xl font-bold mb-2">AI-Native Operations</h3>
+          <div class="bg-primary border-2 border-black p-4 skew-box">
+            <div class="skew-box-inner">
+              <div class="text-surface font-bold mb-3">FULLY AUTOMATED RESULTS</div>
+              <div class="grid grid-cols-2 gap-4 text-sm text-surface">
+                <div>• 98% lead capture rate</div>
+                <div>• 89% booking conversion</div>
+                <div>• 24/7/365 coverage</div>
+                <div>• 2% no-show rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="text-center mt-16 mb-8">
+      <div class="text-2xl font-bold text-white mb-4">Start Your Evolution Today</div>
+      <a href="https://zonke.ai/earlybird" class="inline-block bg-primary text-surface px-12 py-5 font-bold text-xl uppercase border-2 border-black sticker cursor-pointer glitch">
+        BEGIN_TRANSFORMATION
+      </a>
+      <div class="text-xs text-on-surface-variant mt-4 uppercase-tracked">
+        First 10 agencies: Accelerated onboarding + 50% discount
+      </div>
+    </div>
+
+    <!-- Timeline stats at bottom -->
+    <div class="flex justify-between text-xs uppercase-tracked text-surface-variant border-t border-surface-variant pt-4 pb-4 px-4">
+      <div>START: Manual Chaos → Response deficit: <span class="text-secondary">4.2 hours</span></div>
+      <div class="text-primary">FINISH: AI Native → <span class="text-chat-green">+3.8 hour advantage</span></div>
+    </div>
+
+  </div>
+
+  <!-- Legend -->
+  <div class="absolute right-12 top-48 w-56 bg-surface border-2 border-surface-variant p-4">
+    <div class="text-xs uppercase-tracked text-primary mb-3">LEGEND</div>
+    <div class="space-y-3 text-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-4 h-4 bg-secondary"></div>
+        <span>Manual state</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-4 h-4 bg-primary"></div>
+        <span>Zonke deployment</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-4 h-4" style="background: #00CC66;"></div>
+        <span>AI success</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

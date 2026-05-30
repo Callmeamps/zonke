@@ -1,0 +1,13 @@
+{
+  "name": "zonke-ads-renderer",
+  "version": "1.0.0",
+  "description": "Zonke ad creative renderer",
+  "type": "commonjs",
+  "scripts": {
+    "render": "node render.js",
+    "render:all": "node batch-render.js"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0"
+  }
+}

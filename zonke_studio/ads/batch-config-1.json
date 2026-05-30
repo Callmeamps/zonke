@@ -1,0 +1,13 @@
+{
+  "name": "Initial Ad Creatives - Week 1",
+  "description": "First batch of ads for early-bird validation across platforms and verticals",
+  "creatives": [
+    {
+      "name": "System Override - Instagram Feed - Real Estate",
+      "template": "a-system-override.html",
+      "width": 1080,
+      "height": 1080,
+      "output": "insta-feed/realestate-system-override-a.png"
+    }
+  ]
+}

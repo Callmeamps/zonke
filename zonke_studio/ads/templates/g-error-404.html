@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>System Error - Zonke</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container': '#1e2020',
+            'on-surface': '#e2e2e2',
+            primary: '#CCFF00',
+            secondary: '#FF4C00',
+            error: '#FF4C00',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535'
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'monospace'] },
+          spacing: {
+            xs: '4px', sm: '8px', md: '16px', lg: '32px', xl: '64px',
+            gutter: '24px', margin: '40px'
+          },
+          borderRadius: { DEFAULT: '0px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.2) 50%);
+      background-size: 100% 2px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .border-2 { border-width: 2px; }
+    .border-3 { border-width: 3px; }
+    .text-primary { color: #CCFF00; }
+    .text-secondary { color: #FF4C00; }
+    .uppercase-tracked { text-transform: uppercase; letter-spacing: 0.1em; }
+    .error-glitch {
+      animation: glitch 3s infinite;
+    }
+    @keyframes glitch {
+      0% { transform: translate(0); filter: hue-rotate(0deg); }
+      90% { transform: translate(0); filter: hue-rotate(0deg); }
+      91% { transform: translate(-5px, 2px); filter: hue-rotate(90deg); }
+      92% { transform: translate(5px, -2px); filter: hue-rotate(-90deg); }
+      93% { transform: translate(0); filter: hue-rotate(0deg); }
+      100% { transform: translate(0); filter: hue-rotate(0deg); }
+    }
+    .matrix-rain {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.05;
+      font-size: 14px;
+      line-height: 14px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="relative scanlines">
+
+  <!-- Matrix rain background effect -->
+  <div class="matrix-rain text-primary" id="matrix"></div>
+
+  <!-- Error header -->
+  <div class="absolute top-0 left-0 right-0 bg-error border-b-3 border-black z-50">
+    <div class="px-8 py-4 flex items-center gap-4">
+      <div class="w-10 h-10 bg-white border-2 border-black flex items-center justify-center">
+        <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16" class="text-error">
+          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.708c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="text-xs uppercase-tracked text-white opacity-80">ERROR_CODE</div>
+        <div class="text-lg font-bold text-white">SYSTEM_FAILURE_0x4C</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="pt-24 pb-12 px-12 flex flex-col items-center justify-center h-full">
+
+    <!-- 404 display -->
+    <div class="text-center mb-12 error-glitch">
+      <div class="text-[150px] font-black text-error leading-none" style="font-family: 'Inter', sans-serif; font-weight: 900;">404</div>
+      <div class="text-2xl font-bold text-white uppercase-tracked mt-4">AI Command Not Found</div>
+    </div>
+
+    <!-- Error message -->
+    <div class="bg-surface border-2 border-error p-8 max-w-[700px] w-full mb-12">
+      <div class="text-sm uppercase-tracked text-primary mb-4">DIAGNOSTIC INFO</div>
+      <div class="space-y-4 text-lg">
+        <p>The requested operation: <span class="text-white font-bold">"INSTANT_LEAD_RESPONSE"</span></p>
+        <p>Could not be found in your current system.</p>
+        <p class="text-on-surface-variant text-sm mt-6">
+          Your manual processes are missing critical AI components:
+        </p>
+        <ul class="list-none space-y-2 text-sm mt-4">
+          <li class="flex items-center gap-3">
+            <span class="w-4 h-4 bg-error border border-black flex items-center justify-center text-xs font-bold text-white">✗</span>
+            <span>Auto-responder engine</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="w-4 h-4 bg-error border border-black flex items-center justify-center text-xs font-bold text-white">✗</span>
+            <span>24/7 monitoring daemon</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="w-4 h-4 bg-error border border-black flex items-center justify-center text-xs font-bold text-white">✗</span>
+            <span>Competitor intelligence module</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Solution -->
+    <div class="w-full max-w-[700px] text-center mb-12">
+      <div class="text-lg font-bold text-white mb-6">
+        Install <span class="text-primary">Zonke AI Command Center</span> to resolve this error permanently.
+      </div>
+      <a href="https://zonke.ai/earlybird" class="inline-block bg-primary text-surface px-16 py-5 font-bold text-xl uppercase border-2 border-black sticker cursor-pointer glitch">
+        INSTALL_NOW
+      </a>
+      <div class="text-sm text-on-surface-variant mt-4 uppercase-tracked">
+        Early bird discount: 50% off first year
+      </div>
+    </div>
+
+    <!-- Technical details -->
+    <div class="text-xs uppercase-tracked text-surface-variant space-y-1 max-w-[600px]">
+      <div>MODULE: LEAD_CAPTURE_CORE</div>
+      <div>DEPENDENCY: AI_RESPONSE_ENGINE [MISSING]</div>
+      <div>SUGGESTED: zonke.ai/earlybird</div>
+      <div>REACH_OUT: support@zonke.ai</div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="absolute bottom-8 left-12 right-12 text-center">
+    <div class="text-xs uppercase-tracked text-surface-variant">
+      ALL MANUAL SYSTEMS WILL EVENTUALLY FAIL
+    </div>
+  </div>
+
+</body>
+</html>
+<script>
+// Simple matrix rain effect
+const matrix = document.getElementById('matrix');
+const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+let columns = Math.floor(matrix.offsetWidth / 14);
+let drops = Array(columns).fill(1);
+
+setInterval(() => {
+  matrix.innerHTML = '';
+  let output = '';
+  for (let i = 0; i < drops.length; i++) {
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    output += '<span style="position:absolute; left:' + (i * 14) + 'px; top:' + (drops[i] * 14) + 'px;">' + char + '</span>';
+    if (drops[i] * 14 > matrix.offsetHeight && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+  matrix.innerHTML = output;
+}, 50);
+</script>

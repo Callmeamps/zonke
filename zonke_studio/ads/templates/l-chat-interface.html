@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat Interface - Zonke</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container': '#1e2020',
+            'on-surface': '#e2e2e2',
+            primary: '#CCFF00',
+            secondary: '#FF4C00',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535',
+            chat-green: '#00CC66'
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'monospace'] },
+          spacing: {
+            xs: '4px', sm: '8px', md: '16px', lg: '32px', xl: '64px',
+            gutter: '24px', margin: '40px'
+          },
+          borderRadius: { DEFAULT: '0px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0c0f0f;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.2) 50%);
+      background-size: 100% 2px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .border-2 { border-width: 2px; }
+    .text-primary { color: #CCFF00; }
+    .text-secondary { color: #FF4C00; }
+    .text-chat-green { color: #00CC66; }
+    .uppercase-tracked { text-transform: uppercase; letter-spacing: 0.1em; }
+    .message-ai {
+      background: #1e2020;
+      border-left: 3px solid #00CC66;
+    }
+    .message-human {
+      background: rgba(204, 255, 0, 0.1);
+      border-right: 3px solid #CCFF00;
+    }
+    .typing-indicator span {
+      animation: blink 1.4s infinite both;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .timestamp {
+      font-size: 0.7rem;
+      opacity: 0.6;
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body class="relative scanlines flex flex-col">
+
+  <!-- Chat header -->
+  <div class="bg-surface border-b-2 border-primary p-6">
+    <div class="flex items-center gap-4">
+      <div class="relative">
+        <div class="w-12 h-12 bg-primary border-2 border-black flex items-center justify-center">
+          <span class="text-2xl font-bold text-surface">Z</span>
+        </div>
+        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-chat-green border-2 border-surface"></div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-primary">Zonke AI</span>
+          <span class="px-2 py-0.5 bg-primary text-surface text-[10px] font-bold uppercase">ACTIVE</span>
+        </div>
+        <div class="text-xs text-chat-green">Responds in &lt;1 second</div>
+      </div>
+      <div class="ml-auto text-right">
+        <div class="text-xs uppercase-tracked text-on-surface-variant">LEAD SCORE</div>
+        <div class="text-2xl font-bold text-primary">98%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat messages -->
+  <div class="flex-1 p-6 space-y-6 overflow-y-auto" style="background: #0a0d0d;">
+
+    <!-- Intro separator -->
+    <div class="text-center">
+      <div class="inline-block bg-surface border border-surface-variant px-4 py-1 text-xs uppercase-tracked text-on-surface-variant">
+        TODAY 14:23
+      </div>
+    </div>
+
+    <!-- Human message -->
+    <div class="flex items-end gap-3">
+      <div class="flex-1 max-w-[70%] message-human p-4 border-2 border-transparent">
+        <div class="timestamp">14:23:04</div>
+        <div>Hi, I'm interested in the property at 123 Main St. Is it still available?</div>
+      </div>
+      <div class="w-8 h-8 bg-white border border-black flex-shrink-0 flex items-center justify-center text-xs font-bold text-black">JD</div>
+    </div>
+
+    <!-- AI response (instant) -->
+    <div class="flex items-end gap-3 justify-end">
+      <div class="text-xs text-on-surface-variant text-right mr-2 self-end">
+        0<span class="cursor-blink"></span>s
+      </div>
+      <div class="flex-1 max-w-[70%] message-ai p-4 border-2 border-transparent">
+        <div class="timestamp">14:23:04</div>
+        <div>Yes, still available! I'm Zoe, your Zonke AI assistant. Would you like to schedule a viewing?</div>
+      </div>
+      <div class="w-8 h-8 bg-primary border-2 border-black flex-shrink-0 flex items-center justify-center text-surface font-bold">Z</div>
+    </div>
+
+    <!-- Human message -->
+    <div class="flex items-end gap-3">
+      <div class="flex-1 max-w-[70%] message-human p-4 border-2 border-transparent">
+        <div class="timestamp">14:23:08</div>
+        <div>Yes, please! What slots do you have this weekend?</div>
+      </div>
+      <div class="w-8 h-8 bg-white border border-black flex-shrink-0 flex items-center justify-center text-xs font-bold text-black">JD</div>
+    </div>
+
+    <!-- AI response -->
+    <div class="flex items-end gap-3 justify-end">
+      <div class="text-xs text-on-surface-variant text-right mr-2 self-end">
+        0<span class="cursor-blink"></span>s
+      </div>
+      <div class="flex-1 max-w-[70%] message-ai p-4 border-2 border-transparent">
+        <div class="timestamp">14:23:08</div>
+        <div>Saturday 10AM, 2PM, and Sunday 1PM are open. Which works best? I'll lock it in.</div>
+      </div>
+      <div class="w-8 h-8 bg-primary border-2 border-black flex-shrink-0 flex items-center justify-center text-surface font-bold">Z</div>
+    </div>
+
+    <!-- Human message -->
+    <div class="flex items-end gap-3">
+      <div class="flex-1 max-w-[70%] message-human p-4 border-2 border-transparent">
+        <div class="timestamp">14:23:12</div>
+        <div>Saturday at 2pm please!</div>
+      </div>
+      <div class="w-8 h-8 bg-white border border-black flex-shrink-0 flex items-center justify-center text-xs font-bold text-black">JD</div>
+    </div>
+
+    <!-- AI response with booking confirmation -->
+    <div class="flex items-end gap-3 justify-end">
+      <div class="text-xs text-on-surface-variant text-right mr-2 self-end">
+        0<span class="cursor-blink"></span>s
+      </div>
+      <div class="flex-1 max-w-[70%] message-ai p-4 border-2 border-transparent">
+        <div class="timestamp">14:23:12</div>
+        <div>✓ Confirmed! Saturday 2PM at 123 Main St. I've sent calendar invite and directions. See you then!</div>
+      </div>
+      <div class="w-8 h-8 bg-primary border-2 border-black flex-shrink-0 flex items-center justify-center text-surface font-bold">Z</div>
+    </div>
+
+    <!-- Stats banner -->
+    <div class="bg-primary border-2 border-black p-4 mt-6">
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div>
+          <div class="text-xs uppercase-tracked text-surface mb-1">Response Time</div>
+          <div class="text-2xl font-bold text-surface leading-none">&lt;1s</div>
+        </div>
+        <div>
+          <div class="text-xs uppercase-tracked text-surface mb-1">Booking Rate</div>
+          <div class="text-2xl font-bold text-surface leading-none">89%</div>
+        </div>
+        <div>
+          <div class="text-xs uppercase-tracked text-surface mb-1">No-Shows</div>
+          <div class="text-2xl font-bold text-surface leading-none">2%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- More conversation -->
+    <div class="flex items-end gap-3">
+      <div class="flex-1 max-w-[70%] message-human p-4 border-2 border-transparent">
+        <div class="timestamp">14:24:01</div>
+        <div>This is incredible. You responded instantly and booked it right away.</div>
+      </div>
+      <div class="w-8 h-8 bg-white border border-black flex-shrink-0 flex items-center justify-center text-xs font-bold text-black">JD</div>
+    </div>
+
+    <!-- AI response -->
+    <div class="flex items-end gap-3 justify-end">
+      <div class="text-xs text-on-surface-variant text-right mr-2 self-end">
+        0<span class="cursor-blink"></span>s
+      </div>
+      <div class="flex-1 max-w-[70%] message-ai p-4 border-2 border-transparent">
+        <div class="timestamp">14:24:01</div>
+        <div>That's the Zonke advantage. While your competitors are sleeping, we're winning. 📈</div>
+      </div>
+      <div class="w-8 h-8 bg-primary border-2 border-black flex-shrink-0 flex items-center justify-center text-surface font-bold">Z</div>
+    </div>
+
+  </div>
+
+  <!-- Typing indicator -->
+  <div class="p-6 border-t-2 border-surface-variant bg-surface flex items-center gap-3">
+    <div class="text-sm text-on-surface-variant uppercase-tracked">AI STATUS:</div>
+    <div class="typing-indicator text-primary font-bold flex gap-1">
+      <span>●</span><span>●</span><span>●</span>
+    </div>
+    <div class="ml-auto text-xs text-primary font-bold">INSTALL NOW</div>
+  </div>
+
+  <!-- Floating CTA -->
+  <div class="absolute bottom-24 right-12">
+    <a href="https://zonke.ai/earlybird" class="bg-secondary text-surface px-8 py-3 font-bold text-sm uppercase border-2 border-black sticker glitch cursor-pointer">
+      GET_THIS_AI
+    </a>
+  </div>
+
+</body>
+</html>

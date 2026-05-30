@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Network Graph - Zonke</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container': '#1e2020',
+            'on-surface': '#e2e2e2',
+            primary: '#CCFF00',
+            secondary: '#FF4C00',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535',
+            node-blue: '#5CD8FF',
+            node-white: '#E0E0E0'
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'monospace'] },
+          spacing: {
+            xs: '4px', sm: '8px', md: '16px', lg: '32px', xl: '64px',
+            gutter: '24px', margin: '40px'
+          },
+          borderRadius: { DEFAULT: '0px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0c0f0f;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.2) 50%);
+      background-size: 100% 2px;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .border-2 { border-width: 2px; }
+    .text-primary { color: #CCFF00; }
+    .text-secondary { color: #FF4C00; }
+    .uppercase-tracked { text-transform: uppercase; letter-spacing: 0.1em; }
+    .network-node {
+      border: 2px solid;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      position: absolute;
+    }
+    .line {
+      position: absolute;
+      background: #333535;
+      height: 2px;
+      transform-origin: left center;
+    }
+    .line.active {
+      background: linear-gradient(90deg, #CCFF00, #5CD8FF);
+      height: 3px;
+    }
+    .pulse-ring {
+      animation: pulse-ring 2s infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="relative scanlines">
+
+  <!-- Header -->
+  <div class="p-10 pb-4">
+    <div class="text-xs uppercase-tracked text-primary mb-3">NETWORK_TOPOLOGY_ANALYSIS</div>
+    <h1 class="text-3xl font-bold uppercase text-white mb-2">Your Response Network is Isolated</h1>
+    <div class="text-lg text-on-surface-variant">Competitors are connected. You're not.</div>
+  </div>
+
+  <!-- Network visualization container -->
+  <div class="relative mx-10" style="height: 900px;">
+
+    <!-- Connecting lines (static SVG) -->
+    <svg width="100%" height="100%" style="position: absolute; top: 0; left: 0; pointer-events: none;">
+      <!-- Manual isolated node -->
+      <line x1="540" y1="450" x2="840" y2="200" stroke="#333535" stroke-width="2" stroke-dasharray="5,5"/>
+      <line x1="540" y1="450" x2="840" y2="700" stroke="#333535" stroke-width="2" stroke-dasharray="5,5"/>
+
+      <!-- Zonke connected network -->
+      <line x1="540" y1="450" x2="200" y2="200" stroke="#CCFF00" stroke-width="3"/>
+      <line x1="540" y1="450" x2="200" y2="700" stroke="#CCFF00" stroke-width="3"/>
+      <line x1="540" y1="450" x2="540" y2="100" stroke="#CCFF00" stroke-width="3"/>
+      <line x1="540" y1="450" x2="540" y2="800" stroke="#CCFF00" stroke-width="3"/>
+      <line x1="540" y1="450" x2="880" y2="450" stroke="#CCFF00" stroke-width="3"/>
+      <line x1="200" y1="200" x2="200" y2="100" stroke="#CCFF00" stroke-width="2"/>
+      <line x1="200" y1="700" x2="200" y2="800" stroke="#CCFF00" stroke-width="2"/>
+    </svg>
+
+    <!-- Central legend node -->
+    <div class="network-node bg-primary border-2 border-black text-surface" style="left: 510px; top: 420px; z-index: 20;">
+      <div class="text-xs text-center font-bold">YOU</div>
+    </div>
+
+    <!-- Manual isolated node -->
+    <div class="network-node bg-secondary border-2 border-black text-surface" style="left: 800px; top: 380px; z-index: 10;">
+      <div class="text-[10px] text-center font-bold">MANUAL<br/> lone</div>
+    </div>
+
+    <!-- Connected Zonke nodes -->
+    <div class="network-node" style="left: 170px; top: 180px; border-color: #00CC66; color: #00CC66; z-index: 20;">
+      <div class="text-sm">⚡</div>
+    </div>
+    <div class="network-node" style="left: 170px; top: 330px; border-color: #00CC66; color: #00CC66; z-index: 20;">
+      <div class="text-sm">🤖</div>
+    </div>
+    <div class="network-node" style="left: 170px; top: 550px; border-color: #5CD8FF; color: #5CD8FF; z-index: 20;">
+      <div class="text-sm">📊</div>
+    </div>
+    <div class="network-node" style="left: 170px; top: 730px; border-color: #5CD8FF; color: #5CD8FF; z-index: 20;">
+      <div class="text-sm">🎯</div>
+    </div>
+    <div class="network-node" style="left: 480px; top: 50px; border-color: #CCFF00; color: #CCFF00; z-index: 20;">
+      <div class="text-sm">📱</div>
+    </div>
+    <div class="network-node" style="left: 600px; top: 50px; border-color: #CCFF00; color: #CCFF00; z-index: 20;">
+      <div class="text-sm">☁️</div>
+    </div>
+    <div class="network-node" style="left: 480px; top: 830px; border-color: #CCFF00; color: #CCFF00; z-index: 20;">
+      <div class="text-sm">🔔</div>
+    </div>
+    <div class="network-node" style="left: 850px; top: 430px; border-color: #CCFF00; color: #CCFF00; z-index: 20;">
+      <div class="text-sm text-xs">LEADS</div>
+    </div>
+
+    <!-- Animated pulse ring on central node -->
+    <div class="pulse-ring absolute border-2 border-primary rounded-full" style="left: 500px; top: 410px; width: 100px; height: 100px; margin-left: -50px; margin-top: -50px;"></div>
+
+  </div>
+
+  <!-- Stats panel -->
+  <div class="flex justify-center gap-8 mb-10">
+    <div class="text-center">
+      <div class="text-xs uppercase-tracked text-on-surface-variant mb-1">Nodes Connected</div>
+      <div class="text-3xl font-bold text-primary">12</div>
+    </div>
+    <div class="text-center">
+      <div class="text-xs uppercase-tracked text-on-surface-variant mb-1">Real-time Data Flow</div>
+      <div class="text-3xl font-bold text-check-green" style="color: #00CC66;">ACTIVE</div>
+    </div>
+    <div class="text-center">
+      <div class="text-xs uppercase-tracked text-on-surface-variant mb-1">Isolated Nodes</div>
+      <div class="text-3xl font-bold text-secondary">1</div>
+    </div>
+  </div>
+
+  <!-- Explanation -->
+  <div class="max-w-2xl mx-auto px-12">
+    <div class="mb-8">
+      <div class="text-sm font-bold text-primary uppercase-tracked mb-3">Isolated Manual Node</div>
+      <p class="text-on-surface-variant mb-4">
+        Your current manual system operates as a <span class="text-white">single isolated node</span>. No connections to leads, competitors, or real-time data. All information flows through human bottlenecks.
+      </p>
+    </div>
+
+    <div class="mb-10">
+      <div class="text-sm font-bold text-primary uppercase-tracked mb-3">Zonke Network</div>
+      <p class="text-on-surface-variant mb-4">
+        Zonke creates <span class="text-primary font-bold">12 simultaneous connections</span> to critical data sources: lead channels, calendar systems, competitor tracking, and analytics dashboards. Everything syncs in real-time.
+      </p>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center border-t-2 border-surface-variant pt-8">
+      <div class="text-xl font-bold text-white mb-6">Connect Your Entire Operation</div>
+      <a href="https://zonke.ai/earlybird" class="inline-block bg-primary text-surface px-12 py-5 font-bold text-lg uppercase border-2 border-black sticker cursor-pointer">
+        JOIN_NETWORK
+      </a>
+      <div class="text-xs text-on-surface-variant mt-4 uppercase-tracked">
+        Integration takes 2 minutes. First 10 agencies: free trial + 50% off.
+      </div>
+    </div>
+  </div>
+
+  <!-- Node labels (floating) -->
+  <div class="absolute left-4 top-16 text-xs uppercase-tracked text-on-surface-variant" style="writing-mode: vertical-rl;">
+    ⚡ Auto-responder  🤖 AI Chat  📊 Dashboard  📱 Mobile  ☁️ Cloud  🔔 Alerts
+  </div>
+
+  <!-- Footer -->
+  <div class="absolute bottom-4 left-12 right-12 text-center text-xs uppercase-tracked text-surface-variant">
+    NETWORK_EFFECT: Every new user strengthens the collective intelligence
+  </div>
+
+</body>
+</html>

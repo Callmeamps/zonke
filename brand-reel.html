@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ZONKE - Brand Reel</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root {
+    --bg: #121414;
+    --lime: #c3f400;
+    --olive: #8e9379;
+    --white: #ffffff;
+  }
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  html, body {
+    width: 1920px;
+    height: 1080px;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Scanlines */
+  .scanlines {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.03;
+  }
+  
+  /* Container */
+  .frame {
+    position: absolute;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Scene visibility */
+  .scene {
+    position: absolute;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+  }
+  
+  /* Terminal text */
+  .terminal {
+    font-size: 96px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--lime);
+    text-shadow: 6px 6px 0px var(--olive);
+  }
+  
+  .cursor {
+    display: inline-block;
+    width: 12px;
+    height: 80px;
+    background: var(--lime);
+    margin-left: 4px;
+    animation: blink 0.5s infinite;
+  }
+  
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+  
+  /* Glitch character */
+  .glitch-char {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .glitch-char::before,
+  .glitch-char::after {
+    content: attr(data-char);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  
+  .glitch-char::before {
+    color: var(--white);
+    animation: glitch-1 0.15s infinite linear alternate-reverse;
+    clip-path: inset(0 0 70% 0);
+  }
+  
+  .glitch-char::after {
+    color: var(--lime);
+    animation: glitch-2 0.15s infinite linear alternate;
+    clip-path: inset(70% 0 0 0);
+  }
+  
+  @keyframes glitch-1 {
+    0% { transform: translate(-2px, 1px); }
+    25% { transform: translate(2px, -1px); }
+    50% { transform: translate(-1px, 2px); }
+    75% { transform: translate(1px, -2px); }
+    100% { transform: translate(-2px, 1px); }
+  }
+  
+  @keyframes glitch-2 {
+    0% { transform: translate(2px, -1px); }
+    25% { transform: translate(-2px, 1px); }
+    50% { transform: translate(1px, -2px); }
+    75% { transform: translate(-1px, 2px); }
+    100% { transform: translate(2px, -1px); }
+  }
+  
+  /* Z Logo */
+  .z-logo-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+  }
+  
+  .z-logo {
+    position: absolute;
+    font-size: 280px;
+    font-weight: 800;
+    color: var(--lime);
+    text-shadow: 6px 6px 0px var(--olive);
+    opacity: 0;
+  }
+  
+  /* Ghost text */
+  .ghost-text {
+    position: absolute;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.8em;
+    white-space: nowrap;
+    opacity: 0;
+  }
+  
+  /* Stamp */
+  .stamp {
+    font-size: 72px;
+    font-weight: 800;
+    color: var(--lime);
+    text-align: center;
+    line-height: 1.15;
+    text-shadow: 6px 6px 0px var(--olive);
+    border: 2px solid var(--lime);
+    padding: 48px 64px;
+    box-shadow: 6px 6px 0px var(--lime);
+    background: var(--bg);
+  }
+  
+  /* Canvas for particles */
+  #particles {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+  }
+  
+  /* Glitch overlay */
+  .glitch-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--lime);
+    opacity: 0;
+    z-index: 50;
+    mix-blend-mode: exclusion;
+  }
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="scanlines"></div>
+<div class="glitch-overlay" id="glitch-overlay"></div>
+
+<!-- Scene 1: Terminal -->
+<div class="scene" id="scene1">
+  <div class="terminal" id="terminal">
+    <span id="typed"></span><span class="cursor"></span>
+  </div>
+</div>
+
+<!-- Scene 2: Z Logo + Ghost -->
+<div class="scene" id="scene2">
+  <div class="z-logo-container">
+    <canvas id="z-particles"></canvas>
+    <div class="z-logo" id="z-logo">Z</div>
+  </div>
+  <div class="ghost-text" id="ghost-text">AI NATIVE STUDIO</div>
+</div>
+
+<!-- Scene 3: Stamp -->
+<div class="scene" id="scene3">
+  <div class="stamp" id="stamp">YOUR COMPETITOR IS ALREADY USING AI</div>
+</div>
+
+<script>
+// Colors
+const LIME = '#c3f400';
+const OLIVE = '#8e9379';
+
+// Terminal typing with glitch on every 3rd char
+const text = '> ZONKE_';
+const typedEl = document.getElementById('typed');
+let charIndex = 0;
+
+function typeChar() {
+  if (charIndex < text.length) {
+    const char = text[charIndex];
+    const span = document.createElement('span');
+    
+    // Glitch on every 3rd character (index 2, 5, 8...)
+    if ((charIndex + 1) % 3 === 0 && char !== '_') {
+      span.className = 'glitch-char';
+      span.setAttribute('data-char', char);
+      span.textContent = char;
+    } else {
+      span.textContent = char;
+    }
+    
+    typedEl.appendChild(span);
+    charIndex++;
+    setTimeout(typeChar, 80);
+  }
+}
+
+// Particle system for Z logo
+const pCanvas = document.getElementById('z-particles');
+const pCtx = pCanvas.getContext('2d');
+pCanvas.width = 400;
+pCanvas.height = 400;
+
+// Z shape points (scaled to canvas)
+const Z_POINTS = [];
+const zPath = [
+  [50, 50], [350, 50], [350, 120],
+  [120, 350], [350, 350],
+  [350, 280], [80, 50], [80, 120],
+  [310, 350], [50, 350], [50, 280], [280, 120]
+];
+
+// Generate points along Z path
+zPath.forEach(([x, y]) => {
+  for (let i = 0; i < 8; i++) {
+    Z_POINTS.push({
+      x: x + (Math.random() - 0.5) * 20,
+      y: y + (Math.random() - 0.5) * 20,
+      targetX: x,
+      targetY: y
+    });
+  }
+});
+
+class Particle {
+  constructor(x, y, tx, ty) {
+    this.x = Math.random() * 400;
+    this.y = Math.random() * 400;
+    this.targetX = tx;
+    this.targetY = ty;
+    this.vx = (Math.random() - 0.5) * 8;
+    this.vy = (Math.random() - 0.5) * 8;
+    this.size = 3;
+  }
+  
+  update(progress) {
+    // Attract to target
+    const ease = Math.min(1, progress * 2);
+    this.x += (this.targetX - this.x) * 0.08 * ease + this.vx * 0.95;
+    this.y += (this.targetY - this.y) * 0.08 * ease + this.vy * 0.95;
+    this.vx *= 0.92;
+    this.vy *= 0.92;
+    
+    // Jitter
+    this.x += (Math.random() - 0.5) * 2;
+    this.y += (Math.random() - 0.5) * 2;
+  }
+  
+  draw() {
+    pCtx.fillStyle = LIME;
+    pCtx.fillRect(this.x, this.y, this.size, this.size);
+  }
+}
+
+const particles = Z_POINTS.map((p, i) => new Particle(p.x, p.y, p.targetX, p.targetY));
+
+let particleProgress = 0;
+function drawParticles() {
+  pCtx.clearRect(0, 0, 400, 400);
+  particles.forEach(p => {
+    p.update(particleProgress);
+    p.draw();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// GSAP Timeline
+const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+
+// Scene 1: Terminal (0-3s)
+tl.fromTo("#scene1", 
+  { opacity: 0 }, 
+  { opacity: 1, duration: 0.1 }
+);
+
+// Start typing after scene appears
+tl.call(() => typeChar(), null, 0.1);
+
+// Hold scene 1 until 3s
+tl.to("#scene1", { opacity: 0, duration: 0.15 }, 2.85);
+
+// Scene 2: Glitch transition + Z logo (3-8s)
+// Glitch flash
+tl.fromTo("#glitch-overlay",
+  { opacity: 0 },
+  { opacity: 0.8, duration: 0.05 }, 3)
+.to("#glitch-overlay",
+  { opacity: 0, duration: 0.1 }, 3.05);
+
+// Show scene 2
+tl.fromTo("#scene2",
+  { opacity: 0 },
+  { opacity: 1, duration: 0.1 }, 3.1);
+
+// Z logo particles form
+tl.fromTo("#z-logo",
+  { opacity: 0, scale: 0.5, rotation: -15 },
+  { opacity: 1, scale: 1, rotation: 0, duration: 0.6 }, 3.3);
+
+// Animate particles
+tl.to({ onUpdate: () => particleProgress = tl.progress() }, 3.3);
+
+// Ghost text
+tl.fromTo("#ghost-text",
+  { opacity: 0, x: -200 },
+  { opacity: 0.12, x: 0, duration: 1 }, 3.8);
+
+// Hold scene 2 until 8s
+tl.to("#scene2", { opacity: 0, duration: 0.15 }, 7.85);
+
+// Scene 3: Stamp (8-12s)
+// Glitch flash
+tl.fromTo("#glitch-overlay",
+  { opacity: 0 },
+  { opacity: 0.6, duration: 0.03 }, 8)
+.to("#glitch-overlay",
+  { opacity: 0, duration: 0.08 }, 8.03);
+
+// Show scene 3
+tl.fromTo("#scene3",
+  { opacity: 0 },
+  { opacity: 1, duration: 0.1 }, 8.1);
+
+// Stamp impact
+tl.fromTo("#stamp",
+  { opacity: 0, scale: 1.5, y: 50 },
+  { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(3)" }, 8.2);
+
+// Hold final frame
+tl.to("#stamp", { opacity: 1, duration: 3.8 }, 8.6);
+
+console.log("Brand reel timeline ready");
+</script>
+</body>
+</html>

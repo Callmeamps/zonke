@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Results - Zonke</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: '#121414',
+            'surface-dim': '#121414',
+            'surface-bright': '#37393a',
+            'surface-container': '#1e2020',
+            'on-surface': '#e2e2e2',
+            primary: '#CCFF00',
+            secondary: '#FF4C00',
+            background: '#121414',
+            'on-background': '#e2e2e2',
+            'surface-variant': '#333535',
+            'url-blue': '#5CD8FF'
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'monospace'] },
+          spacing: {
+            xs: '4px', sm: '8px', md: '16px', lg: '32px', xl: '64px',
+            gutter: '24px', margin: '40px'
+          },
+          borderRadius: { DEFAULT: '0px' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #121414;
+      color: #e2e2e2;
+      font-family: 'JetBrains Mono', monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
+                  linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+      background-size: 100% 2px, 3px 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .border-2 { border-width: 2px; }
+    .text-primary { color: #CCFF00; }
+    .text-secondary { color: #FF4C00; }
+    .url-blue { color: #5CD8FF; }
+    .uppercase-tracked { text-transform: uppercase; letter-spacing: 0.1em; }
+    .result-card {
+      border: 2px solid transparent;
+    }
+    .result-card.featured {
+      border-color: #CCFF00;
+      background: rgba(204, 255, 0, 0.05);
+    }
+    .star-icon {
+      color: #FFD700;
+    }
+    .snippet-line {
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body class="relative scanlines p-12">
+
+  <!-- Search header -->
+  <div class="mb-10 border-b-2 border-surface-variant pb-6">
+    <div class="text-xs uppercase-tracked text-primary mb-4">SEARCH RESULTS</div>
+    <div class="flex items-center gap-4 mb-4">
+      <div class="flex-1 relative">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-primary">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <input type="text" value="fix lead response time real estate agency" class="w-full bg-surface border-2 border-surface-variant pl-12 pr-4 py-3 font-mono text-lg text-white" readonly>
+      </div>
+    </div>
+    <div class="text-sm text-on-surface-variant">
+      About <span class="text-white font-bold">2,140,000 results</span> (<span class="text-primary">0.42 seconds</span>)
+    </div>
+  </div>
+
+  <!-- Search results -->
+  <div class="space-y-4 pr-4 overflow-y-auto" style="height: 1400px;">
+
+    <!-- Sponsored label -->
+    <div class="text-xs uppercase-tracked text-on-surface-variant mb-2">SPONSORED</div>
+
+    <!-- Featured result (Zonke) -->
+    <div class="result-card featured border-2 p-5 mb-6 relative">
+      <div class="absolute -top-3 left-4 bg-primary px-3 py-1 text-[10px] font-bold uppercase text-surface">
+        TOP_RANKED
+      </div>
+      
+      <div class="flex items-start justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-primary flex items-center justify-center text-surface font-bold text-xs">Z</div>
+          <div class="url-blue text-sm font-bold">zonke.ai</div>
+        </div>
+        <div class="star-icon text-sm">★★★★★</div>
+      </div>
+
+      <div class="text-lg font-bold text-primary mb-2 leading-tight">
+        AI Command Center for Real Estate Agencies
+      </div>
+
+      <div class="snippet-line text-sm text-on-surface-variant mb-3">
+        <span class="text-white font-bold">Automatically respond to every lead in &lt;1 second</span>. 
+        Capture missed opportunities. Outpace competitors. 
+        <span class="text-primary">First 10 agencies get 50% off.</span>
+      </div>
+
+      <div class="flex items-center gap-6 text-xs uppercase-tracked">
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="text-primary"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zM7.5 7.997c-.918-.416-.974-.93-1.103-1.376a2.501 2.501 0 0 0-2.09-.767C3.147 5.635 3 5.475 3 5.189c0-.664.355-1.193.942-1.624A2.501 2.501 0 0 0 5.276 3.5c.718-.456 1.353-.961 1.224-1.497z"/></svg>
+          <span class="text-white">Free trial</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="text-primary"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/><path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/></svg>
+          <span class="text-white">2 min setup</span>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="mt-4 flex items-center gap-4">
+        <a href="https://zonke.ai/earlybird" class="bg-primary text-surface px-6 py-2 font-bold text-sm uppercase border border-black">GET STARTED</a>
+        <span class="text-xs text-on-surface-variant">zonke.ai/earlybird</span>
+      </div>
+    </div>
+
+    <!-- Regular result 1 -->
+    <div class="result-card border-b border-surface-variant pb-4 pl-4">
+      <div class="flex items-start justify-between mb-1">
+        <div>
+          <div class="url-blue text-sm">www.competitor-response-lag.com</div>
+          <div class="text-sm text-on-surface-variant">Why Manual Response Costs You $12k/Month</div>
+        </div>
+      </div>
+      <div class="snippet-line text-sm text-on-surface-variant">
+        So your average response time is <span class="text-secondary">4+ hours</span>? Yeah, you're getting destroyed. Here's why manual response...
+      </div>
+    </div>
+
+    <!-- Regular result 2 -->
+    <div class="result-card border-b border-surface-variant pb-4 pl-4 mt-4">
+      <div>
+        <div class="url-blue text-sm">manual-agencies-fail.com</div>
+        <div class="text-sm text-on-surface-variant">Case Study: Firm Loses 62% of Leads</div>
+      </div>
+      <div class="snippet-line text-sm text-on-surface-variant mt-1">
+        Agency relied on human response. <span class="text-secondary">Disaster ensued</span>. Here's what they should have done...
+      </div>
+    </div>
+
+    <!-- Regular result 3 -->
+    <div class="result-card border-b border-surface-variant pb-4 pl-4 mt-4">
+      <div>
+        <div class="url-blue text-sm">slow-response-sucks.org</div>
+        <div class="text-sm text-on-surface-variant">The 5 Minute Rule - Why It Matters</div>
+      </div>
+      <div class="snippet-line text-sm text-on-surface-variant mt-1">
+        58% of leads convert within 5 minutes. After 30 minutes? <span class="text-secondary">Good luck</span>.
+      </div>
+    </div>
+
+    <!-- Image results section -->
+    <div class="mt-8 mb-4">
+      <div class="text-sm uppercase-tracked text-on-surface-variant mb-3">IMAGES</div>
+      <div class="flex gap-4 overflow-x-auto">
+        <div class="w-32 h-32 bg-surface border border-surface-variant flex-shrink-0 p-2">
+          <div class="w-full h-full border-2 border-primary flex items-center justify-center text-[10px] text-primary text-center break-all px-1">Lead Response Time Infographic</div>
+        </div>
+        <div class="w-32 h-32 bg-surface border border-surface-variant flex-shrink-0 p-2">
+          <div class="w-full h-full border-2 border-secondary flex items-center justify-center text-[10px] text-secondary text-center break-all px-1">AI vs Manual Comparison</div>
+        </div>
+        <div class="w-32 h-32 bg-surface border border-surface-variant flex-shrink-0 p-2">
+          <div class="w-full h-full border-2 border-primary flex items-center justify-center text-[10px] text-primary text-center break-all px-1">Competitor Gap Analysis</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- More regular results -->
+    <div class="result-card border-b border-surface-variant pb-4 pl-4 mt-8">
+      <div>
+        <div class="url-blue text-sm">how-to-speed-up-leads.com</div>
+        <div class="text-sm text-on-surface-variant">11 Ways to Respond Faster (Spoiler: AI is #1)</div>
+      </div>
+      <div class="snippet-line text-sm text-on-surface-variant mt-1">
+        We tried everything. Hiring more staff, scheduling tools, templates... nothing compares to...
+      </div>
+    </div>
+
+    <div class="result-card border-b border-surface-variant pb-4 pl-4 mt-4">
+      <div>
+        <div class="url-blue text-sm">realestate-tech.io</div>
+        <div class="text-sm text-on-surface-variant">Why Top 1% Agencies All Use AI</div>
+      </div>
+      <div class="snippet-line text-sm text-on-surface-variant mt-1">
+        We analyzed 10,000 agencies. <span class="text-secondary">100% of top performers</span> use instant response systems.
+      </div>
+    </div>
+
+    <!-- Footer pagination -->
+    <div class="mt-8 text-center">
+      <div class="inline-flex items-center gap-2">
+        <div class="px-4 py-2 border-2 border-primary text-primary font-bold">1</div>
+        <div class="px-4 py-2 border border-surface-variant text-on-surface-variant">2</div>
+        <div class="px-4 py-2 border border-surface-variant text-on-surface-variant">3</div>
+        <div class="px-4 py-2 border border-surface-variant text-on-surface-variant">4</div>
+        <div class="px-4 py-2 border border-surface-variant text-on-surface-variant">→</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom CTA banner -->
+  <div class="absolute bottom-0 left-0 right-0 bg-primary border-t-3 border-black p-4">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-bold text-surface uppercase-tracked">
+        RANK #1 FOR "Lead Response" - INSTALL NOW
+      </div>
+      <a href="https://zonke.ai/earlybird" class="bg-surface text-primary px-6 py-2 font-bold text-sm uppercase border border-black">
+        VISIT_SITE
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Property Market Pulse | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<script src="/assets/js/toolkit.js"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#121414", "surface-dim": "#121414", "surface-bright": "#37393a",
+        "surface-container-lowest": "#0c0f0f", "surface-container-low": "#1a1c1c",
+        "surface-container": "#1e2020", "surface-container-high": "#282a2b",
+        "surface-container-highest": "#333535", "on-surface": "#e2e2e2",
+        "on-surface-variant": "#c4c9ac", "outline": "#8e9379", "outline-variant": "#444933",
+        "primary": "#c3f400", "on-primary": "#283500", "primary-container": "#c3f400",
+        "on-primary-container": "#556d00", "secondary": "#ffb59f",
+        "secondary-container": "#ff571c", "on-secondary-container": "#531300",
+        "error": "#ffb4ab", "error-container": "#93000a", "on-error-container": "#ffdad6"
+      },
+      borderRadius: { DEFAULT: "0px", lg: "0px", xl: "0px", full: "9999px" },
+      spacing: { xs: "4px", unit: "4px", sm: "8px", xl: "64px", lg: "32px", gutter: "24px", margin: "40px", md: "16px" },
+      fontFamily: { mono: ["JetBrains Mono", "monospace"] },
+      fontSize: {
+        "display-lg": ["72px", { lineHeight: "1.0", letterSpacing: "-0.04em", fontWeight: "800" }],
+        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-md": ["24px", { lineHeight: "1.2", letterSpacing: "0em", fontWeight: "700" }],
+        "body-lg": ["18px", { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" }],
+        "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0.02em", fontWeight: "400" }],
+        "label-mono": ["12px", { lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "700" }],
+        "code-snippet": ["14px", { lineHeight: "1.4", letterSpacing: "0em", fontWeight: "400" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+* { font-family: 'JetBrains Mono', monospace; }
+body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
+
+.screen { transition: opacity 0.5s ease, transform 0.5s ease; }
+.screen.hidden { display: none; }
+.screen.active { display: block; animation: fadeSlideIn 0.6s ease forwards; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(195, 244, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(195, 244, 0, 0.6); }
+}
+
+.scanline-overlay {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.015) 2px,
+    rgba(255,255,255,0.015) 4px
+  );
+}
+
+.cursor-blink::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+  color: #c3f400;
+}
+
+input[type="range"] { accent-color: #c3f400; height: 4px; }
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px;
+  background: #c3f400; border: none; border-radius: 0;
+  cursor: pointer;
+}
+
+.price-bar {
+  transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.demand-bar {
+  transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+</style>
+</head>
+<body>
+
+<div class="scanline-overlay"></div>
+
+<div class="min-h-screen flex flex-col">
+
+<header class="border-b border-outline-variant p-gutter flex items-center justify-between">
+  <a href="/" class="text-primary font-bold text-headline-md hover:opacity-80 transition-opacity no-underline">ZONKE_</a>
+  <span class="text-code-snippet text-on-surface-variant">&gt; PROPERTY MARKET PULSE v1.0</span>
+</header>
+
+<main class="flex-1 flex flex-col items-center justify-center p-gutter max-w-3xl mx-auto w-full">
+
+<!-- SCREEN 1: BOOT / SPLASH -->
+<div id="screen-splash" class="screen active w-full text-center">
+  <div class="mb-xl">
+    <pre class="text-primary text-[10px] sm:text-xs leading-tight opacity-60">
+  ___    _     ___    _   _    ___    _   _
+ | _ \  | |   | _ \  | \ | |  / _ \  | \ | |
+ | _ \  | |   | _ \  |  \| | | | | | |  \| |
+ | |_) | | |  | |_) | | |\  | | |_| | | |\  |
+ |___/  |_|   |___/  |_| \_|  \___/  |_| \_|
+    </pre>
+  </div>
+  <div class="text-left max-w-lg mx-auto border border-outline-variant p-lg bg-surface-container-low">
+    <p class="text-primary text-body-sm mb-sm">&gt; INITIALIZE MARKET PULSE SCAN...</p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-1"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-2"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-3"></p>
+    <div class="h-1 bg-surface-container-highest mt-md overflow-hidden">
+      <div id="boot-progress" class="h-full bg-primary" style="width:0%; transition: width 2s ease;"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="boot-status">_</p>
+  </div>
+  <button id="btn-start" class="hidden mt-xl bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none mx-auto">
+    SCAN MARKET →
+  </button>
+</div>
+
+<!-- SCREEN 2: INPUT FORM -->
+<div id="screen-input" class="screen hidden w-full">
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-headline-md mb-sm">&gt; MARKET PARAMETERS</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Enter a suburb and we'll generate a comprehensive market pulse report.</p>
+
+    <div class="space-y-lg">
+      <div>
+        <label class="text-body-sm text-on-surface mb-xs block">Suburb Name</label>
+        <input type="text" id="input-suburb" value="Sandton" placeholder="e.g. Sandton, Umhlanga, Stellenbosch"
+          class="w-full bg-surface border border-outline-variant p-md text-on-surface text-body-sm outline-none focus:border-primary transition-colors" />
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Property Type</span>
+        </label>
+        <select id="input-propertyType" class="w-full bg-surface border border-outline-variant p-md text-on-surface text-body-sm outline-none focus:border-primary transition-colors">
+          <option value="Houses">Houses</option>
+          <option value="Apartments">Apartments</option>
+          <option value="Townhouses">Townhouses</option>
+          <option value="All" selected>All</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Price Range</span>
+          <span class="text-primary" id="val-priceRange">R2,000,000</span>
+        </label>
+        <input type="range" id="input-priceRange" min="500000" max="10000000" value="2000000" step="100000" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>R500k</span><span>R10M</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Time Horizon</span>
+        </label>
+        <select id="input-horizon" class="w-full bg-surface border border-outline-variant p-md text-on-surface text-body-sm outline-none focus:border-primary transition-colors">
+          <option value="1">1 month</option>
+          <option value="3" selected>3 months</option>
+          <option value="6">6 months</option>
+          <option value="12">1 year</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-analyze" class="w-full bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+    GENERATE PULSE →
+  </button>
+</div>
+
+<!-- SCREEN 3: PROCESSING -->
+<div id="screen-processing" class="screen hidden w-full text-center">
+  <div class="border border-outline-variant p-lg bg-surface-container-low max-w-lg mx-auto">
+    <div class="flex items-center gap-md mb-lg">
+      <div class="w-3 h-3 bg-secondary-container animate-pulse"></div>
+      <p class="text-primary text-headline-md">&gt; SCANNING MARKET DATA</p>
+    </div>
+    <div id="processing-messages" class="text-left space-y-sm mb-lg">
+      <p class="text-code-snippet text-on-surface-variant">&gt; Fetching suburb indicators...</p>
+    </div>
+    <div class="h-2 bg-surface-container-highest overflow-hidden">
+      <div id="processing-bar" class="h-full bg-primary" style="width:0%"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="processing-pct">0%</p>
+  </div>
+</div>
+
+<!-- SCREEN 4: RESULTS -->
+<div id="screen-results" class="screen hidden w-full">
+  <div class="text-center mb-lg">
+    <p class="text-primary text-headline-md">&gt; <span id="result-suburb-name">MARKET</span> PULSE</p>
+    <p class="text-on-surface-variant text-body-sm">Real-time market indicators for <span id="result-suburb-name-2" class="text-primary"></span></p>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-gutter mb-lg">
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-on-surface-variant text-label-mono uppercase tracking-widest mb-md">DAYS ON MARKET</p>
+      <p class="text-display-lg text-primary" id="result-days">0</p>
+      <p class="text-code-snippet text-on-surface-variant">avg days</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-on-surface-variant text-label-mono uppercase tracking-widest mb-md">PRICE TREND</p>
+      <p class="text-display-lg" id="result-trend">0%</p>
+      <p class="text-code-snippet" id="result-trend-label">—</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-on-surface-variant text-label-mono uppercase tracking-widest mb-md">INVENTORY</p>
+      <p class="text-display-lg text-primary" id="result-inventory">0</p>
+      <p class="text-code-snippet text-on-surface-variant">listings</p>
+    </div>
+    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
+      <p class="text-on-surface-variant text-label-mono uppercase tracking-widest mb-md">DEMAND SCORE</p>
+      <p class="text-display-lg text-secondary-container" id="result-demand">0</p>
+      <p class="text-code-snippet text-on-surface-variant">/10</p>
+    </div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">PRICE TREND VISUALIZATION</p>
+    <div id="trend-visualization" class="flex items-end gap-xs h-24 mb-md"></div>
+    <p class="text-code-snippet text-on-surface-variant" id="trend-description">—</p>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">DEMAND INDICATOR</p>
+    <div class="flex justify-between text-code-snippet text-outline mb-xs">
+      <span>COOLING</span><span>STABLE</span><span>WARM</span><span>HOT</span>
+    </div>
+    <div class="h-4 bg-surface-container-highest overflow-hidden relative">
+      <div id="demand-bar" class="h-full demand-bar" style="width:0%"></div>
+    </div>
+    <p class="text-code-snippet font-bold mt-sm" id="demand-label">—</p>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">PRICE VS NATIONAL AVG</p>
+    <p class="text-headline-xl text-primary" id="result-priceVsNational">0%</p>
+    <p class="text-code-snippet text-on-surface-variant">vs national average</p>
+  </div>
+
+  <div class="border border-secondary-container/30 p-lg bg-surface-container-low mb-lg">
+    <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">MARKET BRIEF</p>
+    <p class="text-body-sm text-on-surface leading-relaxed" id="result-brief">—</p>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">RECOMMENDATION</p>
+    <p class="text-headline-xl" id="result-recommendation">—</p>
+    <p class="text-code-snippet text-on-surface-variant mt-sm" id="result-recommendation-detail">—</p>
+  </div>
+
+  <div class="text-center">
+    <p class="text-body-sm text-on-surface-variant mb-md">Want to save this market pulse and get personalized investment tips?</p>
+    <button id="btn-gate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+      SAVE & UNLOCK INSIGHTS →
+    </button>
+    <button id="btn-restart" class="ml-md bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+      SCAN ANOTHER SUBURB
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 5: COMPLETE -->
+<div id="screen-complete" class="screen hidden w-full text-center">
+  <div class="border border-primary/30 p-xl bg-surface-container-low max-w-lg mx-auto">
+    <p class="text-primary text-display-lg mb-md">✓</p>
+    <p class="text-primary text-headline-md mb-sm">&gt; REPORT UNLOCKED</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Your full Market Pulse Report has been sent to <span id="complete-email" class="text-primary"></span>. Check your inbox for personalized investment insights.</p>
+    <div class="border-t border-outline-variant pt-lg space-y-md">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest">WHAT HAPPENS NEXT</p>
+      <div class="flex flex-col gap-sm">
+        <p class="text-code-snippet text-on-surface-variant">1. Full market pulse with comparative suburb analysis</p>
+        <p class="text-code-snippet text-on-surface-variant">2. Custom investment strategy for your target area</p>
+        <p class="text-code-snippet text-on-surface-variant">3. Follow-up with a Zonke property specialist (optional)</p>
+      </div>
+    </div>
+    <div class="mt-lg flex flex-col sm:flex-row gap-md justify-center">
+      <a href="/real-estate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors no-underline inline-block">
+        EXPLORE LEAD REACTOR →
+      </a>
+      <button id="btn-restart-complete" class="bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+        SCAN ANOTHER SUBURB
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="border-t border-outline-variant p-gutter text-center">
+  <p class="text-code-snippet text-on-surface-variant">ZONKE AI NATIVE STUDIO &copy; 2026</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  let lastResults = null;
+
+  function hashSuburb(name) {
+    if (!name || name.trim() === '') name = 'Sandton';
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      const char = name.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
+
+  function getInputs() {
+    return {
+      suburb: document.getElementById('input-suburb').value.trim() || 'Sandton',
+      propertyType: document.getElementById('input-propertyType').value,
+      priceRange: parseInt(document.getElementById('input-priceRange').value),
+      horizon: parseInt(document.getElementById('input-horizon').value)
+    };
+  }
+
+  function calculate(inputs) {
+    const { suburb, propertyType, priceRange, horizon } = inputs;
+    const hash = hashSuburb(suburb);
+
+    const daysOnMarket = 15 + (hash % 76);
+    const rawTrend = -5 + (hash % 21);
+    const priceTrend = +(rawTrend + (propertyType === 'All' ? 0 : propertyType === 'Houses' ? 1 : propertyType === 'Apartments' ? -1 : 0.5)).toFixed(1);
+    const inventory = 50 + ((hash + (priceRange / 100000)) % 451);
+    const demandScore = 1 + ((hash + (horizon * 3)) % 10);
+    const priceVsNational = -20 + ((hash + Math.round(priceRange / 500000)) % 51);
+
+    const isUp = priceTrend >= 0;
+    const absTrend = Math.abs(priceTrend);
+
+    const demandLabels = ['COOLING', 'STABLE', 'WARM', 'HOT'];
+    const demandLabel = demandScore <= 3 ? demandLabels[0] : demandScore <= 5 ? demandLabels[1] : demandScore <= 7 ? demandLabels[2] : demandLabels[3];
+
+    const trendDescription = isUp
+      ? `Prices in ${suburb} have increased ${absTrend}% over the past ${horizon === 1 ? 'month' : horizon + ' months'}, indicating ${absTrend > 5 ? 'strong' : 'moderate'} upward momentum.`
+      : `Prices in ${suburb} have decreased ${absTrend}% over the past ${horizon === 1 ? 'month' : horizon + ' months'}, indicating a ${absTrend > 5 ? 'significant' : 'slight'} market cooling.`;
+
+    const sellerMarket = daysOnMarket < 30;
+    const buyerMarket = daysOnMarket > 60;
+
+    let brief = '';
+    const trendDir = isUp ? 'rising' : 'falling';
+    const marketType = sellerMarket ? "seller's" : buyerMarket ? "buyer's" : 'balanced';
+    brief = `${suburb} is currently showing a ${marketType} market with prices ${trendDir} ${absTrend}%. Average days on market is ${daysOnMarket}, indicating a ${marketType} market. `;
+    brief += `Demand is ${demandLabel.toLowerCase()} at ${demandScore}/10. `;
+
+    let advice = '';
+    if (isUp && demandScore > 6) {
+      advice = 'Recommended strategy: List now to capture peak pricing. Strong demand + rising prices favor sellers.';
+    } else if (isUp && demandScore <= 6) {
+      advice = 'Recommended strategy: Monitor closely. Prices are rising but demand is moderate — good time to buy before prices climb further.';
+    } else if (!isUp && demandScore > 6) {
+      advice = 'Recommended strategy: Buy now. Prices are down but demand remains strong — properties are undervalued.';
+    } else {
+      advice = 'Recommended strategy: Hold. Both prices and demand are soft — wait for clearer market signals.';
+    }
+    brief += advice;
+
+    let recommendation = '';
+    let recColor = '';
+    if (isUp && demandScore > 6 && priceVsNational > 0) {
+      recommendation = 'SELL';
+      recColor = '#c3f400';
+    } else if (!isUp && demandScore > 6) {
+      recommendation = 'BUY';
+      recColor = '#ffb59f';
+    } else if (isUp && daysOnMarket < 30) {
+      recommendation = 'SELL';
+      recColor = '#c3f400';
+    } else if (!isUp && daysOnMarket > 60) {
+      recommendation = 'HOLD';
+      recColor = '#8e9379';
+    } else if (demandScore >= 7) {
+      recommendation = 'BUY';
+      recColor = '#ffb59f';
+    } else {
+      recommendation = 'HOLD';
+      recColor = '#8e9379';
+    }
+
+    let recDetail = '';
+    switch (recommendation) {
+      case 'SELL':
+        recDetail = `${suburb} shows strong price appreciation and high demand. Favorable conditions for sellers. Consider listing within the next ${horizon <= 3 ? 'few weeks' : 'quarter'}.`;
+        break;
+      case 'BUY':
+        recDetail = `${suburb} shows favorable buying conditions with ${isUp ? 'future appreciation potential' : 'priced dip opportunities'}. Strong demand suggests long-term value.`;
+        break;
+      case 'HOLD':
+        recDetail = `${suburb} market conditions are neutral. Wait for clearer directional signals before making a move.`;
+        break;
+    }
+
+    const trendBars = [];
+    const numBars = 12;
+    for (let i = 0; i < numBars; i++) {
+      const barVal = priceTrend * ((i + 1) / numBars) * (0.5 + Math.random() * 0.5);
+      trendBars.push(+(barVal).toFixed(1));
+    }
+
+    return {
+      suburb, propertyType, priceRange, horizon,
+      daysOnMarket, priceTrend, isUp, absTrend, inventory, demandScore,
+      priceVsNational, demandLabel, trendDescription,
+      brief, recommendation, recColor, recDetail, trendBars,
+      sellerMarket, buyerMarket, marketType
+    };
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('active');
+  }
+
+  function setupRangeInputs() {
+    document.getElementById('input-priceRange').addEventListener('input', function() {
+      const val = parseInt(this.value);
+      document.getElementById('val-priceRange').textContent = toolFormatZAR(val);
+    });
+  }
+
+  function runBootSequence() {
+    const line1 = document.getElementById('boot-line-1');
+    const line2 = document.getElementById('boot-line-2');
+    const line3 = document.getElementById('boot-line-3');
+    const progress = document.getElementById('boot-progress');
+    const status = document.getElementById('boot-status');
+
+    const bootMessages = [
+      '> Loading suburb indicator model... OK',
+      '> Fetching market trend algorithms... OK',
+      '> Initializing pulse analysis engine... OK'
+    ];
+
+    toolTerminalType(line1, bootMessages[0], 20, () => {
+      setTimeout(() => {
+        toolTerminalType(line2, bootMessages[1], 20, () => {
+          setTimeout(() => {
+            toolTerminalType(line3, bootMessages[2], 20, () => {
+              progress.style.width = '100%';
+              status.textContent = 'READY';
+              setTimeout(() => {
+                document.getElementById('btn-start').classList.remove('hidden');
+              }, 400);
+            });
+          }, 200);
+        });
+      }, 200);
+    });
+  }
+
+  function runProcessing(inputs, callback) {
+    const msgContainer = document.getElementById('processing-messages');
+    const bar = document.getElementById('processing-bar');
+    const pct = document.getElementById('processing-pct');
+    msgContainer.innerHTML = '';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+
+    const messages = [
+      '> Fetching suburb indicators...',
+      '> Analyzing price trends...',
+      '> Computing demand metrics...',
+      '> Generating market brief...',
+      '> Compiling pulse report...'
+    ];
+
+    let step = 0;
+    function nextStep() {
+      if (step < messages.length) {
+        const p = document.createElement('p');
+        p.className = 'text-code-snippet text-on-surface-variant';
+        p.textContent = messages[step];
+        msgContainer.appendChild(p);
+        const progress = Math.round(((step + 1) / messages.length) * 100);
+        bar.style.width = progress + '%';
+        pct.textContent = progress + '%';
+        step++;
+        setTimeout(nextStep, 700);
+      } else {
+        setTimeout(() => {
+          bar.style.width = '100%';
+          pct.textContent = '100%';
+          setTimeout(callback, 500);
+        }, 300);
+      }
+    }
+    nextStep();
+  }
+
+  function renderTrendVisualization(results) {
+    const container = document.getElementById('trend-visualization');
+    container.innerHTML = '';
+
+    const maxAbs = Math.max(...results.trendBars.map(v => Math.abs(v)), 1);
+    const maxHeight = 80;
+
+    results.trendBars.forEach((val, i) => {
+      const bar = document.createElement('div');
+      const heightPct = Math.abs(val) / maxAbs * maxHeight;
+      const isPositive = val >= 0;
+
+      bar.className = 'price-bar flex-1 mx-[1px] min-w-[8px]';
+      bar.style.cssText = `
+        height: ${Math.max(4, heightPct)}px;
+        background: ${isPositive ? '#c3f400' : '#ff571c'};
+        align-self: ${isPositive ? 'flex-end' : 'flex-start'};
+        opacity: ${0.3 + (i / results.trendBars.length) * 0.7};
+      `;
+      container.appendChild(bar);
+    });
+  }
+
+  function displayResults(results) {
+    lastResults = results;
+
+    document.getElementById('result-suburb-name').textContent = results.suburb.toUpperCase();
+    document.getElementById('result-suburb-name-2').textContent = results.suburb;
+
+    toolAnimateValue(document.getElementById('result-days'), 0, results.daysOnMarket, 1200);
+
+    const trendEl = document.getElementById('result-trend');
+    trendEl.textContent = (results.isUp ? '+' : '') + results.priceTrend + '%';
+    trendEl.style.color = results.isUp ? '#c3f400' : '#ff571c';
+
+    const trendLabel = document.getElementById('result-trend-label');
+    trendLabel.textContent = results.isUp ? '\u2191 Up' : '\u2193 Down';
+    trendLabel.style.color = results.isUp ? '#c3f400' : '#ff571c';
+
+    toolAnimateValue(document.getElementById('result-inventory'), 0, results.inventory, 1200);
+    toolAnimateValue(document.getElementById('result-demand'), 0, results.demandScore, 1200);
+
+    renderTrendVisualization(results);
+    document.getElementById('trend-description').textContent = results.trendDescription;
+
+    const demandPct = (results.demandScore / 10) * 100;
+    const demandBar = document.getElementById('demand-bar');
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        demandBar.style.width = demandPct + '%';
+        demandBar.style.background = results.demandScore <= 3 ? '#8e9379' : results.demandScore <= 5 ? '#ffb59f' : results.demandScore <= 7 ? '#c3f400' : '#ff571c';
+      }, 300);
+    });
+
+    const demandLabel = document.getElementById('demand-label');
+    demandLabel.textContent = results.demandLabel;
+    demandLabel.style.color = results.demandScore <= 3 ? '#8e9379' : results.demandScore <= 5 ? '#ffb59f' : results.demandScore <= 7 ? '#c3f400' : '#ff571c';
+
+    const pvnEl = document.getElementById('result-priceVsNational');
+    pvnEl.textContent = (results.priceVsNational >= 0 ? '+' : '') + results.priceVsNational + '%';
+    pvnEl.style.color = results.priceVsNational >= 0 ? '#c3f400' : '#ff571c';
+
+    document.getElementById('result-brief').textContent = results.brief;
+
+    const recEl = document.getElementById('result-recommendation');
+    recEl.textContent = results.recommendation;
+    recEl.style.color = results.recColor;
+
+    document.getElementById('result-recommendation-detail').textContent = results.recDetail;
+  }
+
+  function init() {
+    setupRangeInputs();
+    runBootSequence();
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      showScreen('screen-input');
+    });
+
+    document.getElementById('btn-analyze').addEventListener('click', () => {
+      const inputs = getInputs();
+      if (!inputs.suburb || inputs.suburb.trim() === '') {
+        alert('Please enter a suburb name.');
+        return;
+      }
+      showScreen('screen-processing');
+      runProcessing(inputs, () => {
+        const results = calculate(inputs);
+        showScreen('screen-results');
+        displayResults(results);
+      });
+    });
+
+    document.getElementById('btn-gate').addEventListener('click', () => {
+      const results = lastResults;
+      if (!results) return;
+      toolShowEmailGate('property-market-pulse', {
+        suburb: results.suburb,
+        propertyType: results.propertyType,
+        priceRange: results.priceRange,
+        horizon: results.horizon,
+        daysOnMarket: results.daysOnMarket,
+        priceTrend: results.priceTrend,
+        inventory: results.inventory,
+        demandScore: results.demandScore,
+        priceVsNational: results.priceVsNational,
+        recommendation: results.recommendation
+      }, (email) => {
+        document.getElementById('complete-email').textContent = email;
+        showScreen('screen-complete');
+      });
+    });
+
+    const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
+    restartButtons.forEach(btn => {
+      if (btn) btn.addEventListener('click', () => {
+        document.getElementById('input-suburb').value = 'Sandton';
+        document.getElementById('input-propertyType').value = 'All';
+        document.getElementById('input-priceRange').value = 2000000;
+        document.getElementById('input-horizon').value = 3;
+        document.getElementById('val-priceRange').textContent = 'R2,000,000';
+        showScreen('screen-input');
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

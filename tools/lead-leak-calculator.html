@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lead Leak Calculator | Zonke AI Native Studio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<script src="/assets/js/toolkit.js"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface": "#121414", "surface-dim": "#121414", "surface-bright": "#37393a",
+        "surface-container-lowest": "#0c0f0f", "surface-container-low": "#1a1c1c",
+        "surface-container": "#1e2020", "surface-container-high": "#282a2b",
+        "surface-container-highest": "#333535", "on-surface": "#e2e2e2",
+        "on-surface-variant": "#c4c9ac", "outline": "#8e9379", "outline-variant": "#444933",
+        "primary": "#c3f400", "on-primary": "#283500", "primary-container": "#c3f400",
+        "on-primary-container": "#556d00", "secondary": "#ffb59f",
+        "secondary-container": "#ff571c", "on-secondary-container": "#531300",
+        "error": "#ffb4ab", "error-container": "#93000a", "on-error-container": "#ffdad6"
+      },
+      borderRadius: { DEFAULT: "0px", lg: "0px", xl: "0px", full: "9999px" },
+      spacing: { xs: "4px", unit: "4px", sm: "8px", xl: "64px", lg: "32px", gutter: "24px", margin: "40px", md: "16px" },
+      fontFamily: { mono: ["JetBrains Mono", "monospace"] },
+      fontSize: {
+        "display-lg": ["72px", { lineHeight: "1.0", letterSpacing: "-0.04em", fontWeight: "800" }],
+        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-md": ["24px", { lineHeight: "1.2", letterSpacing: "0em", fontWeight: "700" }],
+        "body-lg": ["18px", { lineHeight: "1.6", letterSpacing: "0em", fontWeight: "400" }],
+        "body-sm": ["14px", { lineHeight: "1.5", letterSpacing: "0.02em", fontWeight: "400" }],
+        "label-mono": ["12px", { lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "700" }],
+        "code-snippet": ["14px", { lineHeight: "1.4", letterSpacing: "0em", fontWeight: "400" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+* { font-family: 'JetBrains Mono', monospace; }
+body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
+
+.screen { transition: opacity 0.5s ease, transform 0.5s ease; }
+.screen.hidden { display: none; }
+.screen.active { display: block; animation: fadeSlideIn 0.6s ease forwards; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(195, 244, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(195, 244, 0, 0.6); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+.scanline-overlay {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.015) 2px,
+    rgba(255,255,255,0.015) 4px
+  );
+}
+
+.cursor-blink::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+  color: #c3f400;
+}
+
+input[type="range"] { accent-color: #c3f400; height: 4px; }
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px;
+  background: #c3f400; border: none; border-radius: 0;
+  cursor: pointer;
+}
+
+.leak-bar {
+  transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lead-particle {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.canvas-flow {
+  position: relative; overflow: hidden;
+  height: 120px;
+}
+
+.flow-lead {
+  position: absolute;
+  width: 10px; height: 10px;
+  transition: all 0.1s linear;
+}
+</style>
+</head>
+<body>
+
+<div class="scanline-overlay"></div>
+
+<div class="min-h-screen flex flex-col">
+
+<header class="border-b border-outline-variant p-gutter flex items-center justify-between">
+  <a href="/" class="text-primary font-bold text-headline-md hover:opacity-80 transition-opacity no-underline">ZONKE_</a>
+  <span class="text-code-snippet text-on-surface-variant">&gt; LEAD LEAK CALCULATOR v1.0</span>
+</header>
+
+<main class="flex-1 flex flex-col items-center justify-center p-gutter max-w-3xl mx-auto w-full">
+
+<!-- SCREEN 1: BOOT / SPLASH -->
+<div id="screen-splash" class="screen active w-full text-center">
+  <div class="mb-xl">
+    <pre class="text-primary text-[10px] sm:text-xs leading-tight opacity-60">
+  _     ___    _     ___    _  ___
+ | |   / _ \  | |   / _ \  | || __|
+ | |  | | | | | |  | | | | | ||__ \
+ | |__| |_| | | |__| |_| | |_||__) |
+ |_____\___/  |_____\___/  (_)____/
+    </pre>
+  </div>
+  <div class="text-left max-w-lg mx-auto border border-outline-variant p-lg bg-surface-container-low">
+    <p class="text-primary text-body-sm mb-sm">&gt; INITIALIZE LEAD LEAK SCAN...</p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-1"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-2"></p>
+    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-3"></p>
+    <div class="h-1 bg-surface-container-highest mt-md overflow-hidden">
+      <div id="boot-progress" class="h-full bg-primary" style="width:0%; transition: width 2s ease;"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="boot-status">_</p>
+  </div>
+  <button id="btn-start" class="hidden mt-xl bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none mx-auto">
+    START SCAN →
+  </button>
+</div>
+
+<!-- SCREEN 2: INPUT FORM -->
+<div id="screen-input" class="screen hidden w-full">
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-headline-md mb-sm">&gt; ENTER YOUR METRICS</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">We'll scan your current lead pipeline and identify every leak point.</p>
+
+    <div class="space-y-lg">
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Monthly Leads</span>
+          <span class="text-primary" id="val-monthlyLeads">50</span>
+        </label>
+        <input type="range" id="input-monthlyLeads" min="5" max="500" value="50" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>5</span><span>500</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Avg Response Time</span>
+          <span class="text-primary" id="val-responseTime">30 min</span>
+        </label>
+        <input type="range" id="input-responseTime" min="1" max="1440" value="30" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1 min</span><span>24 hrs</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Current Conversion Rate</span>
+          <span class="text-primary" id="val-conversionRate">15%</span>
+        </label>
+        <input type="range" id="input-conversionRate" min="1" max="50" value="15" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>1%</span><span>50%</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Avg Commission (ZAR)</span>
+          <span class="text-primary" id="val-avgCommission">R45,000</span>
+        </label>
+        <input type="range" id="input-avgCommission" min="5000" max="200000" value="45000" step="5000" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>R5k</span><span>R200k</span></div>
+      </div>
+
+      <div>
+        <label class="flex justify-between text-body-sm mb-xs">
+          <span class="text-on-surface">Follow-up Attempts</span>
+          <span class="text-primary" id="val-followUps">1</span>
+        </label>
+        <input type="range" id="input-followUps" min="0" max="10" value="1" class="w-full" />
+        <div class="flex justify-between text-code-snippet text-outline"><span>0</span><span>10</span></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-analyze" class="w-full bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+    ANALYZE LEAD FLOW →
+  </button>
+</div>
+
+<!-- SCREEN 3: PROCESSING -->
+<div id="screen-processing" class="screen hidden w-full text-center">
+  <div class="border border-outline-variant p-lg bg-surface-container-low max-w-lg mx-auto">
+    <div class="flex items-center gap-md mb-lg">
+      <div class="w-3 h-3 bg-secondary-container animate-pulse"></div>
+      <p class="text-primary text-headline-md">&gt; SCANNING LEAD PIPELINE</p>
+    </div>
+    <div id="processing-messages" class="text-left space-y-sm mb-lg">
+      <p class="text-code-snippet text-on-surface-variant">&gt; Analyzing response velocity...</p>
+    </div>
+    <div class="h-2 bg-surface-container-highest overflow-hidden">
+      <div id="processing-bar" class="h-full bg-primary" style="width:0%"></div>
+    </div>
+    <p class="text-code-snippet text-primary mt-sm text-right" id="processing-pct">0%</p>
+  </div>
+</div>
+
+<!-- SCREEN 4: RESULTS -->
+<div id="screen-results" class="screen hidden w-full">
+  <div class="text-center mb-lg">
+    <p class="text-primary text-headline-md">&gt; LEAK ANALYSIS COMPLETE</p>
+    <p class="text-on-surface-variant text-body-sm">Your pipeline diagnosis is ready.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-lg">
+    <div class="border border-secondary-container/30 p-lg bg-surface-container-low">
+      <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">CURRENT</p>
+      <div class="space-y-md">
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Monthly Conversions</p>
+          <p class="text-display-lg text-secondary-container" id="result-current-conversions">0</p>
+        </div>
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Monthly Revenue</p>
+          <p class="text-headline-xl text-secondary-container" id="result-current-revenue">R0</p>
+        </div>
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Conversion Rate</p>
+          <p class="text-headline-md text-secondary-container" id="result-current-rate">0%</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="border border-primary/30 p-lg bg-surface-container-low">
+      <p class="text-primary text-label-mono uppercase tracking-widest mb-md">OPTIMIZED</p>
+      <div class="space-y-md">
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Monthly Conversions</p>
+          <p class="text-display-lg text-primary" id="result-optimized-conversions">0</p>
+        </div>
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Monthly Revenue</p>
+          <p class="text-headline-xl text-primary" id="result-optimized-revenue">R0</p>
+        </div>
+        <div>
+          <p class="text-code-snippet text-on-surface-variant">Conversion Rate</p>
+          <p class="text-headline-md text-primary" id="result-optimized-rate">0%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-secondary-container text-label-mono uppercase tracking-widest mb-md">LEAK BREAKDOWN</p>
+    <div id="leak-breakdown" class="space-y-md"></div>
+  </div>
+
+  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
+    <p class="text-primary text-label-mono uppercase tracking-widest mb-md">LEAD FLOW SIMULATION (7 DAYS)</p>
+    <div id="lead-flow-container">
+      <div class="flex gap-xs justify-between mb-md">
+        <div class="flex-1 text-center">
+          <p class="text-code-snippet text-outline mb-xs">MON</p>
+          <div id="flow-day-0" class="canvas-flow border border-outline-variant bg-surface-container"></div>
+        </div>
+        <div class="flex-1 text-center">
+          <p class="text-code-snippet text-outline mb-xs">TUE</p>
+          <div id="flow-day-1" class="canvas-flow border border-outline-variant bg-surface-container"></div>
+        </div>
+        <div class="flex-1 text-center">
+          <p class="text-code-snippet text-outline mb-xs">WED</p>
+          <div id="flow-day-2" class="canvas-flow border border-outline-variant bg-surface-container"></div>
+        </div>
+        <div class="flex-1 text-center">
+          <p class="text-code-snippet text-outline mb-xs">THU</p>
+          <div id="flow-day-3" class="canvas-flow border border-outline-variant bg-surface-container"></div>
+        </div>
+        <div class="flex-1 text-center">
+          <p class="text-code-snippet text-outline mb-xs">FRI</p>
+          <div id="flow-day-4" class="canvas-flow border border-outline-variant bg-surface-container"></div>
+        </div>
+        <div class="flex-1 text-center">
+          <p class="text-code-snippet text-outline mb-xs">SAT</p>
+          <div id="flow-day-5" class="canvas-flow border border-outline-variant bg-surface-container"></div>
+        </div>
+        <div class="flex-1 text-center">
+          <p class="text-code-snippet text-outline mb-xs">SUN</p>
+          <div id="flow-day-6" class="canvas-flow border border-outline-variant bg-surface-container"></div>
+        </div>
+      </div>
+      <div class="flex justify-center gap-lg mt-md">
+        <div class="flex items-center gap-xs">
+          <div class="w-3 h-3 rounded-full bg-primary"></div>
+          <span class="text-code-snippet text-on-surface-variant">Converted</span>
+        </div>
+        <div class="flex items-center gap-xs">
+          <div class="w-3 h-3 rounded-full bg-secondary-container"></div>
+          <span class="text-code-snippet text-on-surface-variant">Lost</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <p class="text-body-sm text-on-surface-variant mb-md">Want to save this report and get personalized recommendations?</p>
+    <button id="btn-gate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
+      UNLOCK FULL REPORT →
+    </button>
+    <button id="btn-restart" class="ml-md bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+      RE-RUN SCAN
+    </button>
+  </div>
+</div>
+
+<!-- SCREEN 5: COMPLETE (shown after email gate) -->
+<div id="screen-complete" class="screen hidden w-full text-center">
+  <div class="border border-primary/30 p-xl bg-surface-container-low max-w-lg mx-auto">
+    <p class="text-primary text-display-lg mb-md">✓</p>
+    <p class="text-primary text-headline-md mb-sm">&gt; REPORT UNLOCKED</p>
+    <p class="text-on-surface-variant text-body-sm mb-lg">Your full Lead Leak Report has been sent to <span id="complete-email" class="text-primary"></span>. Check your inbox for personalized recommendations.</p>
+    <div class="border-t border-outline-variant pt-lg space-y-md">
+      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest">WHAT HAPPENS NEXT</p>
+      <div class="flex flex-col gap-sm">
+        <p class="text-code-snippet text-on-surface-variant">1. Full leak report with line-by-line breakdown</p>
+        <p class="text-code-snippet text-on-surface-variant">2. Custom optimization roadmap for your agency</p>
+        <p class="text-code-snippet text-on-surface-variant">3. Follow-up with a Zonke specialist (optional)</p>
+      </div>
+    </div>
+    <div class="mt-lg flex flex-col sm:flex-row gap-md justify-center">
+      <a href="/real-estate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors no-underline inline-block">
+        EXPLORE LEAD REACTOR →
+      </a>
+      <button id="btn-restart-complete" class="bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
+        RUN ANOTHER SCAN
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="border-t border-outline-variant p-gutter text-center">
+  <p class="text-code-snippet text-on-surface-variant">ZONKE AI NATIVE STUDIO &copy; 2026</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  const RESPONSE_CURVE = [
+    { max: 1, rate: 0.85 },
+    { max: 5, rate: 0.65 },
+    { max: 15, rate: 0.45 },
+    { max: 30, rate: 0.30 },
+    { max: 60, rate: 0.20 },
+    { max: 120, rate: 0.10 },
+    { max: Infinity, rate: 0.05 }
+  ];
+
+  const DAY_NAMES = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  let lastResults = null;
+  let leadFlowAnimId = null;
+
+  function getInputs() {
+    return {
+      monthlyLeads: parseInt(document.getElementById('input-monthlyLeads').value),
+      responseTime: parseInt(document.getElementById('input-responseTime').value),
+      conversionRate: parseInt(document.getElementById('input-conversionRate').value),
+      avgCommission: parseInt(document.getElementById('input-avgCommission').value),
+      followUps: parseInt(document.getElementById('input-followUps').value)
+    };
+  }
+
+  function getResponseRate(minutes) {
+    for (const point of RESPONSE_CURVE) {
+      if (minutes <= point.max) return point.rate;
+    }
+    return 0.05;
+  }
+
+  function getFollowUpMultiplier(followUps) {
+    return Math.min(1, 0.35 + followUps * 0.13);
+  }
+
+  function calculate(inputs) {
+    const { monthlyLeads, responseTime, conversionRate, avgCommission, followUps } = inputs;
+
+    const responseRate = getResponseRate(responseTime);
+    const followMul = getFollowUpMultiplier(followUps);
+    const optimalResponseRate = getResponseRate(1);
+    const optimalFollowMul = getFollowUpMultiplier(5);
+
+    const currentEffectiveRate = responseRate * followMul;
+    const optimalRate = optimalResponseRate * optimalFollowMul;
+
+    const currentConversions = monthlyLeads * (conversionRate / 100);
+    const currentRevenue = currentConversions * avgCommission;
+
+    const optimalConversions = Math.round(monthlyLeads * optimalRate);
+    const optimalRevenue = Math.round(optimalConversions * avgCommission);
+
+    const leakedLeads = Math.round(optimalConversions - currentConversions);
+    const leakedRevenue = Math.round(optimalRevenue - currentRevenue);
+
+    const speedLeak = Math.round(monthlyLeads * (optimalResponseRate - responseRate) * avgCommission * followMul);
+    const followLeak = Math.round(monthlyLeads * responseRate * (optimalFollowMul - followMul) * avgCommission);
+    const processLeak = Math.round(monthlyLeads * (optimalRate - (conversionRate / 100)) * avgCommission);
+
+    return {
+      monthlyLeads, responseTime, conversionRate, avgCommission, followUps,
+      currentEffectiveRate: +(currentEffectiveRate * 100).toFixed(1),
+      optimalRate: +(optimalRate * 100).toFixed(1),
+      currentConversions: Math.round(currentConversions),
+      currentRevenue,
+      optimalConversions,
+      optimalRevenue,
+      leakedLeads: Math.max(0, leakedLeads),
+      leakedRevenue: Math.max(0, leakedRevenue),
+      speedLeak: Math.max(0, speedLeak),
+      followLeak: Math.max(0, followLeak),
+      processLeak: Math.max(0, processLeak)
+    };
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('active');
+  }
+
+  function setupRangeInputs() {
+    const map = {
+      'input-monthlyLeads': 'val-monthlyLeads',
+      'input-responseTime': 'val-responseTime',
+      'input-conversionRate': 'val-conversionRate',
+      'input-avgCommission': 'val-avgCommission',
+      'input-followUps': 'val-followUps'
+    };
+    Object.entries(map).forEach(([inputId, displayId]) => {
+      const input = document.getElementById(inputId);
+      const display = document.getElementById(displayId);
+      input.addEventListener('input', () => {
+        const val = parseInt(input.value);
+        switch (inputId) {
+          case 'input-monthlyLeads': display.textContent = val; break;
+          case 'input-responseTime':
+            if (val < 60) display.textContent = val + ' min';
+            else if (val < 1440) display.textContent = Math.round(val / 60) + ' hr' + (val >= 120 ? 's' : '');
+            else display.textContent = '24 hrs';
+            break;
+          case 'input-conversionRate': display.textContent = val + '%'; break;
+          case 'input-avgCommission': display.textContent = 'R' + val.toLocaleString(); break;
+          case 'input-followUps': display.textContent = val; break;
+        }
+      });
+    });
+  }
+
+  function runBootSequence() {
+    const line1 = document.getElementById('boot-line-1');
+    const line2 = document.getElementById('boot-line-2');
+    const line3 = document.getElementById('boot-line-3');
+    const progress = document.getElementById('boot-progress');
+    const status = document.getElementById('boot-status');
+
+    const bootMessages = [
+      '> Loading lead response model... OK',
+      '> Fetching industry benchmarks... OK',
+      '> Initializing leak detection engine... OK'
+    ];
+
+    toolTerminalType(line1, bootMessages[0], 20, () => {
+      setTimeout(() => {
+        toolTerminalType(line2, bootMessages[1], 20, () => {
+          setTimeout(() => {
+            toolTerminalType(line3, bootMessages[2], 20, () => {
+              progress.style.width = '100%';
+              status.textContent = 'READY';
+              setTimeout(() => {
+                document.getElementById('btn-start').classList.remove('hidden');
+              }, 400);
+            });
+          }, 200);
+        });
+      }, 200);
+    });
+  }
+
+  function runProcessing(inputs, callback) {
+    const msgContainer = document.getElementById('processing-messages');
+    const bar = document.getElementById('processing-bar');
+    const pct = document.getElementById('processing-pct');
+    msgContainer.innerHTML = '';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+
+    const messages = [
+      '> Analyzing response velocity...',
+      '> Calculating conversion decay curve...',
+      '> Mapping follow-up sequence gaps...',
+      '> Computing lead leakage points...',
+      '> Generating optimization model...'
+    ];
+
+    let step = 0;
+    function nextStep() {
+      if (step < messages.length) {
+        const p = document.createElement('p');
+        p.className = 'text-code-snippet text-on-surface-variant';
+        p.textContent = messages[step];
+        msgContainer.appendChild(p);
+        const progress = Math.round(((step + 1) / messages.length) * 100);
+        bar.style.width = progress + '%';
+        pct.textContent = progress + '%';
+        step++;
+        setTimeout(nextStep, 700);
+      } else {
+        setTimeout(() => {
+          bar.style.width = '100%';
+          pct.textContent = '100%';
+          setTimeout(callback, 500);
+        }, 300);
+      }
+    }
+    nextStep();
+  }
+
+  function renderLeakBreakdown(results) {
+    const container = document.getElementById('leak-breakdown');
+    const leaks = [
+      { label: 'Speed Leak (slow response)', value: results.speedLeak, pct: results.speedLeak / Math.max(results.leakedRevenue, 1) * 100 },
+      { label: 'Follow-up Leak (incomplete sequence)', value: results.followLeak, pct: results.followLeak / Math.max(results.leakedRevenue, 1) * 100 },
+      { label: 'Process Leak (conversion gap)', value: results.processLeak, pct: results.processLeak / Math.max(results.leakedRevenue, 1) * 100 }
+    ];
+
+    container.innerHTML = leaks.map(l => {
+      const width = Math.min(l.pct, 100);
+      return `
+        <div>
+          <div class="flex justify-between text-body-sm mb-xs">
+            <span class="text-on-surface">${l.label}</span>
+            <span class="text-secondary-container font-bold">${toolFormatZAR(l.value)}</span>
+          </div>
+          <div class="h-2 bg-surface-container-highest overflow-hidden">
+            <div class="h-full bg-secondary-container leak-bar" style="width:0%"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    requestAnimationFrame(() => {
+      container.querySelectorAll('.leak-bar').forEach((bar, i) => {
+        const pct = [results.speedLeak, results.followLeak, results.processLeak][i] / Math.max(results.leakedRevenue, 1) * 100;
+        setTimeout(() => { bar.style.width = Math.min(pct, 100) + '%'; }, 100 + i * 200);
+      });
+    });
+
+    const totalDiv = document.createElement('div');
+    totalDiv.className = 'border-t border-outline-variant pt-md mt-md flex justify-between items-center';
+    totalDiv.innerHTML = `
+      <span class="text-headline-md text-on-surface">Total Leaked Revenue</span>
+      <span class="text-display-lg text-secondary-container">${toolFormatZAR(results.leakedRevenue)}</span>
+    `;
+    container.appendChild(totalDiv);
+  }
+
+  function renderLeadFlow(results, mode) {
+    const dailyLeads = Math.round(results.monthlyLeads / 30);
+    const isOptimized = mode === 'optimized';
+    const rate = isOptimized ? results.optimalRate / 100 : results.currentEffectiveRate / 100;
+
+    for (let day = 0; day < 7; day++) {
+      const container = document.getElementById('flow-day-' + day);
+      container.innerHTML = '';
+      container.style.position = 'relative';
+
+      const numLeads = Math.max(1, Math.round(dailyLeads * (0.7 + Math.random() * 0.6)));
+      const converted = Math.round(numLeads * rate);
+      const lost = numLeads - converted;
+
+      const leadSize = Math.min(8, Math.floor((container.offsetWidth - 10) / Math.max(numLeads, 5)));
+      const size = Math.max(4, leadSize);
+
+      for (let i = 0; i < converted; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'flow-lead';
+        dot.style.cssText = `
+          background: #c3f400; border-radius: 50%;
+          width: ${size}px; height: ${size}px;
+          position: absolute; bottom: ${8 + Math.random() * 40}%;
+          left: ${5 + (i / Math.max(converted, 1)) * 85}%;
+          opacity: 0.8;
+          box-shadow: 0 0 4px rgba(195, 244, 0, 0.5);
+        `;
+        container.appendChild(dot);
+      }
+
+      for (let i = 0; i < lost; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'flow-lead';
+        dot.style.cssText = `
+          background: #ff571c; border-radius: 50%;
+          width: ${size}px; height: ${size}px;
+          position: absolute; top: ${5 + Math.random() * 30}%;
+          left: ${5 + (i / Math.max(lost, 1)) * 85}%;
+          opacity: 0.6;
+        `;
+        container.appendChild(dot);
+      }
+
+      const label = document.createElement('div');
+      label.className = 'absolute bottom-0 left-0 right-0 text-center text-code-snippet';
+      label.style.cssText = 'font-size: 8px; line-height: 1;';
+      label.innerHTML = `<span class="text-primary">${converted}</span><span class="text-outline">/${lost}</span>`;
+      container.appendChild(label);
+    }
+  }
+
+  function displayResults(results) {
+    lastResults = results;
+
+    toolAnimateValue(document.getElementById('result-current-conversions'), 0, results.currentConversions, 1200);
+    toolAnimateValue(document.getElementById('result-current-revenue'), 0, results.currentRevenue, 1200, 'R');
+    document.getElementById('result-current-rate').textContent = results.currentEffectiveRate + '%';
+
+    toolAnimateValue(document.getElementById('result-optimized-conversions'), 0, results.optimalConversions, 1200);
+    toolAnimateValue(document.getElementById('result-optimized-revenue'), 0, results.optimalRevenue, 1200, 'R');
+    document.getElementById('result-optimized-rate').textContent = results.optimalRate + '%';
+
+    renderLeakBreakdown(results);
+    renderLeadFlow(results, 'current');
+  }
+
+  function init() {
+    setupRangeInputs();
+    runBootSequence();
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      showScreen('screen-input');
+    });
+
+    document.getElementById('btn-analyze').addEventListener('click', () => {
+      const inputs = getInputs();
+      showScreen('screen-processing');
+      runProcessing(inputs, () => {
+        const results = calculate(inputs);
+        showScreen('screen-results');
+        displayResults(results);
+      });
+    });
+
+    document.getElementById('btn-gate').addEventListener('click', () => {
+      const results = lastResults;
+      if (!results) return;
+      toolShowEmailGate('lead-leak-calculator', {
+        monthlyLeads: results.monthlyLeads,
+        responseTime: results.responseTime,
+        conversionRate: results.conversionRate,
+        avgCommission: results.avgCommission,
+        followUps: results.followUps,
+        currentConversions: results.currentConversions,
+        currentRevenue: results.currentRevenue,
+        optimalConversions: results.optimalConversions,
+        optimalRevenue: results.optimalRevenue,
+        leakedLeads: results.leakedLeads,
+        leakedRevenue: results.leakedRevenue,
+        speedLeak: results.speedLeak,
+        followLeak: results.followLeak,
+        processLeak: results.processLeak,
+        currentRate: results.currentEffectiveRate,
+        optimalRate: results.optimalRate
+      }, (email) => {
+        document.getElementById('complete-email').textContent = email;
+        showScreen('screen-complete');
+      });
+    });
+
+    const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
+    restartButtons.forEach(btn => {
+      if (btn) btn.addEventListener('click', () => {
+        document.getElementById('input-monthlyLeads').value = 50;
+        document.getElementById('input-responseTime').value = 30;
+        document.getElementById('input-conversionRate').value = 15;
+        document.getElementById('input-avgCommission').value = 45000;
+        document.getElementById('input-followUps').value = 1;
+        document.getElementById('val-monthlyLeads').textContent = '50';
+        document.getElementById('val-responseTime').textContent = '30 min';
+        document.getElementById('val-conversionRate').textContent = '15%';
+        document.getElementById('val-avgCommission').textContent = 'R45,000';
+        document.getElementById('val-followUps').textContent = '1';
+        showScreen('screen-input');
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>
