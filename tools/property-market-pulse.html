@@ -609,12 +609,12 @@ input[type="range"]::-webkit-slider-thumb {
     const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartButtons.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        document.getElementById('input-suburb').value = 'Sandton';
-        document.getElementById('input-propertyType').value = 'All';
-        document.getElementById('input-priceRange').value = 2000000;
-        document.getElementById('input-horizon').value = 3;
-        document.getElementById('val-priceRange').textContent = 'R2,000,000';
-        showScreen('screen-input');
+        toolResetAndShowInput({
+          'input-suburb': 'Sandton',
+          'input-propertyType': 'All',
+          'input-priceRange': 2000000,
+          'input-horizon': 3
+        });
       });
     });
   }

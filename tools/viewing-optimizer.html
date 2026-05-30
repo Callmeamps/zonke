@@ -634,16 +634,13 @@ input[type="checkbox"]:checked::after {
     const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartButtons.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        document.getElementById('input-viewingsPerDay').value = 4;
-        document.getElementById('input-travelTime').value = 15;
-        document.getElementById('input-responseTime').value = 5;
-        document.getElementById('input-closeTimeframe').value = 4;
-        document.getElementById('val-viewingsPerDay').textContent = '4';
-        document.getElementById('val-travelTime').textContent = '15 min';
-        document.getElementById('val-responseTime').textContent = '5 min';
-        document.getElementById('val-closeTimeframe').textContent = '1 month';
+        toolResetAndShowInput({
+          'input-viewingsPerDay': 4,
+          'input-travelTime': 15,
+          'input-responseTime': 5,
+          'input-closeTimeframe': 4
+        });
         document.querySelectorAll('.day-check').forEach(cb => cb.checked = cb.value <= 4);
-        showScreen('screen-input');
       });
     });
   }

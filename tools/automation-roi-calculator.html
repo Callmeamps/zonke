@@ -524,7 +524,9 @@ select option { background: #1a1c1c; color: #e2e2e2; }
     const restartBtns = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartBtns.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        location.reload();
+        toolResetAndShowInput({
+          'input-hourlyRate': 500
+        });
       });
     });
   }

@@ -683,17 +683,13 @@ input[type="range"]::-webkit-slider-thumb {
     const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartButtons.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        document.getElementById('input-monthlyLeads').value = 50;
-        document.getElementById('input-responseTime').value = 30;
-        document.getElementById('input-conversionRate').value = 15;
-        document.getElementById('input-avgCommission').value = 45000;
-        document.getElementById('input-followUps').value = 1;
-        document.getElementById('val-monthlyLeads').textContent = '50';
-        document.getElementById('val-responseTime').textContent = '30 min';
-        document.getElementById('val-conversionRate').textContent = '15%';
-        document.getElementById('val-avgCommission').textContent = 'R45,000';
-        document.getElementById('val-followUps').textContent = '1';
-        showScreen('screen-input');
+        toolResetAndShowInput({
+          'input-monthlyLeads': 50,
+          'input-responseTime': 30,
+          'input-conversionRate': 15,
+          'input-avgCommission': 45000,
+          'input-followUps': 1
+        });
       });
     });
   }

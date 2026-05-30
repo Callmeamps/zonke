@@ -743,7 +743,7 @@ input[type="range"]::-webkit-slider-thumb {
       if (btn) btn.addEventListener('click', () => {
         currentStep = 1;
         showQuestion(currentStep);
-        showScreen('screen-input');
+        toolResetAndShowInput(null);
       });
     });
   }

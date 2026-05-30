@@ -656,7 +656,14 @@ textarea { resize: vertical; min-height: 80px; }
     const restartBtns = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartBtns.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        location.reload();
+        toolResetAndShowInput({
+          'input-name': '',
+          'input-description': '',
+          'input-people': 3,
+          'input-hours': 20,
+          'input-error': 5,
+          'input-rate': 500
+        });
       });
     });
   }

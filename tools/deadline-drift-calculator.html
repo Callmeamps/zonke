@@ -600,7 +600,11 @@ select:focus { border-color: #c3f400; }
     const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartButtons.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        showScreen('screen-input');
+        toolResetAndShowInput({
+          'input-stage': '50',
+          'input-teamMembers': 3,
+          'input-workingDays': 5
+        });
       });
     });
   }

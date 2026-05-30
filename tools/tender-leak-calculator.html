@@ -622,19 +622,14 @@ input[type="range"]::-webkit-slider-thumb {
     const restartBtns = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartBtns.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        document.getElementById('input-opportunities').value = 20;
-        document.getElementById('input-responseTime').value = 2880;
-        document.getElementById('input-winRate').value = 20;
-        document.getElementById('input-contractValue').value = 500000;
-        document.getElementById('input-followUps').value = 1;
-        document.getElementById('input-teamSize').value = 3;
-        document.getElementById('val-opportunities').textContent = '20';
-        document.getElementById('val-responseTime').textContent = '2 days';
-        document.getElementById('val-winRate').textContent = '20%';
-        document.getElementById('val-contractValue').textContent = 'R500,000';
-        document.getElementById('val-followUps').textContent = '1';
-        document.getElementById('val-teamSize').textContent = '3';
-        showScreen('screen-input');
+        toolResetAndShowInput({
+          'input-opportunities': 20,
+          'input-responseTime': 2880,
+          'input-winRate': 20,
+          'input-contractValue': 500000,
+          'input-followUps': 1,
+          'input-teamSize': 3
+        });
       });
     });
   }

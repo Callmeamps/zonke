@@ -1,324 +1,6 @@
-<!DOCTYPE html>
-<html class="dark" lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Commission Forecaster | Zonke AI Native Studio</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet"/>
-<script src="/assets/js/toolkit.js"></script>
-<script>
-tailwind.config = {};</script>
-<script src="../assets/js/tailwind-config.js"></script>
-<style>
-* { font-family: 'JetBrains Mono', monospace; }
-body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
-
-.screen { transition: opacity 0.5s ease, transform 0.5s ease; }
-.screen.hidden { display: none; }
-.screen.active { display: block; animation: fadeSlideIn 0.6s ease forwards; }
-
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(195, 244, 0, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(195, 244, 0, 0.6); }
-}
-
-@keyframes progress-fill {
-  from { width: 0%; }
-}
-
-.scanline-overlay {
-  pointer-events: none;
-  position: fixed; inset: 0; z-index: 9999;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(255,255,255,0.015) 2px,
-    rgba(255,255,255,0.015) 4px
-  );
-}
-
-.cursor-blink::after {
-  content: "_";
-  animation: blink 1s step-end infinite;
-  color: #c3f400;
-}
-
-input[type="range"] { accent-color: #c3f400; height: 4px; }
-
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none; width: 16px; height: 16px;
-  background: #c3f400; border: none; border-radius: 0;
-  cursor: pointer;
-}
-
-.dist-bar {
-  transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.deal-row {
-  transition: background 0.2s ease;
-}
-
-select {
-  background: #1a1c1c;
-  color: #e2e2e2;
-  border: 1px solid #444933;
-  padding: 8px 12px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  outline: none;
-}
-
-select:focus {
-  border-color: #c3f400;
-}
-
-.remove-btn {
-  transition: all 0.2s ease;
-}
-
-.risk-indicator {
-  animation: pulse-glow 2s infinite;
-}
-</style>
-</head>
-<body>
-
-<div class="scanline-overlay"></div>
-
-<div class="min-h-screen flex flex-col">
-
-<header class="border-b border-outline-variant p-gutter flex items-center justify-between">
-  <a href="/" class="text-primary font-bold text-headline-md hover:opacity-80 transition-opacity no-underline">ZONKE_</a>
-  <span class="text-code-snippet text-on-surface-variant">&gt; COMMISSION FORECASTER v1.0</span>
-</header>
-
-<main class="flex-1 flex flex-col items-center justify-center p-gutter max-w-3xl mx-auto w-full">
-
-<!-- SCREEN 1: BOOT / SPLASH -->
-<div id="screen-splash" class="screen active w-full text-center">
-  <div class="mb-xl">
-    <pre class="text-primary text-[10px] sm:text-xs leading-tight opacity-60">
-   ___   ___   ___   ___  ___   _   ___   ___   ___   ___
-  / __| / _ \ |   \ | __|/ _ \ /_\ | _ \ / __| / __| |_ _|
- | (__ | (_) || |) || _|| (_) / _ \|   / \__ \ \__ \  | |
-  \___| \___/ |___/ |___|\___/_/ \_\_|_\ |___/ |___/ |___|
-    </pre>
-  </div>
-  <div class="text-left max-w-lg mx-auto border border-outline-variant p-lg bg-surface-container-low">
-    <p class="text-primary text-body-sm mb-sm">&gt; INITIALIZE COMMISSION FORECASTER...</p>
-    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-1"></p>
-    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-2"></p>
-    <p class="text-on-surface-variant text-code-snippet mb-sm" id="boot-line-3"></p>
-    <div class="h-1 bg-surface-container-highest mt-md overflow-hidden">
-      <div id="boot-progress" class="h-full bg-primary" style="width:0%; transition: width 2s ease;"></div>
-    </div>
-    <p class="text-code-snippet text-primary mt-sm text-right" id="boot-status">_</p>
-  </div>
-  <button id="btn-start" class="hidden mt-xl bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none mx-auto">
-    START FORECAST →
-  </button>
-</div>
-
-<!-- SCREEN 2: INPUT FORM -->
-<div id="screen-input" class="screen hidden w-full">
-  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
-    <p class="text-primary text-headline-md mb-sm">&gt; BUILD YOUR PIPELINE</p>
-    <p class="text-on-surface-variant text-body-sm mb-lg">Add your current deals and operating costs. We'll run 500 simulations to forecast your commission.</p>
-
-    <div id="deals-container" class="space-y-md mb-lg">
-      <!-- Deals rendered by JS -->
-    </div>
-
-    <div class="flex gap-sm mb-lg">
-      <button id="btn-add-deal" class="bg-surface-container border border-outline-variant text-on-surface font-bold py-sm px-md text-code-snippet uppercase tracking-widest hover:bg-surface-container-high transition-colors cursor-pointer">
-        + ADD DEAL
-      </button>
-      <span class="text-code-snippet text-on-surface-variant self-center" id="deal-count">1 / 10 deals</span>
-    </div>
-
-    <div class="border-t border-outline-variant pt-lg">
-      <div>
-        <label class="flex justify-between text-body-sm mb-xs">
-          <span class="text-on-surface">Monthly Operating Costs (ZAR)</span>
-          <span class="text-primary" id="val-operatingCosts">R15,000</span>
-        </label>
-        <input type="range" id="input-operatingCosts" min="5000" max="100000" value="15000" step="1000" class="w-full" />
-        <div class="flex justify-between text-code-snippet text-outline"><span>R5k</span><span>R100k</span></div>
-      </div>
-    </div>
-  </div>
-
-  <button id="btn-forecast" class="w-full bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
-    RUN FORECAST →
-  </button>
-</div>
-
-<!-- SCREEN 3: PROCESSING -->
-<div id="screen-processing" class="screen hidden w-full text-center">
-  <div class="border border-outline-variant p-lg bg-surface-container-low max-w-lg mx-auto">
-    <div class="flex items-center gap-md mb-lg">
-      <div class="w-3 h-3 bg-secondary-container animate-pulse"></div>
-      <p class="text-primary text-headline-md">&gt; RUNNING MONTE CARLO SIMULATION</p>
-    </div>
-    <div class="text-left space-y-sm mb-lg" id="processing-messages">
-      <p class="text-code-snippet text-on-surface-variant">&gt; Initializing simulation engine...</p>
-    </div>
-    <div class="mb-md">
-      <p class="text-headline-xl text-primary" id="processing-iteration">0</p>
-      <p class="text-code-snippet text-on-surface-variant">of 500 iterations</p>
-    </div>
-    <div class="h-2 bg-surface-container-highest overflow-hidden">
-      <div id="processing-bar" class="h-full bg-primary" style="width:0%"></div>
-    </div>
-    <p class="text-code-snippet text-primary mt-sm text-right" id="processing-pct">0%</p>
-  </div>
-</div>
-
-<!-- SCREEN 4: RESULTS -->
-<div id="screen-results" class="screen hidden w-full">
-  <div class="text-center mb-lg">
-    <p class="text-primary text-headline-md">&gt; FORECAST COMPLETE</p>
-    <p class="text-on-surface-variant text-body-sm">Your probabilistic commission forecast is ready.</p>
-  </div>
-
-  <div id="risk-indicator-box" class="hidden border border-secondary-container p-lg bg-surface-container-low mb-lg risk-indicator text-center">
-    <p class="text-secondary-container text-headline-md">⚠ NEGATIVE RISK DETECTED</p>
-    <p class="text-code-snippet text-on-surface-variant mt-sm">Your worst-case scenario exceeds operating costs. Consider reviewing your pipeline or reducing costs.</p>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-lg">
-    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
-      <p class="text-on-surface-variant text-label-mono uppercase tracking-widest mb-md">WORST CASE</p>
-      <p class="text-display-lg text-secondary-container" id="result-worst">R0</p>
-      <p class="text-code-snippet text-on-surface-variant">5th percentile</p>
-    </div>
-    <div class="border border-primary/30 p-lg bg-surface-container-low text-center">
-      <p class="text-primary text-label-mono uppercase tracking-widest mb-md">LIKELY CASE</p>
-      <p class="text-display-lg text-primary" id="result-likely">R0</p>
-      <p class="text-code-snippet text-on-surface-variant">50th percentile (median)</p>
-    </div>
-    <div class="border border-outline-variant p-lg bg-surface-container-low text-center">
-      <p class="text-on-surface-variant text-label-mono uppercase tracking-widest mb-md">BEST CASE</p>
-      <p class="text-display-lg text-on-surface" id="result-best">R0</p>
-      <p class="text-code-snippet text-on-surface-variant">95th percentile</p>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-lg">
-    <div class="border border-outline-variant p-lg bg-surface-container-low">
-      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">DISTRIBUTION</p>
-      <div id="distribution-container" class="space-y-sm">
-      </div>
-      <p class="text-code-snippet text-on-surface-variant mt-md text-center">Distribution of net commission outcomes</p>
-    </div>
-
-    <div class="border border-outline-variant p-lg bg-surface-container-low">
-      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">FORECAST SUMMARY</p>
-      <div class="space-y-md">
-        <div>
-          <p class="text-code-snippet text-on-surface-variant">Total Pipeline Value</p>
-          <p class="text-headline-md text-primary" id="result-total-pipeline">R0</p>
-        </div>
-        <div>
-          <p class="text-code-snippet text-on-surface-variant">Weighted Expected Commission</p>
-          <p class="text-headline-md text-primary" id="result-weighted">R0</p>
-        </div>
-        <div>
-          <p class="text-code-snippet text-on-surface-variant">Monthly Operating Costs</p>
-          <p class="text-headline-md text-on-surface" id="result-costs">R0</p>
-        </div>
-        <div>
-          <p class="text-code-snippet text-on-surface-variant">Deals in Pipeline</p>
-          <p class="text-headline-md text-primary" id="result-deal-count">0</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="border border-outline-variant p-lg bg-surface-container-low mb-lg">
-    <p class="text-label-mono text-on-surface-variant uppercase tracking-widest mb-md">DEAL BREAKDOWN</p>
-    <div class="overflow-x-auto">
-      <table class="w-full text-code-snippet">
-        <thead>
-          <tr class="text-left border-b border-outline-variant">
-            <th class="py-sm pr-sm text-on-surface-variant">#</th>
-            <th class="py-sm pr-sm text-on-surface-variant">Property Value</th>
-            <th class="py-sm pr-sm text-on-surface-variant">Rate</th>
-            <th class="py-sm pr-sm text-on-surface-variant">Commission</th>
-            <th class="py-sm pr-sm text-on-surface-variant">Stage</th>
-            <th class="py-sm pr-sm text-on-surface-variant">Probability</th>
-          </tr>
-        </thead>
-        <tbody id="deal-breakdown-body">
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="text-center">
-    <p class="text-body-sm text-on-surface-variant mb-md">Want to save this forecast and get personalized pipeline recommendations?</p>
-    <button id="btn-gate" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors cursor-pointer border-none">
-      UNLOCK FULL REPORT →
-    </button>
-    <button id="btn-restart" class="ml-md bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
-      RE-RUN FORECAST
-    </button>
-  </div>
-</div>
-
-<!-- SCREEN 5: COMPLETE -->
-<div id="screen-complete" class="screen hidden w-full text-center">
-  <div class="border border-primary/30 p-xl bg-surface-container-low max-w-lg mx-auto">
-    <p class="text-primary text-display-lg mb-md">✓</p>
-    <p class="text-primary text-headline-md mb-sm">&gt; REPORT UNLOCKED</p>
-    <p class="text-on-surface-variant text-body-sm mb-lg">Your full Commission Forecast Report has been sent to <span id="complete-email" class="text-primary"></span>. Check your inbox for personalized pipeline recommendations.</p>
-    <div class="border-t border-outline-variant pt-lg space-y-md">
-      <p class="text-label-mono text-on-surface-variant uppercase tracking-widest">WHAT HAPPENS NEXT</p>
-      <div class="flex flex-col gap-sm">
-        <p class="text-code-snippet text-on-surface-variant">1. Full probabilistic forecast with detailed distribution</p>
-        <p class="text-code-snippet text-on-surface-variant">2. Custom pipeline optimization recommendations</p>
-        <p class="text-code-snippet text-on-surface-variant">3. Follow-up with a Zonke specialist (optional)</p>
-      </div>
-    </div>
-    <div class="mt-lg flex flex-col sm:flex-row gap-md justify-center">
-      <a href="/lead-reactor" class="bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors no-underline inline-block">
-        EXPLORE LEAD REACTOR →
-      </a>
-      <button id="btn-restart-complete" class="bg-transparent text-on-surface-variant font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:text-on-surface transition-colors cursor-pointer border border-outline-variant">
-        RUN ANOTHER FORECAST
-      </button>
-    </div>
-  </div>
-</div>
-
-</main>
-
-<footer class="border-t border-outline-variant p-gutter text-center">
-  <p class="text-code-snippet text-on-surface-variant">ZONKE AI NATIVE STUDIO &copy; 2026</p>
-</footer>
-
-</div>
-
 <script>
 (function () {
+  // --- Constants ---
   const STAGE_PROB_MAP = {
     'Lead': 0.10,
     'Viewing': 0.25,
@@ -326,12 +8,16 @@ select:focus {
     'Under Offer': 0.75,
     'Closed': 1.00
   };
-
   const STAGES = ['Lead', 'Viewing', 'Offer', 'Under Offer', 'Closed'];
+  const NUM_ITERATIONS = 500;
+  const BATCH_SIZE = 50;
 
+  // --- State ---
   let deals = [];
   let lastResult = null;
   let dealIdCounter = 0;
+
+  // --- Pure Functions ---
 
   function createDefaultDeal() {
     return {
@@ -350,9 +36,77 @@ select:focus {
     return STAGE_PROB_MAP[stage] || 0.10;
   }
 
-  function formatStage(val) {
-    return val.charAt(0).toUpperCase() + val.slice(1);
+  function validate(inputs) {
+    const errors = [];
+    if (!inputs.deals || inputs.deals.length === 0) {
+      errors.push('Add at least one deal');
+    }
+    inputs.deals.forEach((d, i) => {
+      if (!d.propertyValue || d.propertyValue < 1) errors.push(`Deal ${i + 1}: invalid property value`);
+      if (!d.commissionRate || d.commissionRate < 0) errors.push(`Deal ${i + 1}: invalid commission rate`);
+    });
+    return { valid: errors.length === 0, errors };
   }
+
+  function calculate(inputs) {
+    const outcomes = [];
+    const commissionPerDeal = inputs.deals.map(d => getDealCommission(d));
+    const probabilityPerDeal = inputs.deals.map(d => getDealProbability(d.stage));
+
+    for (let iter = 0; iter < NUM_ITERATIONS; iter++) {
+      let totalCommission = 0;
+      for (let i = 0; i < inputs.deals.length; i++) {
+        if (Math.random() < probabilityPerDeal[i]) {
+          totalCommission += commissionPerDeal[i];
+        }
+      }
+      outcomes.push(totalCommission - inputs.operatingCosts);
+    }
+
+    outcomes.sort((a, b) => a - b);
+
+    const min = outcomes[0];
+    const max = outcomes[NUM_ITERATIONS - 1];
+    const range = max - min || 1;
+    const bucketCount = 10;
+    const buckets = new Array(bucketCount).fill(0);
+    const bucketLabels = [];
+
+    for (let i = 0; i < bucketCount; i++) {
+      const lower = min + (range * i / bucketCount);
+      const upper = min + (range * (i + 1) / bucketCount);
+      bucketLabels.push(toolFormatZAR(Math.round(lower)) + ' - ' + toolFormatZAR(Math.round(upper)));
+    }
+
+    for (const val of outcomes) {
+      const idx = Math.min(bucketCount - 1, Math.floor((val - min) / range * bucketCount));
+      buckets[idx]++;
+    }
+
+    const totalPipelineValue = inputs.deals.reduce((sum, d) => sum + d.propertyValue, 0);
+    const weightedCommission = inputs.deals.reduce((sum, d) => sum + getDealCommission(d) * getDealProbability(d.stage), 0);
+
+    return {
+      worst: outcomes[Math.floor(0.05 * NUM_ITERATIONS)],
+      likely: outcomes[Math.floor(0.50 * NUM_ITERATIONS)],
+      best: outcomes[Math.floor(0.95 * NUM_ITERATIONS)],
+      buckets,
+      bucketLabels,
+      outcomes,
+      totalPipelineValue,
+      weightedCommission: Math.round(weightedCommission),
+      negativeRisk: outcomes[Math.floor(0.05 * NUM_ITERATIONS)] < 0,
+      dealCount: inputs.deals.length,
+      operatingCosts: inputs.operatingCosts,
+      deals: inputs.deals.map(d => ({
+        ...d,
+        commission: getDealCommission(d),
+        probability: getDealProbability(d.stage)
+      }))
+    };
+  }
+
+  // --- DOM: Get Inputs ---
 
   function getInputs() {
     return {
@@ -360,6 +114,8 @@ select:focus {
       operatingCosts: parseInt(document.getElementById('input-operatingCosts').value)
     };
   }
+
+  // --- DOM: Render ---
 
   function renderDeals() {
     const container = document.getElementById('deals-container');
@@ -407,43 +163,9 @@ select:focus {
       `;
 
       container.appendChild(div);
-
-      // Wire up event listeners
-      div.querySelector('.deal-prop-val').addEventListener('input', function () {
-        const id = parseInt(this.dataset.dealId);
-        const val = parseInt(this.value);
-        const d = deals.find(x => x.id === id);
-        if (d) d.propertyValue = val;
-        updateDealDisplay(id);
-      });
-
-      div.querySelector('.deal-rate').addEventListener('input', function () {
-        const id = parseInt(this.dataset.dealId);
-        const val = parseFloat(this.value);
-        const d = deals.find(x => x.id === id);
-        if (d) d.commissionRate = val;
-        updateDealDisplay(id);
-      });
-
-      div.querySelector('.deal-stage').addEventListener('change', function () {
-        const id = parseInt(this.dataset.dealId);
-        const val = this.value;
-        const d = deals.find(x => x.id === id);
-        if (d) d.stage = val;
-        updateDealDisplay(id);
-      });
-
-      const removeBtn = div.querySelector('.remove-btn');
-      if (removeBtn) {
-        removeBtn.addEventListener('click', function () {
-          const id = parseInt(this.dataset.dealId);
-          deals = deals.filter(d => d.id !== id);
-          updateDealCount();
-          renderDeals();
-        });
-      }
     });
 
+    wireDealEvents();
     updateDealCount();
   }
 
@@ -451,223 +173,25 @@ select:focus {
     const deal = deals.find(d => d.id === dealId);
     if (!deal) return;
 
-    const propDisplay = document.querySelector(`.deal-prop-display[data-deal-id="${dealId}"]`);
-    const rateDisplay = document.querySelector(`.deal-rate-display[data-deal-id="${dealId}"]`);
-    const probDisplay = document.querySelector(`.deal-prob-display[data-deal-id="${dealId}"]`);
-    const commDisplay = document.querySelector(`.deal-commission-display[data-deal-id="${dealId}"]`);
-    const propInput = document.querySelector(`.deal-prop-val[data-deal-id="${dealId}"]`);
-    const rateInput = document.querySelector(`.deal-rate[data-deal-id="${dealId}"]`);
+    const els = {
+      propDisplay: document.querySelector(`.deal-prop-display[data-deal-id="${dealId}"]`),
+      rateDisplay: document.querySelector(`.deal-rate-display[data-deal-id="${dealId}"]`),
+      probDisplay: document.querySelector(`.deal-prob-display[data-deal-id="${dealId}"]`),
+      commDisplay: document.querySelector(`.deal-commission-display[data-deal-id="${dealId}"]`),
+      propInput: document.querySelector(`.deal-prop-val[data-deal-id="${dealId}"]`),
+      rateInput: document.querySelector(`.deal-rate[data-deal-id="${dealId}"]`)
+    };
 
-    if (propDisplay) propDisplay.textContent = toolFormatZAR(deal.propertyValue);
-    if (rateDisplay) rateDisplay.textContent = deal.commissionRate + '%';
-    if (probDisplay) probDisplay.textContent = (getDealProbability(deal.stage) * 100).toFixed(0) + '%';
-    if (commDisplay) commDisplay.textContent = toolFormatZAR(getDealCommission(deal));
-    if (propInput) propInput.value = deal.propertyValue;
-    if (rateInput) rateInput.value = deal.commissionRate;
+    if (els.propDisplay) els.propDisplay.textContent = toolFormatZAR(deal.propertyValue);
+    if (els.rateDisplay) els.rateDisplay.textContent = deal.commissionRate + '%';
+    if (els.probDisplay) els.probDisplay.textContent = (getDealProbability(deal.stage) * 100).toFixed(0) + '%';
+    if (els.commDisplay) els.commDisplay.textContent = toolFormatZAR(getDealCommission(deal));
+    if (els.propInput) els.propInput.value = deal.propertyValue;
+    if (els.rateInput) els.rateInput.value = deal.commissionRate;
   }
 
   function updateDealCount() {
     document.getElementById('deal-count').textContent = deals.length + ' / 10 deals';
-  }
-
-  function runSimulation(inputs) {
-    const numIterations = 500;
-    const outcomes = [];
-    const commissionPerDeal = inputs.deals.map(d => getDealCommission(d));
-    const probabilityPerDeal = inputs.deals.map(d => getDealProbability(d.stage));
-
-    for (let iter = 0; iter < numIterations; iter++) {
-      let totalCommission = 0;
-      for (let i = 0; i < inputs.deals.length; i++) {
-        if (Math.random() < probabilityPerDeal[i]) {
-          totalCommission += commissionPerDeal[i];
-        }
-      }
-      const net = totalCommission - inputs.operatingCosts;
-      outcomes.push(net);
-    }
-
-    outcomes.sort((a, b) => a - b);
-
-    const worst = outcomes[Math.floor(0.05 * numIterations)];
-    const likely = outcomes[Math.floor(0.50 * numIterations)];
-    const best = outcomes[Math.floor(0.95 * numIterations)];
-
-    // Distribution buckets
-    const min = outcomes[0];
-    const max = outcomes[numIterations - 1];
-    const range = max - min || 1;
-    const bucketCount = 10;
-    const buckets = new Array(bucketCount).fill(0);
-    const bucketLabels = [];
-
-    for (let i = 0; i < bucketCount; i++) {
-      const lower = min + (range * i / bucketCount);
-      const upper = min + (range * (i + 1) / bucketCount);
-      bucketLabels.push(toolFormatZAR(Math.round(lower)) + ' - ' + toolFormatZAR(Math.round(upper)));
-    }
-
-    for (const val of outcomes) {
-      const idx = Math.min(bucketCount - 1, Math.floor((val - min) / range * bucketCount));
-      buckets[idx]++;
-    }
-
-    const totalPipelineValue = inputs.deals.reduce((sum, d) => sum + d.propertyValue, 0);
-    const weightedCommission = inputs.deals.reduce((sum, d) => sum + getDealCommission(d) * getDealProbability(d.stage), 0);
-
-    return {
-      worst,
-      likely,
-      best,
-      buckets,
-      bucketLabels,
-      outcomes,
-      totalPipelineValue,
-      weightedCommission: Math.round(weightedCommission),
-      negativeRisk: worst < 0,
-      dealCount: inputs.deals.length,
-      operatingCosts: inputs.operatingCosts,
-      deals: inputs.deals
-    };
-  }
-
-  function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => {
-      s.classList.remove('active');
-      s.classList.add('hidden');
-    });
-    const el = document.getElementById(id);
-    el.classList.remove('hidden');
-    el.classList.add('active');
-  }
-
-  function runBootSequence() {
-    const line1 = document.getElementById('boot-line-1');
-    const line2 = document.getElementById('boot-line-2');
-    const line3 = document.getElementById('boot-line-3');
-    const progress = document.getElementById('boot-progress');
-    const status = document.getElementById('boot-status');
-
-    toolTerminalType(line1, '> Loading Monte Carlo engine... OK', 20, () => {
-      setTimeout(() => {
-        toolTerminalType(line2, '> Fetching market probability models... OK', 20, () => {
-          setTimeout(() => {
-            toolTerminalType(line3, '> Initializing forecast pipeline... OK', 20, () => {
-              progress.style.width = '100%';
-              status.textContent = 'READY';
-              setTimeout(() => {
-                document.getElementById('btn-start').classList.remove('hidden');
-              }, 400);
-            });
-          }, 200);
-        });
-      }, 200);
-    });
-  }
-
-  function runForecast(inputs, callback) {
-    const msgContainer = document.getElementById('processing-messages');
-    const bar = document.getElementById('processing-bar');
-    const pct = document.getElementById('processing-pct');
-    const iterEl = document.getElementById('processing-iteration');
-    msgContainer.innerHTML = '<p class="text-code-snippet text-on-surface-variant">&gt; Running Monte Carlo simulation...</p>';
-    bar.style.width = '0%';
-    pct.textContent = '0%';
-    iterEl.textContent = '0';
-
-    const numIterations = 500;
-    const commissionPerDeal = inputs.deals.map(d => getDealCommission(d));
-    const probabilityPerDeal = inputs.deals.map(d => getDealProbability(d.stage));
-    const allOutcomes = [];
-
-    let completed = 0;
-    const batchSize = 50;
-
-    const messages = [
-      '> Running Monte Carlo simulation...',
-      '> Simulating deal outcomes...',
-      '> Aggregating distribution buckets...',
-      '> Computing percentile values...',
-      '> Finalizing forecast report...'
-    ];
-
-    function nextBatch() {
-      const batchEnd = Math.min(completed + batchSize, numIterations);
-      for (let i = completed; i < batchEnd; i++) {
-        let totalCommission = 0;
-        for (let j = 0; j < inputs.deals.length; j++) {
-          if (Math.random() < probabilityPerDeal[j]) {
-            totalCommission += commissionPerDeal[j];
-          }
-        }
-        allOutcomes.push(totalCommission - inputs.operatingCosts);
-      }
-      completed = batchEnd;
-
-      const pctDone = Math.round((completed / numIterations) * 100);
-      bar.style.width = pctDone + '%';
-      pct.textContent = pctDone + '%';
-      iterEl.textContent = completed;
-
-      const msgIdx = Math.min(Math.floor(completed / (numIterations / messages.length)), messages.length - 1);
-      msgContainer.innerHTML = '<p class="text-code-snippet text-on-surface-variant">' + messages[msgIdx] + '</p>';
-
-      if (completed < numIterations) {
-        setTimeout(nextBatch, 100);
-      } else {
-        setTimeout(() => {
-          bar.style.width = '100%';
-          pct.textContent = '100%';
-          iterEl.textContent = numIterations;
-
-          allOutcomes.sort((a, b) => a - b);
-          const worst = allOutcomes[Math.floor(0.05 * numIterations)];
-          const likely = allOutcomes[Math.floor(0.50 * numIterations)];
-          const best = allOutcomes[Math.floor(0.95 * numIterations)];
-
-          const min = allOutcomes[0];
-          const max = allOutcomes[numIterations - 1];
-          const range = max - min || 1;
-          const bucketCount = 10;
-          const buckets = new Array(bucketCount).fill(0);
-          const bucketLabels = [];
-
-          for (let i = 0; i < bucketCount; i++) {
-            const lower = min + (range * i / bucketCount);
-            const upper = min + (range * (i + 1) / bucketCount);
-            bucketLabels.push(toolFormatZAR(Math.round(lower)) + ' - ' + toolFormatZAR(Math.round(upper)));
-          }
-
-          for (const val of allOutcomes) {
-            const idx = Math.min(bucketCount - 1, Math.floor((val - min) / range * bucketCount));
-            buckets[idx]++;
-          }
-
-          const totalPipelineValue = inputs.deals.reduce((sum, d) => sum + d.propertyValue, 0);
-          const weightedCommission = Math.round(inputs.deals.reduce((sum, d) => sum + getDealCommission(d) * getDealProbability(d.stage), 0));
-
-          const result = {
-            worst, likely, best,
-            buckets, bucketLabels,
-            outcomes: allOutcomes,
-            totalPipelineValue,
-            weightedCommission,
-            negativeRisk: worst < 0,
-            dealCount: inputs.deals.length,
-            operatingCosts: inputs.operatingCosts,
-            deals: inputs.deals.map(d => ({
-              ...d,
-              commission: getDealCommission(d),
-              probability: getDealProbability(d.stage)
-            }))
-          };
-
-          callback(result);
-        }, 400);
-      }
-    }
-
-    nextBatch();
   }
 
   function displayResults(result) {
@@ -675,12 +199,9 @@ select:focus {
 
     // Risk indicator
     const riskBox = document.getElementById('risk-indicator-box');
-    if (result.negativeRisk) {
-      riskBox.classList.remove('hidden');
-    } else {
-      riskBox.classList.add('hidden');
-    }
+    riskBox.classList.toggle('hidden', !result.negativeRisk);
 
+    // Animate counters
     toolAnimateValue(document.getElementById('result-worst'), 0, result.worst, 1200, 'R');
     toolAnimateValue(document.getElementById('result-likely'), 0, result.likely, 1200, 'R');
     toolAnimateValue(document.getElementById('result-best'), 0, result.best, 1200, 'R');
@@ -711,6 +232,7 @@ select:focus {
       });
     });
 
+    // Summary stats
     document.getElementById('result-total-pipeline').textContent = toolFormatZAR(result.totalPipelineValue);
     document.getElementById('result-weighted').textContent = toolFormatZAR(result.weightedCommission);
     document.getElementById('result-costs').textContent = toolFormatZAR(result.operatingCosts);
@@ -730,17 +252,194 @@ select:focus {
     `).join('');
   }
 
-  function init() {
-    // Initialize with first deal
-    deals = [createDefaultDeal()];
-    renderDeals();
+  // --- DOM: Screens ---
 
-    // Operating costs slider
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('active');
+  }
+
+  // --- DOM: Processing Animation ---
+
+  function runProcessing(inputs, callback) {
+    const msgContainer = document.getElementById('processing-messages');
+    const bar = document.getElementById('processing-bar');
+    const pct = document.getElementById('processing-pct');
+    const iterEl = document.getElementById('processing-iteration');
+    msgContainer.innerHTML = '<p class="text-code-snippet text-on-surface-variant">&gt; Running Monte Carlo simulation...</p>';
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+    iterEl.textContent = '0';
+
+    const commissionPerDeal = inputs.deals.map(d => getDealCommission(d));
+    const probabilityPerDeal = inputs.deals.map(d => getDealProbability(d.stage));
+    const allOutcomes = [];
+    let completed = 0;
+
+    const messages = [
+      '> Running Monte Carlo simulation...',
+      '> Simulating deal outcomes...',
+      '> Aggregating distribution buckets...',
+      '> Computing percentile values...',
+      '> Finalizing forecast report...'
+    ];
+
+    function nextBatch() {
+      const batchEnd = Math.min(completed + BATCH_SIZE, NUM_ITERATIONS);
+      for (let i = completed; i < batchEnd; i++) {
+        let totalCommission = 0;
+        for (let j = 0; j < inputs.deals.length; j++) {
+          if (Math.random() < probabilityPerDeal[j]) {
+            totalCommission += commissionPerDeal[j];
+          }
+        }
+        allOutcomes.push(totalCommission - inputs.operatingCosts);
+      }
+      completed = batchEnd;
+
+      const pctDone = Math.round((completed / NUM_ITERATIONS) * 100);
+      bar.style.width = pctDone + '%';
+      pct.textContent = pctDone + '%';
+      iterEl.textContent = completed;
+
+      const msgIdx = Math.min(Math.floor(completed / (NUM_ITERATIONS / messages.length)), messages.length - 1);
+      msgContainer.innerHTML = '<p class="text-code-snippet text-on-surface-variant">' + messages[msgIdx] + '</p>';
+
+      if (completed < NUM_ITERATIONS) {
+        setTimeout(nextBatch, 100);
+      } else {
+        setTimeout(() => {
+          bar.style.width = '100%';
+          pct.textContent = '100%';
+          iterEl.textContent = NUM_ITERATIONS;
+
+          allOutcomes.sort((a, b) => a - b);
+          const result = buildResult(inputs, allOutcomes);
+          callback(result);
+        }, 400);
+      }
+    }
+
+    nextBatch();
+  }
+
+  function buildResult(inputs, outcomes) {
+    const min = outcomes[0];
+    const max = outcomes[NUM_ITERATIONS - 1];
+    const range = max - min || 1;
+    const bucketCount = 10;
+    const buckets = new Array(bucketCount).fill(0);
+    const bucketLabels = [];
+
+    for (let i = 0; i < bucketCount; i++) {
+      const lower = min + (range * i / bucketCount);
+      const upper = min + (range * (i + 1) / bucketCount);
+      bucketLabels.push(toolFormatZAR(Math.round(lower)) + ' - ' + toolFormatZAR(Math.round(upper)));
+    }
+
+    for (const val of outcomes) {
+      const idx = Math.min(bucketCount - 1, Math.floor((val - min) / range * bucketCount));
+      buckets[idx]++;
+    }
+
+    const totalPipelineValue = inputs.deals.reduce((sum, d) => sum + d.propertyValue, 0);
+    const weightedCommission = Math.round(inputs.deals.reduce((sum, d) => sum + getDealCommission(d) * getDealProbability(d.stage), 0));
+
+    return {
+      worst: outcomes[Math.floor(0.05 * NUM_ITERATIONS)],
+      likely: outcomes[Math.floor(0.50 * NUM_ITERATIONS)],
+      best: outcomes[Math.floor(0.95 * NUM_ITERATIONS)],
+      buckets,
+      bucketLabels,
+      outcomes,
+      totalPipelineValue,
+      weightedCommission,
+      negativeRisk: outcomes[Math.floor(0.05 * NUM_ITERATIONS)] < 0,
+      dealCount: inputs.deals.length,
+      operatingCosts: inputs.operatingCosts,
+      deals: inputs.deals.map(d => ({
+        ...d,
+        commission: getDealCommission(d),
+        probability: getDealProbability(d.stage)
+      }))
+    };
+  }
+
+  // --- DOM: Boot Sequence ---
+
+  function runBootSequence() {
+    const line1 = document.getElementById('boot-line-1');
+    const line2 = document.getElementById('boot-line-2');
+    const line3 = document.getElementById('boot-line-3');
+    const progress = document.getElementById('boot-progress');
+    const status = document.getElementById('boot-status');
+
+    toolTerminalType(line1, '> Loading Monte Carlo engine... OK', 20, () => {
+      setTimeout(() => {
+        toolTerminalType(line2, '> Fetching market probability models... OK', 20, () => {
+          setTimeout(() => {
+            toolTerminalType(line3, '> Initializing forecast pipeline... OK', 20, () => {
+              progress.style.width = '100%';
+              status.textContent = 'READY';
+              setTimeout(() => {
+                document.getElementById('btn-start').classList.remove('hidden');
+              }, 400);
+            });
+          }, 200);
+        });
+      }, 200);
+    });
+  }
+
+  // --- DOM: Event Wiring ---
+
+  function wireDealEvents() {
+    document.querySelectorAll('.deal-prop-val').forEach(el => {
+      el.addEventListener('input', function () {
+        const id = parseInt(this.dataset.dealId);
+        const d = deals.find(x => x.id === id);
+        if (d) d.propertyValue = parseInt(this.value);
+        updateDealDisplay(id);
+      });
+    });
+
+    document.querySelectorAll('.deal-rate').forEach(el => {
+      el.addEventListener('input', function () {
+        const id = parseInt(this.dataset.dealId);
+        const d = deals.find(x => x.id === id);
+        if (d) d.commissionRate = parseFloat(this.value);
+        updateDealDisplay(id);
+      });
+    });
+
+    document.querySelectorAll('.deal-stage').forEach(el => {
+      el.addEventListener('change', function () {
+        const id = parseInt(this.dataset.dealId);
+        const d = deals.find(x => x.id === id);
+        if (d) d.stage = this.value;
+        updateDealDisplay(id);
+      });
+    });
+
+    document.querySelectorAll('.remove-btn').forEach(el => {
+      el.addEventListener('click', function () {
+        const id = parseInt(this.dataset.dealId);
+        deals = deals.filter(d => d.id !== id);
+        updateDealCount();
+        renderDeals();
+      });
+    });
+  }
+
+  function wireEvents() {
     document.getElementById('input-operatingCosts').addEventListener('input', function () {
       document.getElementById('val-operatingCosts').textContent = toolFormatZAR(parseInt(this.value));
     });
-
-    runBootSequence();
 
     document.getElementById('btn-start').addEventListener('click', () => {
       showScreen('screen-input');
@@ -755,9 +454,13 @@ select:focus {
 
     document.getElementById('btn-forecast').addEventListener('click', () => {
       const inputs = getInputs();
-      if (inputs.deals.length === 0) return;
+      const { valid, errors } = validate(inputs);
+      if (!valid) {
+        alert(errors.join('\n'));
+        return;
+      }
       showScreen('screen-processing');
-      runForecast(inputs, (result) => {
+      runProcessing(inputs, (result) => {
         showScreen('screen-results');
         displayResults(result);
       });
@@ -783,14 +486,23 @@ select:focus {
 
     const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartButtons.forEach(btn => {
-      if (btn) btn.addEventListener('click', () => {
+      btn.addEventListener('click', () => {
         deals = [createDefaultDeal()];
         renderDeals();
-        document.getElementById('input-operatingCosts').value = 15000;
-        document.getElementById('val-operatingCosts').textContent = 'R15,000';
-        showScreen('screen-input');
+        toolResetAndShowInput({
+          'input-operatingCosts': 15000
+        });
       });
     });
+  }
+
+  // --- Init ---
+
+  function init() {
+    deals = [createDefaultDeal()];
+    renderDeals();
+    wireEvents();
+    runBootSequence();
   }
 
   if (document.readyState === 'loading') {
@@ -800,6 +512,3 @@ select:focus {
   }
 })();
 </script>
-
-</body>
-</html>

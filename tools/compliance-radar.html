@@ -588,7 +588,9 @@ input[type="checkbox"] {
     const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartButtons.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        showScreen('screen-input');
+        toolResetAndShowInput({
+          'input-staffCount': 10
+        });
       });
     });
   }

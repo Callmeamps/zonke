@@ -114,3 +114,24 @@ function toolLinearGradient(ctx, x1, y1, x2, y2, colorStops) {
   colorStops.forEach(([offset, color]) => grad.addColorStop(offset, color));
   return grad;
 }
+
+function toolResetAndShowInput(defaults) {
+  if (defaults) {
+    Object.entries(defaults).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.value = value;
+        el.dispatchEvent(new Event('input'));
+      }
+    });
+  }
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.classList.add('hidden');
+  });
+  const input = document.getElementById('screen-input');
+  if (input) {
+    input.classList.remove('hidden');
+    input.classList.add('active');
+  }
+}

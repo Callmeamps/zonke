@@ -714,15 +714,12 @@ input[type="range"]::-webkit-slider-thumb {
     const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartButtons.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        document.getElementById('input-responseSpeed').value = 0;
-        document.getElementById('input-followUpCadence').value = 1;
-        document.getElementById('input-monthlyLeads').value = 50;
-        document.getElementById('input-avgDealValue').value = 45000;
-        document.getElementById('val-responseSpeed').textContent = '1 sec';
-        document.getElementById('val-followUpCadence').textContent = '1';
-        document.getElementById('val-monthlyLeads').textContent = '50';
-        document.getElementById('val-avgDealValue').textContent = 'R45,000';
-        showScreen('screen-input');
+        toolResetAndShowInput({
+          'input-responseSpeed': 0,
+          'input-followUpCadence': 1,
+          'input-monthlyLeads': 50,
+          'input-avgDealValue': 45000
+        });
       });
     });
   }

@@ -567,17 +567,13 @@ input[type="range"]::-webkit-slider-thumb {
     const restartButtons = [document.getElementById('btn-restart'), document.getElementById('btn-restart-complete')];
     restartButtons.forEach(btn => {
       if (btn) btn.addEventListener('click', () => {
-        document.getElementById('input-bidCost').value = 25000;
-        document.getElementById('input-contractValue').value = 500000;
-        document.getElementById('input-winProb').value = 40;
-        document.getElementById('input-timeToSubmit').value = 4;
-        document.getElementById('input-overhead').value = 200000;
-        document.getElementById('val-bidCost').textContent = 'R25,000';
-        document.getElementById('val-contractValue').textContent = 'R500,000';
-        document.getElementById('val-winProb').textContent = '40%';
-        document.getElementById('val-timeToSubmit').textContent = '4 weeks';
-        document.getElementById('val-overhead').textContent = 'R200,000';
-        showScreen('screen-input');
+        toolResetAndShowInput({
+          'input-bidCost': 25000,
+          'input-contractValue': 500000,
+          'input-winProb': 40,
+          'input-timeToSubmit': 4,
+          'input-overhead': 200000
+        });
       });
     });
   }
