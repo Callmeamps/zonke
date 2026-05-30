@@ -43,7 +43,7 @@ app.post('/api/tool-submit', async (req, res) => {
   }
 });
 
-// Serve specific HTML files for each route
+// Page Routes
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -68,6 +68,19 @@ app.get('/lead-reactor', (req, res) => {
   res.sendFile(path.join(__dirname, 'lead-reactor.html'));
 });
 
+app.get('/tender-vault', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tender-vault.html'));
+});
+
+app.get('/audit-thanks', (req, res) => {
+  res.sendFile(path.join(__dirname, 'audit-thanks.html'));
+});
+
+app.get('/tools', (req, res) => {
+  res.sendFile(path.join(__dirname, 'tools', 'index.html'));
+});
+
+// Tool Routes
 app.get('/tools/lead-leak-calculator', (req, res) => {
   res.sendFile(path.join(__dirname, 'tools', 'lead-leak-calculator.html'));
 });
@@ -106,10 +119,6 @@ app.get('/tools/compliance-radar', (req, res) => {
 
 app.get('/tools/ai-readiness-scanner', (req, res) => {
   res.sendFile(path.join(__dirname, 'tools', 'ai-readiness-scanner.html'));
-});
-
-app.get('/tender-vault', (req, res) => {
-  res.sendFile(path.join(__dirname, 'tender-vault.html'));
 });
 
 app.get('/tools/automation-roi-calculator', (req, res) => {

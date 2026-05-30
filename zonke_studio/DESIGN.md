@@ -113,7 +113,7 @@ The visual language communicates authority and speed. It is designed for power u
 The palette is rooted in high-visibility functionalism. 
 
 - **Backgrounds:** A deep, matte charcoal (#131313) serves as the "void" for all content.
-- **Primary (Action):** Lime Green (#CCFF00) is used for primary calls to action, active states, and critical data points. It is the color of the "on" state.
+- **Primary (Action):** Lime Green (#c3f400) is used for primary calls to action, active states, and critical data points. It is the color of the "on" state.
 - **Secondary (Warning):** Orange (#FF4C00) is reserved for secondary accents, alerts, and system-level status indicators.
 - **Support:** Pure white (#FFFFFF) is used for high-contrast body text and borders. Mid-tone greys are avoided to maintain the binary, high-contrast feel; instead, use low-opacity white or deep grey (#333333) for structural lines.
 
@@ -155,13 +155,13 @@ The shape language is strictly **Rectilinear**.
 ## Components
 
 ### Buttons
-- **Primary:** Background #CCFF00, Text #131313, 0px radius. All-caps bold text. On hover: Invert colors or apply a "flicker" glitch effect.
+- **Primary:** Background #c3f400, Text #131313, 0px radius. All-caps bold text. On hover: Invert colors or apply a "flicker" glitch effect.
 - **Secondary:** Background transparent, 2px solid #FFFFFF border, Text #FFFFFF.
 - **Tertiary:** No background, underline on hover, #CCFF00 text.
 
 ### Inputs & Fields
 - **Container:** Dark background (#131313), 1px solid border (#333333).
-- **Focus State:** Border changes to #CCFF00. A "blinking cursor" underscore should appear at the end of the text.
+- **Focus State:** Border changes to #c3f400. A "blinking cursor" underscore should appear at the end of the text.
 - **Labels:** Positioned outside the box, top-left, in `label-mono` style.
 
 ### Stickers & Badges

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free AI Tools | Zonke AI Native Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/assets/js/tailwind-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  <style>
+    * { font-family: 'JetBrains Mono', monospace; }
+    body { background: #121414; color: #e2e2e2; overflow-x: hidden; }
+    .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); }
+    .animate-on-scroll { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+    .tool-card { transition: all 0.2s ease; }
+    .tool-card:hover { transform: translateY(-4px); box-shadow: 0 0 0 2px #c3f400; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .animate-blink { animation: blink 1s step-end infinite; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <div class="scanline"></div>
+
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-surface-container-low border-r border-outline-variant flex-col fixed h-full hidden md:flex z-40">
+      <div class="p-md border-b border-outline-variant flex items-center justify-between">
+        <span class="font-headline-xl text-headline-xl font-black tracking-tighter text-primary">ZONKE</span>
+        <button class="md:hidden text-primary" aria-label="Menu">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+      </div>
+      <nav class="flex-1 p-md hidden md:flex flex flex-col gap-unit">
+        <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="/">
+          <span class="material-symbols-outlined">home</span> HOME
+        </a>
+        <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="/real-estate">
+          <span class="material-symbols-outlined">apartment</span> REAL_ESTATE
+        </a>
+        <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="/tenders">
+          <span class="material-symbols-outlined">description</span> TENDERS
+        </a>
+        <a class="font-label-mono text-label-mono text-primary border border-primary bg-surface-container-low px-md py-sm flex items-center gap-sm" href="/tools">
+          <span class="material-symbols-outlined">build</span> TOOLS
+        </a>
+        <a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary hover:border-primary border border-transparent px-md py-sm flex items-center gap-sm transition-colors" href="/pricing">
+          <span class="material-symbols-outlined">payments</span> PRICING
+        </a>
+      </nav>
+      <div class="p-md border-t border-surface-variant md:block bg-surface-container">
+        <div class="font-label-mono text-label-mono text-on-surface-variant mb-sm">SYS_STATUS: <span class="text-primary-fixed animate-pulse">ONLINE</span></div>
+        <div class="text-xs text-surface-variant font-code-snippet">USER: GUEST // UNAUTH</div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col md:ml-64 w-full">
+      <div class="max-w-[1200px] w-full mx-auto px-margin py-xl flex flex-col gap-xl" id="main-content">
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden fixed top-0 left-0 right-0 z-50 bg-surface-container-low border-b border-outline-variant p-md flex items-center justify-between">
+          <span class="font-headline-xl text-headline-xl font-black tracking-tighter text-primary">ZONKE</span>
+          <button id="mobile-menu-btn" class="text-primary" aria-label="Menu">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+        </div>
+
+        <!-- Header -->
+        <section class="animate-on-scroll mt-16 md:mt-0">
+          <div class="border border-outline-variant p-lg bg-surface-container-low">
+            <div class="flex items-center gap-md mb-md">
+              <h1 class="font-headline-xl text-headline-xl text-primary uppercase font-bold">&gt; FREE AI TOOLS</h1>
+              <div class="font-terminal-log text-terminal-log text-surface bg-primary px-sm py-xs animate-pulse border border-primary font-bold shadow-[2px_2px_0px_0px_#444933]">
+                [13 TOOLS]
+              </div>
+            </div>
+            <p class="font-body-lg text-body-lg text-on-surface max-w-2xl">
+              Run the numbers. See the gaps. These tools show you exactly where your business leaks money—and how to fix it.
+            </p>
+          </div>
+        </section>
+
+        <!-- Real Estate Tools -->
+        <section class="animate-on-scroll">
+          <h2 class="font-headline-md text-headline-md text-primary uppercase mb-md flex items-center gap-sm">
+            <span class="material-symbols-outlined">apartment</span> REAL_ESTATE
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+            <a href="/tools/lead-leak-calculator" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">LEAD_LEAK_CALCULATOR</h3>
+              <p class="text-body-sm text-on-surface-variant">Find where leads drop out of your pipeline. See exactly how much revenue you lose monthly.</p>
+            </a>
+            <a href="/tools/viewing-optimizer" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">VIEWING_OPTIMIZER</h3>
+              <p class="text-body-sm text-on-surface-variant">Optimize viewing schedules for maximum conversions. Reduce no-shows and wasted trips.</p>
+            </a>
+            <a href="/tools/response-time-simulator" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">RESPONSE_TIME_SIMULATOR</h3>
+              <p class="text-body-sm text-on-surface-variant">See how response speed affects lead conversion. Simulate different response scenarios.</p>
+            </a>
+            <a href="/tools/property-market-pulse" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">PROPERTY_MARKET_PULSE</h3>
+              <p class="text-body-sm text-on-surface-variant">Track market movements and identify opportunities. Stay ahead of price shifts.</p>
+            </a>
+            <a href="/tools/commission-forecaster" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">COMMISSION_FORECASTER</h3>
+              <p class="text-body-sm text-on-surface-variant">Forecast commissions based on pipeline data. Plan your revenue with confidence.</p>
+            </a>
+          </div>
+        </section>
+
+        <!-- Tender Tools -->
+        <section class="animate-on-scroll">
+          <h2 class="font-headline-md text-headline-md text-primary uppercase mb-md flex items-center gap-sm">
+            <span class="material-symbols-outlined">description</span> TENDERS
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+            <a href="/tools/tender-leak-calculator" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">TENDER_LEAK_CALCULATOR</h3>
+              <p class="text-body-sm text-on-surface-variant">Find where you lose tenders. See win/loss ratios and identify improvement areas.</p>
+            </a>
+            <a href="/tools/tender-fit-score" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">TENDER_FIT_SCORE</h3>
+              <p class="text-body-sm text-on-surface-variant">Score tender fit before you bid. Stop wasting time on tenders you can't win.</p>
+            </a>
+            <a href="/tools/bid-roi-analyzer" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">BID_ROI_ANALYZER</h3>
+              <p class="text-body-sm text-on-surface-variant">Calculate ROI on bid efforts. Focus resources on high-value opportunities.</p>
+            </a>
+            <a href="/tools/deadline-drift-calculator" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">DEADLINE_DRIFT_CALCULATOR</h3>
+              <p class="text-body-sm text-on-surface-variant">Track deadline drift and its cost. See how delays impact your win rate.</p>
+            </a>
+            <a href="/tools/compliance-radar" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">COMPLIANCE_RADAR</h3>
+              <p class="text-body-sm text-on-surface-variant">Scan compliance gaps before submission. Never lose a tender on a technicality.</p>
+            </a>
+          </div>
+        </section>
+
+        <!-- Business Tools -->
+        <section class="animate-on-scroll">
+          <h2 class="font-headline-md text-headline-md text-primary uppercase mb-md flex items-center gap-sm">
+            <span class="material-symbols-outlined">business</span> BUSINESS
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+            <a href="/tools/automation-roi-calculator" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">AUTOMATION_ROI_CALCULATOR</h3>
+              <p class="text-body-sm text-on-surface-variant">Calculate ROI on automation. See time and cost savings from AI implementation.</p>
+            </a>
+            <a href="/tools/workflow-automator" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">WORKFLOW_AUTOMATOR</h3>
+              <p class="text-body-sm text-on-surface-variant">Identify automation opportunities in your workflows. Find the quick wins.</p>
+            </a>
+            <a href="/tools/ai-readiness-scanner" class="tool-card border border-outline-variant p-lg bg-surface-container-low block">
+              <h3 class="font-label-mono text-label-mono text-primary mb-sm">AI_READINESS_SCANNER</h3>
+              <p class="text-body-sm text-on-surface-variant">Assess your AI readiness. Get a roadmap for AI-native transformation.</p>
+            </a>
+          </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="animate-on-scroll">
+          <div class="border-2 border-primary p-xl bg-surface-container-low text-center">
+            <h2 class="font-headline-md text-headline-md text-primary uppercase mb-md">&gt; NEED HELP?</h2>
+            <p class="text-body-lg text-on-surface mb-lg">Run a tool. See the gap. Book a call to fix it.</p>
+            <a href="/pricing" class="inline-block bg-primary text-on-primary font-bold py-md px-xl text-body-sm uppercase tracking-widest hover:bg-primary-fixed-dim transition-colors">
+              VIEW PRICING →
+            </a>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Scroll animation observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    if (menuBtn) {
+      menuBtn.addEventListener('click', () => {
+        const nav = menuBtn.closest('div').nextElementSibling.querySelector('nav');
+        nav.classList.toggle('hidden');
+      });
+    }
+  </script>
+</body>
+</html>

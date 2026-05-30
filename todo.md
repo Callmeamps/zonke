@@ -21,11 +21,12 @@
 - [x] `tenders.html` — Tender Vault funnel
 - [x] `pricing.html` — Full pricing table
 - [ ] `booking.html` (optional — forms on vertical pages)
-- [ ] `audit-thanks.html` (optional — inline success)
+- [x] `audit-thanks.html` — Success page after audit submission
+- [x] `tools/index.html` — Tools landing page
 
 ### Components & Assets
 - [x] Sidebar navigation (reusable HTML snippet)
-- [x] Buttons / cards / form styles (Tailwind classes)
+- [x] Buttons / card / form styles (Tailwind classes)
 - [x] Canvas particle network (`assets/js/particles.js`)
 - [x] Scroll animations with motion.dev
 - [ ] GA4 integration snippet (add manually later)
@@ -39,11 +40,14 @@
 ### Tool Audit Issues (from TOOL_AUDIT_REPORT.md)
 
 #### P2 — Fix Now
-- [ ] `zonke-xi8` Extract tailwind.config to shared assets/js/tailwind-config.js
-- [ ] `zonke-8pv` Reorganize server.js route ordering
-- [ ] `zonke-2zw` Replace inline ZAR formatting with toolFormatZAR() in 2 tools
-- [ ] `zonke-o7i` Animate additional counters in compliance-radar and deadline-drift-calculator
-- [ ] `zonke-53k` Replace hardcoded inline hex colors with design token classes
+- [x] `zonke-xi8` Extract tailwind.config to shared assets/js/tailwind-config.js
+- [x] `zonke-8pv` Reorganize server.js route ordering
+- [x] `zonke-2zw` Replace inline ZAR formatting with toolFormatZAR() in 2 tools
+- [x] `zonke-o7i` Animate additional counters in compliance-radar and deadline-drift-calculator
+- [x] `zonke-53k` Replace hardcoded inline hex colors with design token classes
+- [x] `zonke-6t7` Add tools index page and sidebar nav
+- [x] `zonke-wkt` Add Free Tools section to tenders.html
+- [x] `zonke-138` Create audit-thanks.html page after successful audit submission
 
 #### P3 — Fix Next
 - [ ] `zonke-zlz` Decompose monolithic JS in commission-forecaster (tracer bullet)
@@ -56,3 +60,15 @@
   - `zonke-videos-mobile/brand-reel-mobile.mp4`
   - `zonke-videos-mobile-lead/lead-reactor-mobile.mp4`
   - `zonke-videos-mobile-tender/tender-vault-mobile.mp4`
+- [x] Fixed DESIGN.md color references (#CCFF00 → #c3f400)
+- [x] Made toolkit.js email gate text dynamic per tool
+- [x] Replaced rogue orange (#ff8c00 → #ff571c) in tender-leak-calculator
+- [x] Extracted tailwind.config to shared assets/js/tailwind-config.js (13 tools)
+- [x] Converted inline hex colors to Tailwind classes where possible
+- [x] Replaced inline ZAR formatting with toolFormatZAR()
+- [x] Added counter animations to compliance-radar and deadline-drift-calculator
+- [x] Reorganized server.js routes (pages → tools → fallback)
+- [x] Created tools index page with all 13 tools
+- [x] Added TOOLS link to sidebar navigation on all pages
+- [x] Added Free Tools section to tenders.html
+- [x] Created audit-thanks.html success page

@@ -45,12 +45,28 @@ function toolDelayedShow(el, delay) {
 }
 
 function toolShowEmailGate(toolId, results, onComplete) {
+  const reportNames = {
+    'lead-leak-calculator': 'Lead Leak Report',
+    'tender-leak-calculator': 'Tender Leak Report',
+    'compliance-radar': 'Compliance Report',
+    'deadline-drift-calculator': 'Deadline Drift Report',
+    'automation-roi-calculator': 'Automation ROI Report',
+    'workflow-automator': 'Workflow Report',
+    'commission-forecaster': 'Commission Forecast',
+    'viewing-scheduler': 'Viewing Schedule',
+    'lead-response-analyzer': 'Lead Response Report',
+    'listing-optimizer': 'Listing Report',
+    'property-valuation': 'Valuation Report',
+    'tenant-screening': 'Tenant Report',
+    'maintenance-tracker': 'Maintenance Report'
+  };
+  const reportName = reportNames[toolId] || 'Full Report';
   const overlay = document.createElement('div');
   overlay.className = 'fixed inset-0 z-50 flex items-center justify-center bg-surface/90 backdrop-blur-sm';
   overlay.innerHTML = `
     <div class="bg-surface-container border border-outline-variant p-xl max-w-md w-full mx-sm">
       <div class="text-primary font-bold text-headline-md mb-md">> UNLOCK YOUR REPORT</div>
-      <p class="text-on-surface-variant text-body-sm mb-lg">Enter your email to receive the full Lead Leak Report with personalized recommendations.</p>
+      <p class="text-on-surface-variant text-body-sm mb-lg">Enter your email to receive ${reportName} with personalized recommendations.</p>
       <div id="tool-gate-error" class="text-secondary-container text-body-sm mb-sm hidden">Please enter a valid email.</div>
       <form id="tool-gate-form">
         <input type="email" id="tool-gate-email" placeholder="your@email.com" required
