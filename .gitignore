@@ -10,6 +10,9 @@ build/
 .vscode/
 .idea/
 
+# Internal tools (not public site)
+internal/
+
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db
