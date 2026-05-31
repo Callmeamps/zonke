@@ -4,6 +4,7 @@ const path = require('path');
 const { handleAudit } = require('./lib/handleAudit');
 const { handleBooking } = require('./lib/handleBooking');
 const { handleToolSubmit } = require('./lib/handleToolSubmit');
+const { createAdminClient } = require('./lib/supabaseAdmin');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,7 +44,155 @@ app.post('/api/tool-submit', async (req, res) => {
   }
 });
 
+// Internal Auth
+app.post('/api/internal/verify', (req, res) => {
+  const { password } = req.body;
+  const validPassword = process.env.INTERNAL_PASSWORD || 'zonke2024';
+  if (password === validPassword) {
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ success: false });
+  }
+});
+
+// Internal Stats (Dashboard)
+app.get('/api/internal/stats', async (req, res) => {
+  try {
+    const client = createAdminClient();
+    
+    // Fetch all data
+    const [audits, bookings, toolSubmissions] = await Promise.all([
+      client.from('audits').select('*').order('created_at', { ascending: false }),
+      client.from('bookings').select('*').order('created_at', { ascending: false }),
+      client.from('tool_submissions').select('*').order('created_at', { ascending: false })
+    ]);
+
+    const auditsData = audits.data || [];
+    const bookingsData = bookings.data || [];
+    const toolsData = toolSubmissions.data || [];
+
+    // KPIs
+    const kpis = {
+      audits: {
+        total: auditsData.length,
+        byVertical: auditsData.reduce((acc, a) => {
+          acc[a.vertical] = (acc[a.vertical] || 0) + 1;
+          return acc;
+        }, {})
+      },
+      bookings: bookingsData.length,
+      tools: toolsData.length,
+      total: auditsData.length + bookingsData.length + toolsData.length
+    };
+
+    // 30-day submissions chart
+    const days = 30;
+    const labels = [];
+    const now = new Date();
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    }
+
+    const auditCounts = new Array(days).fill(0);
+    const bookingCounts = new Array(days).fill(0);
+    const toolCounts = new Array(days).fill(0);
+
+    const toDateKey = (d) => d.toISOString().split('T')[0];
+
+    auditsData.forEach(a => {
+      const idx = labels.findIndex(l => toDateKey(new Date(a.created_at)) === toDateKey(new Date(l)));
+      if (idx >= 0) auditCounts[idx]++;
+    });
+    bookingsData.forEach(b => {
+      const idx = labels.findIndex(l => toDateKey(new Date(b.created_at)) === toDateKey(new Date(l)));
+      if (idx >= 0) bookingCounts[idx]++;
+    });
+    toolsData.forEach(t => {
+      const idx = labels.findIndex(l => toDateKey(new Date(t.created_at)) === toDateKey(new Date(l)));
+      if (idx >= 0) toolCounts[idx]++;
+    });
+
+    // Tools by type
+    const toolsByType = toolsData.reduce((acc, t) => {
+      acc[t.tool_id] = (acc[t.tool_id] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Recent activity
+    const recent = [
+      ...auditsData.map(a => ({ type: 'audit', email: a.email, details: a.vertical, created_at: a.created_at })),
+      ...bookingsData.map(b => ({ type: 'booking', email: b.email, details: b.name, created_at: b.created_at })),
+      ...toolsData.map(t => ({ type: 'tool', email: t.email, details: t.tool_id, created_at: t.created_at }))
+    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 50);
+
+    res.json({
+      kpis,
+      charts: {
+        submissions: { labels, audits: auditCounts, bookings: bookingCounts, tools: toolCounts },
+        tools: toolsByType
+      },
+      recent
+    });
+  } catch (err) {
+    console.error('Stats error:', err);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
+// Internal: Get all audits
+app.get('/api/internal/audits', async (req, res) => {
+  try {
+    const client = createAdminClient();
+    const { data, error } = await client.from('audits').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error('Audits error:', err);
+    res.status(500).json({ error: 'Failed to fetch audits' });
+  }
+});
+
+// Internal: Get all bookings
+app.get('/api/internal/bookings', async (req, res) => {
+  try {
+    const client = createAdminClient();
+    const { data, error } = await client.from('bookings').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error('Bookings error:', err);
+    res.status(500).json({ error: 'Failed to fetch bookings' });
+  }
+});
+
+// Internal: Get all tool submissions
+app.get('/api/internal/tool-submissions', async (req, res) => {
+  try {
+    const client = createAdminClient();
+    const { data, error } = await client.from('tool_submissions').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error('Tool submissions error:', err);
+    res.status(500).json({ error: 'Failed to fetch tool submissions' });
+  }
+});
+
 // Page Routes
+app.get('/internal', (req, res) => {
+  res.sendFile(path.join(__dirname, 'internal', 'index.html'));
+});
+
+app.get('/internal/dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'internal', 'dashboard.html'));
+});
+
+app.get('/internal/leads.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'internal', 'leads.html'));
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

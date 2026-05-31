@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zonke Internal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#0a0a0a',
+            primary: '#c3f400',
+            secondary: '#1478db',
+            error: '#ff3b30',
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #0a0a0a; color: #fff; font-family: 'JetBrains Mono', monospace; }
+    .glitch:hover { animation: glitch 0.3s infinite; }
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 #c3f400, -2px 0 #ff3b30; }
+      50% { text-shadow: -2px 0 #c3f400, 2px 0 #ff3b30; }
+      100% { text-shadow: 2px 0 #c3f400, -2px 0 #ff3b30; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-primary glitch mb-2">ZONKE</h1>
+      <p class="text-gray-500 text-sm">INTERNAL ACCESS</p>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label class="block text-xs text-gray-500 mb-1 uppercase tracking-wider">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          class="w-full bg-surface border-2 border-gray-700 px-4 py-3 text-white placeholder-gray-600 focus:border-primary focus:outline-none transition-colors"
+          placeholder="Enter access password"
+          autocomplete="current-password"
+        >
+      </div>
+      <button 
+        type="submit" 
+        class="w-full bg-primary text-surface font-bold py-3 px-4 hover:bg-opacity-90 transition-all uppercase tracking-wider"
+      >
+        ACCESS
+      </button>
+      <p id="errorMsg" class="text-error text-sm text-center hidden">ACCESS DENIED</p>
+    </form>
+
+    <!-- Loading -->
+    <div id="loading" class="hidden text-center py-4">
+      <div class="inline-block w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('errorMsg');
+    const loading = document.getElementById('loading');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+
+      loading.classList.remove('hidden');
+      form.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/internal/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          sessionStorage.setItem('zonke_auth', '1');
+          window.location.href = '/internal/dashboard.html';
+        } else {
+          errorMsg.classList.remove('hidden');
+          loading.classList.add('hidden');
+          form.classList.remove('hidden');
+          document.getElementById('password').value = '';
+        }
+      } catch (err) {
+        errorMsg.textContent = 'CONNECTION ERROR';
+        errorMsg.classList.remove('hidden');
+        loading.classList.add('hidden');
+        form.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

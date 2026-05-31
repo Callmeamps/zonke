@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Zonke Internal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#0a0a0a',
+            primary: '#c3f400',
+            secondary: '#1478db',
+            error: '#ff3b30',
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #0a0a0a; color: #fff; font-family: 'JetBrains Mono', monospace; }
+    .card { background: #111; border: 1px solid #222; }
+    .stat-up { color: #c3f400; }
+    .stat-down { color: #ff3b30; }
+    canvas { max-width: 100%; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Header -->
+  <header class="border-b border-gray-800 px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <a href="/internal/dashboard.html" class="text-2xl font-bold text-primary">ZONKE</a>
+        <span class="text-gray-500 text-sm ml-2">INTERNAL DASHBOARD</span>
+      </div>
+      <nav class="flex items-center gap-6">
+        <a href="/internal/dashboard.html" class="text-primary hover:underline">DASHBOARD</a>
+        <a href="/internal/leads.html" class="text-gray-400 hover:text-white transition-colors">LEADS</a>
+        <button id="logoutBtn" class="text-gray-500 hover:text-error transition-colors">LOGOUT</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="p-6">
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="card p-4">
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Audits</p>
+        <p id="kpi-audits" class="text-3xl font-bold text-primary">-</p>
+        <p class="text-xs text-gray-600 mt-1">Real Estate: <span id="kpi-audits-re">0</span> | Tenders: <span id="kpi-audits-td">0</span></p>
+      </div>
+      <div class="card p-4">
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Bookings</p>
+        <p id="kpi-bookings" class="text-3xl font-bold text-primary">-</p>
+        <p class="text-xs text-gray-600 mt-1">Consultation requests</p>
+      </div>
+      <div class="card p-4">
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Tool Submissions</p>
+        <p id="kpi-tools" class="text-3xl font-bold text-primary">-</p>
+        <p class="text-xs text-gray-600 mt-1">Email gated leads</p>
+      </div>
+      <div class="card p-4">
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Leads</p>
+        <p id="kpi-total" class="text-3xl font-bold text-primary">-</p>
+        <p class="text-xs text-gray-600 mt-1">All sources combined</p>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Submissions Over Time -->
+      <div class="card p-4">
+        <h3 class="text-sm font-bold mb-4 uppercase tracking-wider">Submissions (Last 30 Days)</h3>
+        <canvas id="submissionsChart" height="200"></canvas>
+      </div>
+      <!-- Tool Performance -->
+      <div class="card p-4">
+        <h3 class="text-sm font-bold mb-4 uppercase tracking-wider">Tool Submissions by Tool</h3>
+        <canvas id="toolsChart" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card p-4">
+      <h3 class="text-sm font-bold mb-4 uppercase tracking-wider">Recent Submissions</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-500 border-b border-gray-800">
+              <th class="pb-2 font-medium">Type</th>
+              <th class="pb-2 font-medium">Email</th>
+              <th class="pb-2 font-medium">Details</th>
+              <th class="pb-2 font-medium">Date</th>
+            </tr>
+          </thead>
+          <tbody id="recentTable">
+            <tr><td colspan="4" class="py-4 text-gray-500">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Auth check
+    if (!sessionStorage.getItem('zonke_auth')) {
+      window.location.href = '/internal/index.html';
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('zonke_auth');
+      window.location.href = '/internal/index.html';
+    });
+
+    // Fetch data
+    async function fetchData() {
+      const res = await fetch('/api/internal/stats', {
+        headers: { 'X-Auth': '1' }
+      });
+      return res.json();
+    }
+
+    async function init() {
+      const data = await fetchData();
+
+      // KPIs
+      document.getElementById('kpi-audits').textContent = data.kpis.audits.total;
+      document.getElementById('kpi-audits-re').textContent = data.kpis.audits.byVertical.real_estate || 0;
+      document.getElementById('kpi-audits-td').textContent = data.kpis.audits.byVertical.tenders || 0;
+      document.getElementById('kpi-bookings').textContent = data.kpis.bookings;
+      document.getElementById('kpi-tools').textContent = data.kpis.tools;
+      document.getElementById('kpi-total').textContent = data.kpis.total;
+
+      // Submissions chart
+      const subCtx = document.getElementById('submissionsChart').getContext('2d');
+      new Chart(subCtx, {
+        type: 'line',
+        data: {
+          labels: data.charts.submissions.labels,
+          datasets: [
+            {
+              label: 'Audits',
+              data: data.charts.submissions.audits,
+              borderColor: '#c3f400',
+              backgroundColor: 'rgba(195, 244, 0, 0.1)',
+              fill: true,
+              tension: 0.3
+            },
+            {
+              label: 'Bookings',
+              data: data.charts.submissions.bookings,
+              borderColor: '#1478db',
+              backgroundColor: 'rgba(20, 120, 219, 0.1)',
+              fill: true,
+              tension: 0.3
+            },
+            {
+              label: 'Tools',
+              data: data.charts.submissions.tools,
+              borderColor: '#ff3b30',
+              backgroundColor: 'rgba(255, 59, 48, 0.1)',
+              fill: true,
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: '#666' } } },
+          scales: {
+            x: { grid: { color: '#222' }, ticks: { color: '#666' } },
+            y: { grid: { color: '#222' }, ticks: { color: '#666' } }
+          }
+        }
+      });
+
+      // Tools chart
+      const toolsCtx = document.getElementById('toolsChart').getContext('2d');
+      const toolLabels = Object.keys(data.charts.tools);
+      const toolValues = Object.values(data.charts.tools);
+      new Chart(toolsCtx, {
+        type: 'bar',
+        data: {
+          labels: toolLabels.map(l => l.replace(/-/g, ' ').slice(0, 15)),
+          datasets: [{
+            label: 'Submissions',
+            data: toolValues,
+            backgroundColor: '#c3f400',
+            borderColor: '#c3f400',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          indexAxis: 'y',
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#222' }, ticks: { color: '#666' } },
+            y: { grid: { display: false }, ticks: { color: '#999' } }
+          }
+        }
+      });
+
+      // Recent table
+      const tbody = document.getElementById('recentTable');
+      tbody.innerHTML = data.recent.slice(0, 10).map(r => `
+        <tr class="border-b border-gray-800">
+          <td class="py-2"><span class="px-2 py-0.5 text-xs rounded ${
+            r.type === 'audit' ? 'bg-primary/20 text-primary' :
+            r.type === 'booking' ? 'bg-secondary/20 text-secondary' :
+            'bg-error/20 text-error'
+          }">${r.type.toUpperCase()}</span></td>
+          <td class="py-2 text-gray-300">${r.email}</td>
+          <td class="py-2 text-gray-500">${r.details || '-'}</td>
+          <td class="py-2 text-gray-500">${new Date(r.created_at).toLocaleDateString()}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Simple chart lib (vanilla)
+    class Chart {
+      constructor(ctx, config) {
+        this.ctx = ctx;
+        this.config = config;
+        this.draw();
+      }
+      draw() {
+        const canvas = this.ctx.canvas;
+        const w = canvas.width = canvas.offsetWidth * 2;
+        const h = canvas.height = canvas.offsetHeight * 2;
+        this.ctx.scale(2, 2);
+        const cw = canvas.offsetWidth;
+        const ch = canvas.offsetHeight;
+        const data = this.config.data;
+        const isHorizontal = this.config.options?.indexAxis === 'y';
+
+        if (this.config.type === 'line') {
+          this.drawLine(cw, ch, data);
+        } else if (this.config.type === 'bar') {
+          this.drawBar(cw, ch, data, isHorizontal);
+        }
+      }
+      drawLine(cw, ch, data) {
+        const ctx = this.ctx;
+        const labels = data.labels;
+        const maxVal = Math.max(...data.datasets.flatMap(d => d.data), 1);
+        const padding = 30;
+        const chartW = cw - padding * 2;
+        const chartH = ch - padding * 2;
+
+        data.datasets.forEach(dataset => {
+          ctx.beginPath();
+          ctx.strokeStyle = dataset.borderColor;
+          ctx.lineWidth = 2;
+          dataset.data.forEach((val, i) => {
+            const x = padding + (i / (labels.length - 1)) * chartW;
+            const y = ch - padding - (val / maxVal) * chartH;
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+
+          // Fill
+          ctx.lineTo(padding + chartW, ch - padding);
+          ctx.lineTo(padding, ch - padding);
+          ctx.closePath();
+          ctx.fillStyle = dataset.backgroundColor;
+          ctx.fill();
+        });
+      }
+      drawBar(cw, ch, data, horizontal) {
+        const ctx = this.ctx;
+        const labels = data.labels;
+        const values = data.data;
+        const maxVal = Math.max(...values, 1);
+        const padding = 30;
+        const chartW = cw - padding * 2;
+        const chartH = ch - padding * 2;
+        const barHeight = Math.min(20, chartH / values.length - 4);
+
+        values.forEach((val, i) => {
+          const barW = (val / maxVal) * (horizontal ? chartW : chartW);
+          const y = padding + i * (chartH / values.length) + (chartH / values.length - barHeight) / 2;
+          const x = horizontal ? padding : padding;
+          const w = horizontal ? barW : chartW / values.length - 4;
+          const h = horizontal ? barHeight : barH - padding - (val / maxVal) * chartH;
+          const barX = horizontal ? x : x + i * (chartW / values.length) + 2;
+
+          ctx.fillStyle = data.datasets[0].backgroundColor;
+          if (horizontal) {
+            ctx.fillRect(y, padding, barW, barHeight);
+          } else {
+            ctx.fillRect(barX, ch - padding - (val / maxVal) * chartH, (chartW / values.length) - 4, (val / maxVal) * chartH);
+          }
+        });
+      }
+    }
+
+    // Simpler chart approach using basic drawing
+    class SimpleChart {
+      constructor(canvasId, data, type = 'bar') {
+        this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) return;
+        this.ctx = this.canvas.getContext('2d');
+        this.data = data;
+        this.type = type;
+        this.draw();
+      }
+      draw() {
+        const canvas = this.canvas;
+        const w = canvas.width = canvas.offsetWidth;
+        const h = canvas.height = canvas.offsetHeight;
+        const ctx = this.ctx;
+        const padding = 40;
+
+        if (this.type === 'bar') {
+          const labels = this.data.labels;
+          const values = this.data.values;
+          const maxVal = Math.max(...values, 1);
+          const barW = (w - padding * 2) / labels.length - 8;
+
+          ctx.fillStyle = '#c3f400';
+          values.forEach((val, i) => {
+            const barH = (val / maxVal) * (h - padding * 2);
+            const x = padding + i * ((w - padding * 2) / labels.length) + 4;
+            const y = h - padding - barH;
+            ctx.fillRect(x, y, barW, barH);
+          });
+
+          // Labels
+          ctx.fillStyle = '#666';
+          ctx.font = '10px JetBrains Mono';
+          ctx.textAlign = 'center';
+          labels.forEach((label, i) => {
+            const x = padding + i * ((w - padding * 2) / labels.length) + (w - padding * 2) / labels.length / 2;
+            ctx.fillText(label, x, h - 10);
+          });
+        }
+      }
+    }
+
+    init().catch(console.error);
+  </script>
+</body>
+</html>

@@ -72,3 +72,10 @@
 - [x] Added TOOLS link to sidebar navigation on all pages
 - [x] Added Free Tools section to tenders.html
 - [x] Created audit-thanks.html success page
+
+### Internal Tools
+- [x] Login page (`/internal/index.html`)
+- [x] Dashboard with KPIs and charts (`/internal/dashboard.html`)
+- [x] Lead viewer with tabs, filters, pagination (`/internal/leads.html`)
+- [x] Internal API routes (verify, stats, audits, bookings, tool-submissions)
+- [x] Password auth via INTERNAL_PASSWORD env var
