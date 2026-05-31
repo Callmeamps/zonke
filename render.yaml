@@ -5,6 +5,15 @@ services:
     buildCommand: npm install
     startCommand: node server.js
     plan: free
-    region: frankfurt  # Adjust as needed
-    # Environment variables should be set in Render dashboard:
-    # SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+    region: frankfurt
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        sync: false
+      - key: RESEND_REPLY_TO
+        sync: false

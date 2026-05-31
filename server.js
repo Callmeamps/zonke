@@ -76,6 +76,10 @@ app.get('/audit-thanks', (req, res) => {
   res.sendFile(path.join(__dirname, 'audit-thanks.html'));
 });
 
+app.get('/booking-thanks', (req, res) => {
+  res.sendFile(path.join(__dirname, 'booking-thanks.html'));
+});
+
 app.get('/tools', (req, res) => {
   res.sendFile(path.join(__dirname, 'tools', 'index.html'));
 });
