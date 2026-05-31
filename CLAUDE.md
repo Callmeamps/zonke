@@ -62,7 +62,25 @@ _Add your build and test commands here_
 
 ## Architecture Overview
 
-_Add a brief overview of your project architecture_
+Zonke has three main areas:
+1. **Public site** (`/`, `/real-estate`, `/tenders`, `/pricing`) — marketing funnels
+2. **Lead magnet tools** (`/tools/*.html`) — 13 tools with email gate
+3. **Internal admin** (`/internal/`) — auth-protected dashboard and lead viewer
+
+## Internal Tools
+
+| Route | Purpose |
+|-------|---------|
+| `/internal` | Login page (password: `zonke2024` or `INTERNAL_PASSWORD` env var) |
+| `/internal/dashboard.html` | KPI dashboard — audits, bookings, tools, charts |
+| `/internal/leads.html` | Lead viewer — tabbed (audits/bookings/tools), filterable, paginated |
+
+Internal API:
+- `POST /api/internal/verify` — auth check
+- `GET /api/internal/stats` — dashboard data
+- `GET /api/internal/audits` — all audits
+- `GET /api/internal/bookings` — all bookings
+- `GET /api/internal/tool-submissions` — all tool submissions
 
 ## Conventions & Patterns
 
